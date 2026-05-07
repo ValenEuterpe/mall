@@ -13,7 +13,6 @@ import { logger } from "@/lib/utils/logger";
 import type { UserRole, RefreshErrorCode } from "@/types/auth";
 
 const config = AUTH_CONFIG.tokenRefresh;
-const cookieConfig = AUTH_CONFIG.cookies;
 
 // ============================================================================
 // TYPES
@@ -395,48 +394,11 @@ export async function refreshSession(
 // ============================================================================
 // COOKIE HELPERS
 // ============================================================================
+// Re-exported from @/lib/auth/cookies for backward compatibility. Edge code
+// (middleware) should import directly from there to avoid pulling Prisma.
 
-/**
- * Get cookie options for access token
- */
-export function getAccessTokenCookieOptions(): {
-  httpOnly: boolean;
-  secure: boolean;
-  sameSite: "lax" | "strict" | "none";
-  path: string;
-  maxAge: number;
-} {
-  return {
-    ...cookieConfig.base,
-    maxAge: 15 * 60, // 15 minutes
-  };
-}
-
-/**
- * Get cookie options for refresh token
- */
-export function getRefreshTokenCookieOptions(): {
-  httpOnly: boolean;
-  secure: boolean;
-  sameSite: "lax" | "strict" | "none";
-  path: string;
-  maxAge: number;
-} {
-  return {
-    ...cookieConfig.base,
-    maxAge: 7 * 24 * 60 * 60, // 7 days
-  };
-}
-
-/**
- * Get cookie options for clearing tokens
- */
-export function getClearCookieOptions(): {
-  httpOnly: boolean;
-  secure: boolean;
-  sameSite: "lax" | "strict" | "none";
-  path: string;
-  maxAge: number;
-} {
-  return cookieConfig.clear;
-}
+export {
+  getAccessTokenCookieOptions,
+  getRefreshTokenCookieOptions,
+  getClearCookieOptions,
+} from "@/lib/auth/cookies";

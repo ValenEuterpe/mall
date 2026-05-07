@@ -206,7 +206,6 @@ export default function SellerShopEditPage(): React.ReactElement {
               <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-lg border bg-muted">
                 {imageUrl ? (
                   <>
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={imageUrl} alt={t("shopImage")} className="h-full w-full object-cover" />
                     <button
                       type="button"
@@ -288,7 +287,6 @@ export default function SellerShopEditPage(): React.ReactElement {
           <CardContent className="space-y-4">
             {SOCIAL_PLATFORMS.map((platform) => (
               <div key={platform.type} className="flex items-center gap-3">
-                {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   src={platform.icon}
                   alt={platform.label}

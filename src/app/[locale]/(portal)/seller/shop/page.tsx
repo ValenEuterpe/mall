@@ -176,7 +176,6 @@ export default function SellerShopPage(): React.ReactElement {
           <div className="flex items-center gap-4">
             <div className="bg-muted h-16 w-16 shrink-0 overflow-hidden rounded-lg">
               {shopDetail?.imageUrl ? (
-                /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={shopDetail.imageUrl}
                   alt=""

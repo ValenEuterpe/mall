@@ -242,7 +242,7 @@ export const LeafletMapView = memo(function LeafletMapView({
     }
 
     return cleanupFn;
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // Center map when center changes (single-building mode only)
   useEffect(() => {

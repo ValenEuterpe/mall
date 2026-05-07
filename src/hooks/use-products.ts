@@ -286,7 +286,6 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
       pagination.goToPage(1);
     }
     filtersKeyRef.current = filtersKey;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtersKey]);
 
   const fetchProducts = useCallback(

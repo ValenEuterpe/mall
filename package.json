@@ -14,8 +14,6 @@
     "db:deploy": "prisma migrate deploy",
     "db:seed": "tsx prisma/seed.ts",
     "db:studio": "prisma studio",
-    "test": "jest",
-    "test:watch": "jest --watch",
     "test:e2e": "playwright test",
     "type-check": "tsc --noEmit"
   },

@@ -160,7 +160,6 @@ export function useShops(options: UseShopsOptions = {}): UseShopsReturn {
       pagination.goToPage(1);
     }
     filtersKeyRef.current = filtersKey;
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [filtersKey]);
 
   const fetchShops = useCallback(

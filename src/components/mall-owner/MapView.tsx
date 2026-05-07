@@ -280,7 +280,7 @@ export function MapView({
       map.remove();
       mapRef.current = null;
     };
-  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+  }, []);
 
   // Center map on initial mount only
   const initialCenterDoneRef = useRef(false);

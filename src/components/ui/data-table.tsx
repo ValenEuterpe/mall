@@ -529,7 +529,6 @@ export function DataTable<TData, TValue>({
   const selectedRows = React.useMemo(
     () => table.getFilteredSelectedRowModel().rows.map((row) => row.original),
     // TanStack table selection model depends on rowSelection state.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
     [rowSelection]
   );
 

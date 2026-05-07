@@ -109,7 +109,6 @@ export const SelectedProductsSheet = memo(function SelectedProductsSheet() {
               {products.map((p) => (
                 <Card key={p.id} className="flex items-center gap-3 p-2">
                   <div className="h-14 w-14 overflow-hidden rounded-md bg-muted">
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
                     <img src={p.images?.[0] || ""} alt={p.name} className="h-full w-full object-cover" />
                   </div>
 

@@ -402,7 +402,6 @@ export const ShopDetailClient = memo(function ShopDetailClient({
 
     const timer = setTimeout(() => handleShopClick(shop.svgId!), 400);
     return () => clearTimeout(timer);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [shop?.svgId, globalLoading, mapBuildings.length]);
 
   // ---- Infinite scroll for products ----
@@ -495,7 +494,6 @@ export const ShopDetailClient = memo(function ShopDetailClient({
           <div className="flex flex-col gap-4 md:flex-row">
             <div className="bg-muted h-40 w-full overflow-hidden rounded-md md:h-40 md:w-72">
               {(shop.imageUrl || shop.seller?.logoUrl) && (
-                /* eslint-disable-next-line @next/next/no-img-element */
                 <img
                   src={shop.imageUrl ?? shop.seller?.logoUrl ?? ""}
                   alt={title}
@@ -573,7 +571,6 @@ export const ShopDetailClient = memo(function ShopDetailClient({
                   const content = (
                     <span className="inline-flex items-center gap-2 rounded-md border px-3 py-1.5 text-sm">
                       {social ? (
-                        /* eslint-disable-next-line @next/next/no-img-element */
                         <img
                           src={social.icon}
                           alt={social.label}

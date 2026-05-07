@@ -150,7 +150,6 @@ function FilePreview({
       <div className="flex-shrink-0">
         {showPreview && isImage && file.previewUrl ? (
           <div className="h-12 w-12 overflow-hidden rounded bg-muted">
-            {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={file.previewUrl} alt={file.name} className="h-full w-full object-cover" />
           </div>
         ) : (
@@ -239,7 +238,6 @@ export function FileUpload({
       }
     };
     // We only want a final cleanup on unmount.
-    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   const validateFile = React.useCallback(
@@ -447,7 +445,6 @@ export function FileUpload({
           onClick={() => !disabled && fileInputRef.current?.click()}
         >
           {hasImage ? (
-            // eslint-disable-next-line @next/next/no-img-element
             <img
               src={currentFile?.previewUrl || currentFile?.url}
               alt="Avatar"
