@@ -1,0 +1,368 @@
+"use client";
+
+import React, { useCallback, useEffect, useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
+import { Plus, Trash2, Loader2, Package } from "lucide-react";
+
+import {
+  apiClient,
+  type ApiResponse,
+  type PaginationMeta,
+} from "@/lib/api-client";
+import { useRequireRole } from "@/hooks/use-auth";
+import { Link, useRouter } from "@/i18n/routing";
+import { toast } from "@/lib/utils/toast";
+
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from "@/components/ui/dialog";
+import {
+  SellerProductCard,
+  SellerProductCardSkeleton,
+} from "@/components/seller";
+import { ProductDetailModal } from "@/components/products/ProductDetailModal";
+
+type SellerProductListItem = {
+  id: string;
+  name: string;
+  description?: string | null;
+  images: string[];
+  pricing: { basePrice: number };
+  inventory: {
+    stockQuantity: number;
+    sku: string | null;
+    barcode: string | null;
+  };
+  status: string;
+  isActive: boolean;
+  timestamps: { updatedAt: string | Date | null };
+  discounts?: Array<{
+    id: string;
+    name: string;
+    name_en?: string | null;
+    name_ru?: string | null;
+    name_am?: string | null;
+    discountType: "percentage" | "fixed";
+    discountValue: number;
+    startDate: string | null;
+    endDate: string | null;
+    isActive: boolean;
+  }>;
+  category: null | {
+    id: string;
+    name: { en: string | null; ru: string | null };
+  };
+  subcategory: null | {
+    id: string;
+    name: { en: string | null; ru: string | null };
+  };
+};
+
+function isSuccess<T>(
+  res: ApiResponse<T>
+): res is { success: true; data: T; meta?: PaginationMeta } {
+  return res?.success === true;
+}
+
+export default function SellerProductsPage(): React.ReactElement {
+  const t = useTranslations("portal.sellerProducts");
+  const tSeller = useTranslations("seller.products");
+  const router = useRouter();
+  const { isAuthorized, isLoading: isAuthLoading } = useRequireRole(
+    "SELLER",
+    "/unauthorized"
+  );
+
+  const [q, setQ] = useState("");
+  const [page, setPage] = useState(1);
+  const [limit] = useState(12);
+
+  const [items, setItems] = useState<SellerProductListItem[]>([]);
+  const [meta, setMeta] = useState<PaginationMeta | null>(null);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
+  const [productToDelete, setProductToDelete] =
+    useState<SellerProductListItem | null>(null);
+  const [isDeleting, setIsDeleting] = useState(false);
+
+  const [selectedProductId, setSelectedProductId] = useState<string | null>(
+    null
+  );
+  const [detailModalOpen, setDetailModalOpen] = useState(false);
+
+  const fetchProducts = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const res = await apiClient.get<SellerProductListItem[]>(
+        "/sellers/products",
+        {
+          q: q || undefined,
+          page,
+          limit,
+          sort: "lastUpdated:desc",
+        }
+      );
+
+      if (isSuccess(res)) {
+        setItems(res.data);
+        setMeta(res.meta ?? null);
+      }
+    } catch (e: any) {
+      setError(e?.message ?? t("errors.loadFailed"));
+    } finally {
+      setIsLoading(false);
+    }
+  }, [limit, page, q, t]);
+
+  const handleDeleteClick = (product: SellerProductListItem) => {
+    setProductToDelete(product);
+    setDeleteDialogOpen(true);
+  };
+
+  const handleDeleteConfirm = async () => {
+    if (!productToDelete) return;
+
+    setIsDeleting(true);
+    try {
+      const res = await apiClient.delete(
+        `/sellers/products/${productToDelete.id}`
+      );
+      if (res.success) {
+        toast.success(tSeller("deleteSuccess"));
+        void fetchProducts();
+      } else {
+        toast.error(tSeller("deleteFailed"));
+      }
+    } catch (e: any) {
+      toast.error(e?.message || tSeller("deleteFailed"));
+    } finally {
+      setIsDeleting(false);
+      setDeleteDialogOpen(false);
+      setProductToDelete(null);
+    }
+  };
+
+  const handleShowDetails = useCallback((productId: string) => {
+    setSelectedProductId(productId);
+    setDetailModalOpen(true);
+  }, []);
+
+  const handleCloseDetailModal = useCallback(() => {
+    setDetailModalOpen(false);
+    setSelectedProductId(null);
+  }, []);
+
+  const handleEditProduct = useCallback(
+    (productId: string) => {
+      router.push(`/seller/products/${productId}/edit`);
+    },
+    [router]
+  );
+
+  useEffect(() => {
+    if (!isAuthorized) return;
+    void fetchProducts();
+  }, [fetchProducts, isAuthorized]);
+
+  const headerActions = useMemo(() => {
+    return (
+      <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-1">
+          <h1 className="text-2xl font-bold">{t("title")}</h1>
+          <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
+        </div>
+
+        <div className="flex flex-wrap items-center gap-2">
+          <Button asChild variant="secondary">
+            <Link href="/seller/products/import">{t("actions.import")}</Link>
+          </Button>
+          <Button asChild variant="secondary">
+            <Link href="/seller/products/export">{t("actions.export")}</Link>
+          </Button>
+          <Button asChild>
+            <Link href="/seller/products/new">
+              <Plus className="mr-2 h-4 w-4" />
+              {tSeller("addProduct")}
+            </Link>
+          </Button>
+        </div>
+      </div>
+    );
+  }, [t, tSeller]);
+
+  if (isAuthLoading) return <div className="p-6">{t("loading")}</div>;
+  if (!isAuthorized) return <></>;
+
+  return (
+    <div className="container mx-auto max-w-6xl space-y-4 py-6">
+      {headerActions}
+
+      <Card>
+        <CardHeader className="gap-3 sm:flex-row sm:items-center sm:justify-between">
+          <CardTitle className="text-base">{t("filters.title")}</CardTitle>
+          <div className="flex w-full flex-col gap-2 sm:w-auto sm:flex-row sm:items-center">
+            <Input
+              value={q}
+              onChange={(e) => {
+                setQ(e.target.value);
+                setPage(1);
+              }}
+              placeholder={t("filters.searchPlaceholder")}
+              className="sm:w-[280px]"
+            />
+            <Button onClick={fetchProducts} disabled={isLoading}>
+              {t("actions.refresh")}
+            </Button>
+          </div>
+        </CardHeader>
+        <CardContent>
+          {error ? (
+            <p className="text-destructive mb-4 text-sm">{error}</p>
+          ) : null}
+
+          {isLoading ? (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {Array.from({ length: 6 }).map((_, i) => (
+                <SellerProductCardSkeleton key={i} />
+              ))}
+            </div>
+          ) : items.length === 0 ? (
+            <div className="flex flex-col items-center justify-center py-12 text-center">
+              <Package className="text-muted-foreground/50 h-12 w-12" />
+              <h3 className="mt-4 text-lg font-semibold">{t("empty")}</h3>
+              <p className="text-muted-foreground mt-1 text-sm">
+                {t("emptyDescription")}
+              </p>
+              <Button asChild className="mt-4">
+                <Link href="/seller/products/new">
+                  <Plus className="mr-2 h-4 w-4" />
+                  {tSeller("addProduct")}
+                </Link>
+              </Button>
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+              {items.map((p) => (
+                <SellerProductCard
+                  key={p.id}
+                  product={{
+                    id: p.id,
+                    name: p.name,
+                    description: p.description,
+                    basePrice: p.pricing.basePrice,
+                    stockQuantity: p.inventory.stockQuantity,
+                    images: p.images,
+                    isActive: p.isActive,
+                    status: p.status,
+                    sku: p.inventory.sku ?? undefined,
+                    discounts: p.discounts,
+                    category: p.category,
+                    subcategory: p.subcategory,
+                  }}
+                  onShowDetails={() => handleShowDetails(p.id)}
+                  onEdit={() => handleEditProduct(p.id)}
+                />
+              ))}
+            </div>
+          )}
+
+          {meta ? (
+            <div className="mt-4 flex items-center justify-between gap-3">
+              <p className="text-muted-foreground text-xs">
+                {t("pagination", {
+                  page: meta.page,
+                  totalPages: meta.totalPages,
+                  total: meta.total,
+                })}
+              </p>
+              <div className="flex items-center gap-2">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => Math.max(1, p - 1))}
+                  disabled={isLoading || !meta.hasPrevious}
+                >
+                  {t("actions.prev")}
+                </Button>
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => setPage((p) => p + 1)}
+                  disabled={isLoading || !meta.hasMore}
+                >
+                  {t("actions.next")}
+                </Button>
+              </div>
+            </div>
+          ) : null}
+        </CardContent>
+      </Card>
+
+      {/* Delete Confirmation Dialog */}
+      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
+        <DialogContent>
+          <DialogHeader>
+            <DialogTitle>{tSeller("deleteDialog.title")}</DialogTitle>
+            <DialogDescription>
+              {tSeller("deleteDialog.description", {
+                name: productToDelete?.name || "",
+              })}
+            </DialogDescription>
+          </DialogHeader>
+          <DialogFooter>
+            <Button
+              variant="outline"
+              onClick={() => setDeleteDialogOpen(false)}
+              disabled={isDeleting}
+            >
+              {tSeller("deleteDialog.cancel")}
+            </Button>
+            <Button
+              variant="destructive"
+              onClick={handleDeleteConfirm}
+              disabled={isDeleting}
+            >
+              {isDeleting ? (
+                <>
+                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
+                  {tSeller("deleteDialog.deleting")}
+                </>
+              ) : (
+                <>
+                  <Trash2 className="mr-2 h-4 w-4" />
+                  {tSeller("deleteDialog.confirm")}
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+      {/* Product Detail Modal */}
+      <ProductDetailModal
+        productId={selectedProductId}
+        isOpen={detailModalOpen}
+        onClose={handleCloseDetailModal}
+        context="seller"
+        onEdit={() => {
+          if (selectedProductId) {
+            handleEditProduct(selectedProductId);
+            handleCloseDetailModal();
+          }
+        }}
+      />
+    </div>
+  );
+}

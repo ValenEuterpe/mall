@@ -1,0 +1,75 @@
+{
+  "food": {
+    "name": "Սնունդ և մթերք",
+    "subcategories": {
+      "fruits_vegetables": "Մրգեր և բանջարեղեն",
+      "meat_poultry": "Միս և թռչնամիս",
+      "dairy": "Կաթնամթերք",
+      "bakery": "Հացաբուլկեղեն",
+      "beverages": "Ըմպելիքներ",
+      "snacks": "Նախուտեստներ և հրուշակեղեն",
+      "canned_goods": "Պահածոներ",
+      "spices_seasonings": "Համեմունքներ",
+      "grains_cereals": "Հացահատիկներ և ձավարեղեն",
+      "frozen_food": "Սառեցված մթերք"
+    }
+  },
+  "clothing": {
+    "name": "Հագուստ",
+    "subcategories": {
+      "mens_clothing": "Տղամարդու հագուստ",
+      "womens_clothing": "Կանացի հագուստ",
+      "childrens_clothing": "Մանկական հագուստ",
+      "footwear": "Կոշկեղեն",
+      "accessories": "Աքսեսուարներ"
+    }
+  },
+  "electronics": {
+    "name": "Էլեկտրոնիկա",
+    "subcategories": {
+      "phones_tablets": "Հեռախոսներ և պլանշետներ",
+      "computers_laptops": "Համակարգիչներ և նոութբուքեր",
+      "audio_video": "Աուդիո և վիդեո",
+      "cables_accessories": "Մալուխներ և աքսեսուարներ",
+      "home_appliances": "Կենցաղային տեխնիկա"
+    }
+  },
+  "household": {
+    "name": "Տուն և կենցաղ",
+    "subcategories": {
+      "cleaning_supplies": "Մաքրող միջոցներ",
+      "kitchenware": "Խոհանոցային սպասք",
+      "bathroom": "Լոգասենյակի պարագաներ",
+      "storage_organization": "Պահպանում և կազմակերպում",
+      "home_decor": "Տան դեկոր"
+    }
+  },
+  "health_beauty": {
+    "name": "Առողջություն և գեղեցկություն",
+    "subcategories": {
+      "skincare": "Մաշկի խնամք",
+      "haircare": "Մազերի խնամք",
+      "personal_care": "Անձնական խնամք",
+      "supplements": "Վիտամիններ և հավելումներ",
+      "hygiene": "Հիգիենայի պարագաներ"
+    }
+  },
+  "stationery": {
+    "name": "Գրենական պիտույքներ և գրասենյակ",
+    "subcategories": {
+      "office_supplies": "Գրասենյակային պարագաներ",
+      "paper_products": "Թղթային արտադրանք",
+      "writing_tools": "Գրելու պարագաներ",
+      "packaging": "Փաթեթավորում և տոպրակներ"
+    }
+  },
+  "toys_games": {
+    "name": "Խաղալիքներ և խաղեր",
+    "subcategories": {
+      "childrens_toys": "Մանկական խաղալիքներ",
+      "board_games": "Սեղանի խաղեր",
+      "outdoor_play": "Բակային խաղեր",
+      "educational": "Ուսուցողական խաղալիքներ"
+    }
+  }
+}

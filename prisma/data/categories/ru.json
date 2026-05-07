@@ -1,0 +1,75 @@
+{
+  "food": {
+    "name": "Продукты питания",
+    "subcategories": {
+      "fruits_vegetables": "Фрукты и овощи",
+      "meat_poultry": "Мясо и птица",
+      "dairy": "Молочные продукты",
+      "bakery": "Выпечка",
+      "beverages": "Напитки",
+      "snacks": "Снеки и кондитерские изделия",
+      "canned_goods": "Консервы",
+      "spices_seasonings": "Специи и приправы",
+      "grains_cereals": "Крупы и злаки",
+      "frozen_food": "Замороженные продукты"
+    }
+  },
+  "clothing": {
+    "name": "Одежда",
+    "subcategories": {
+      "mens_clothing": "Мужская одежда",
+      "womens_clothing": "Женская одежда",
+      "childrens_clothing": "Детская одежда",
+      "footwear": "Обувь",
+      "accessories": "Аксессуары"
+    }
+  },
+  "electronics": {
+    "name": "Электроника",
+    "subcategories": {
+      "phones_tablets": "Телефоны и планшеты",
+      "computers_laptops": "Компьютеры и ноутбуки",
+      "audio_video": "Аудио и видео",
+      "cables_accessories": "Кабели и аксессуары",
+      "home_appliances": "Бытовая техника"
+    }
+  },
+  "household": {
+    "name": "Товары для дома",
+    "subcategories": {
+      "cleaning_supplies": "Чистящие средства",
+      "kitchenware": "Кухонные принадлежности",
+      "bathroom": "Ванная комната",
+      "storage_organization": "Хранение и организация",
+      "home_decor": "Декор для дома"
+    }
+  },
+  "health_beauty": {
+    "name": "Здоровье и красота",
+    "subcategories": {
+      "skincare": "Уход за кожей",
+      "haircare": "Уход за волосами",
+      "personal_care": "Личная гигиена",
+      "supplements": "Витамины и добавки",
+      "hygiene": "Средства гигиены"
+    }
+  },
+  "stationery": {
+    "name": "Канцтовары и офис",
+    "subcategories": {
+      "office_supplies": "Офисные принадлежности",
+      "paper_products": "Бумажная продукция",
+      "writing_tools": "Письменные принадлежности",
+      "packaging": "Упаковка и пакеты"
+    }
+  },
+  "toys_games": {
+    "name": "Игрушки и игры",
+    "subcategories": {
+      "childrens_toys": "Детские игрушки",
+      "board_games": "Настольные игры",
+      "outdoor_play": "Игры на свежем воздухе",
+      "educational": "Развивающие игрушки"
+    }
+  }
+}

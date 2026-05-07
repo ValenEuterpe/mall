@@ -1,0 +1,75 @@
+{
+  "food": {
+    "name": "Food & Groceries",
+    "subcategories": {
+      "fruits_vegetables": "Fruits & Vegetables",
+      "meat_poultry": "Meat & Poultry",
+      "dairy": "Dairy Products",
+      "bakery": "Bakery",
+      "beverages": "Beverages",
+      "snacks": "Snacks & Confectionery",
+      "canned_goods": "Canned & Preserved Goods",
+      "spices_seasonings": "Spices & Seasonings",
+      "grains_cereals": "Grains & Cereals",
+      "frozen_food": "Frozen Food"
+    }
+  },
+  "clothing": {
+    "name": "Clothing & Apparel",
+    "subcategories": {
+      "mens_clothing": "Men's Clothing",
+      "womens_clothing": "Women's Clothing",
+      "childrens_clothing": "Children's Clothing",
+      "footwear": "Footwear",
+      "accessories": "Accessories"
+    }
+  },
+  "electronics": {
+    "name": "Electronics",
+    "subcategories": {
+      "phones_tablets": "Phones & Tablets",
+      "computers_laptops": "Computers & Laptops",
+      "audio_video": "Audio & Video",
+      "cables_accessories": "Cables & Accessories",
+      "home_appliances": "Home Appliances"
+    }
+  },
+  "household": {
+    "name": "Household & Home",
+    "subcategories": {
+      "cleaning_supplies": "Cleaning Supplies",
+      "kitchenware": "Kitchenware",
+      "bathroom": "Bathroom",
+      "storage_organization": "Storage & Organization",
+      "home_decor": "Home Decor"
+    }
+  },
+  "health_beauty": {
+    "name": "Health & Beauty",
+    "subcategories": {
+      "skincare": "Skincare",
+      "haircare": "Haircare",
+      "personal_care": "Personal Care",
+      "supplements": "Vitamins & Supplements",
+      "hygiene": "Hygiene Products"
+    }
+  },
+  "stationery": {
+    "name": "Stationery & Office",
+    "subcategories": {
+      "office_supplies": "Office Supplies",
+      "paper_products": "Paper Products",
+      "writing_tools": "Writing Tools",
+      "packaging": "Packaging & Bags"
+    }
+  },
+  "toys_games": {
+    "name": "Toys & Games",
+    "subcategories": {
+      "childrens_toys": "Children's Toys",
+      "board_games": "Board Games",
+      "outdoor_play": "Outdoor Play",
+      "educational": "Educational Toys"
+    }
+  }
+}

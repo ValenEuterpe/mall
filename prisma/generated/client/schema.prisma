@@ -1,0 +1,639 @@
+generator client {
+  provider = "prisma-client-js"
+  output   = "./generated/client"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// USER MODEL (Regular Customers)
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  emailVerified DateTime?
+  firstName     String
+  lastName      String
+  password      String
+  image         String?
+  phone         String?
+
+  isActive Boolean @default(true)
+
+  createdAt           DateTime  @default(now())
+  updatedAt           DateTime  @updatedAt
+  failedLoginAttempts Int?      @default(0)
+  lockedUntil         DateTime?
+  lastLoginAt         DateTime?
+  lastLoginIp         String?
+
+  // Map selection (customer)
+  // Stores selected products for the "Add to map" feature.
+  // Anonymous users store this in sessionStorage; signed-in users persist here.
+  mapSelectionProductIds String[] @default([])
+
+  // Relations
+  sessions Session[]
+
+  @@index([email])
+  @@map("users")
+}
+
+// SELLER MODEL
+model Seller {
+  id       String  @id @default(cuid())
+  email    String  @unique
+  password String? // NULL until they set it up
+
+  // Profile
+  businessName  String?
+  contactPerson String?
+  phone         String?
+  description   String?
+  logoUrl       String?
+  bannerUrl     String?
+  socialLinks   Json? // { instagram, telegram, whatsapp, email }
+
+  // Status
+  isVerified  Boolean   @default(false)
+  isActive    Boolean   @default(true)
+  invitedAt   DateTime  @default(now())
+  lastLoginAt DateTime?
+
+  // Invitation
+  inviteToken  String?   @unique
+  inviteExpiry DateTime?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  shops    Shop[]
+  sessions Session[]
+
+  failedLoginAttempts Int?      @default(0)
+  lockedUntil         DateTime?
+  lastLoginIp         String?
+
+  @@index([email])
+  @@index([inviteToken])
+  @@map("sellers")
+}
+
+// MALL OWNER MODEL
+model MallOwner {
+  id       String @id @default(cuid())
+  email    String @unique
+  password String
+
+  // Profile
+  name  String
+  phone String?
+
+  // Security
+  allowedIps          String[] // IP whitelist
+  mfaSecret           String? // For 2FA (future)
+  mfaEnabled          Boolean   @default(false)
+  failedLoginAttempts Int       @default(0)
+  lockedUntil         DateTime?
+
+  // Session management
+  lastLoginAt DateTime?
+  lastLoginIp String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  sessions Session[]
+
+  lastMagicLinkRequestedAt DateTime?
+  lastMagicLinkRequestIp   String?
+
+  @@index([email])
+  @@map("mall_owners")
+}
+
+// SESSION MODEL (For all user types)
+model Session {
+  id           String @id @default(cuid())
+  sessionToken String @unique
+
+  // Polymorphic relations (only one will be set)
+  userId      String?
+  sellerId    String?
+  mallOwnerId String?
+
+  // Session data
+  expires   DateTime
+  ipAddress String?
+  userAgent String?
+
+  // Token rotation security
+  // Used for refresh token rotation to detect token reuse attacks
+  tokenFamily String?
+
+  // Session revocation flag
+  isRevoked Boolean @default(false)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  user      User?      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  seller    Seller?    @relation(fields: [sellerId], references: [id], onDelete: Cascade)
+  mallOwner MallOwner? @relation(fields: [mallOwnerId], references: [id], onDelete: Cascade)
+
+  @@index([sessionToken])
+  @@index([userId])
+  @@index([sellerId])
+  @@index([mallOwnerId])
+  @@index([tokenFamily])
+  @@map("sessions")
+}
+
+// VERIFICATION TOKEN (Email verification, magic links)
+model VerificationToken {
+  id         String    @id @default(cuid())
+  identifier String // Email or user ID
+  token      String    @unique
+  type       TokenType
+  expires    DateTime
+
+  createdAt DateTime @default(now())
+
+  @@unique([identifier, token])
+  @@index([token])
+  @@map("verification_tokens")
+}
+
+enum TokenType {
+  EMAIL_VERIFICATION
+  PASSWORD_RESET
+  MAGIC_LINK
+  INVITATION
+}
+
+// SHOP TYPE MODEL (Database-defined types for shops/units)
+model ShopType {
+  id               String  @id @default(cuid())
+  key              String  @unique
+  name_en          String
+  name_ru          String
+  name_am          String?
+  icon             String?
+  color            String?
+  supportsProducts Boolean @default(true)
+  sortOrder        Int     @default(0)
+
+  shops Shop[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("shop_types")
+}
+
+// SHOP MODEL
+model Shop {
+  id String @id @default(cuid())
+
+  // Location (legacy string fields - kept for backward compatibility)
+  venue      String
+  building   String?
+  floor      String?
+  shopNumber String
+  fullCode   String  @unique
+
+  // New: Direct relation to Floor entity
+  floorId  String?
+  floorRef Floor?  @relation("FloorShops", fields: [floorId], references: [id], onDelete: SetNull)
+
+  // Shop type
+  shopTypeId String?
+  shopType   ShopType? @relation(fields: [shopTypeId], references: [id], onDelete: SetNull)
+
+  // Seller relation
+  sellerId String?
+
+  // Shop details
+  shopName     String?
+  description  String?
+  imageUrl     String?
+  svgId        String? // For map linking
+  coordinates  Json? // { x, y } if needed
+  openingHours Json? // { mon: "9-18", tue: "9-18", ... }
+
+  // Status
+  isActive Boolean @default(true)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relations
+  seller   Seller?       @relation(fields: [sellerId], references: [id], onDelete: SetNull)
+  products Product[]
+  contacts ShopContact[]
+
+  @@index([sellerId])
+  @@index([fullCode])
+  @@index([floorId])
+  @@index([shopTypeId])
+  @@map("shops")
+}
+
+// PRODUCT MODEL
+
+model Product {
+  id     String @id @default(cuid())
+  shopId String
+
+  // Basic info (multilingual)
+  name                 String // Legacy field - kept for backward compatibility
+  name_en              String?
+  name_ru              String?
+  name_am              String?
+  description          String? // Legacy field - kept for backward compatibility
+  description_en       String?
+  description_ru       String?
+  description_am       String?
+  detailDescription    String? @db.Text // Legacy field
+  detailDescription_en String? @db.Text
+  detailDescription_ru String? @db.Text
+  detailDescription_am String? @db.Text
+
+  // Pricing & stock
+  basePrice     Decimal @db.Decimal(10, 2)
+  stockQuantity Int     @default(0)
+  unitType      String  @default("piece")
+
+  // Categorization (3-level hierarchy)
+  categoryId       String?
+  subcategoryId    String?
+  subSubcategoryId String?
+  brand            String?
+  barcode          String?
+  tags             String[]
+
+  // Media (max 5 images)
+  images String[]
+
+  // Status
+  status     ProductStatus @default(DRAFT)
+  isActive   Boolean       @default(true)
+  isFeatured Boolean       @default(false)
+
+  // Timestamps
+  createdAt   DateTime @default(now())
+  lastUpdated DateTime @updatedAt
+
+  // Relations
+  shop           Shop              @relation(fields: [shopId], references: [id], onDelete: Cascade)
+  category       Category?         @relation(fields: [categoryId], references: [id])
+  subcategory    Subcategory?      @relation(fields: [subcategoryId], references: [id])
+  subSubcategory SubSubcategory?   @relation(fields: [subSubcategoryId], references: [id])
+  priceTiers     PriceTier[]
+  discounts      ProductDiscount[]
+  views          ProductView[]
+  favorites      Favorite[]
+
+  sku            String?
+  viewCount      Int      @default(0) // Legacy total count - kept for quick queries
+  weight         Decimal? @db.Decimal(10, 2)
+  specifications Json? // To handle the metadata
+
+  @@index([shopId])
+  @@index([categoryId])
+  @@index([subcategoryId])
+  @@index([subSubcategoryId])
+  @@index([status])
+  @@index([barcode])
+  @@index([sku])
+  @@map("products")
+}
+
+// FAVORITE (Wishlist)
+model Favorite {
+  id        String   @id @default(cuid())
+  ownerId   String
+  ownerRole String
+  productId String
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@unique([ownerId, productId])
+  @@index([ownerId, createdAt(sort: Desc)])
+  @@index([productId])
+  @@map("favorites")
+}
+
+// PRODUCT VIEW (For analytics with timestamps)
+model ProductView {
+  id        String @id @default(cuid())
+  productId String
+
+  // Optional user tracking (null for anonymous views)
+  userId String?
+
+  // View metadata
+  ipAddress String?
+  userAgent String?
+  referrer  String?
+
+  viewedAt DateTime @default(now())
+
+  // Relations
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@index([productId, viewedAt])
+  @@index([viewedAt])
+  @@map("product_views")
+}
+
+enum ProductStatus {
+  DRAFT
+  PUBLISHED
+  ARCHIVED
+}
+
+// PRICE TIER (Wholesale pricing)
+
+model PriceTier {
+  id          String  @id @default(cuid())
+  productId   String
+  minQuantity Int
+  maxQuantity Int?
+  price       Decimal @db.Decimal(10, 2)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("price_tiers")
+}
+
+// PRODUCT DISCOUNT
+model ProductDiscount {
+  id            String    @id @default(cuid())
+  productId     String
+  name          String
+  name_en       String?
+  name_ru       String?
+  name_am       String?
+  discountType  String    @default("percentage") // percentage | fixed
+  discountValue Decimal   @db.Decimal(10, 2)
+  startDate     DateTime?
+  endDate       DateTime?
+  isActive      Boolean   @default(true)
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+
+  @@index([productId])
+  @@map("product_discounts")
+}
+
+// SHOP CONTACT
+
+model ShopContact {
+  id     String      @id @default(cuid())
+  shopId String
+  type   ContactType
+  value  String
+  label  String?
+
+  shop Shop @relation(fields: [shopId], references: [id], onDelete: Cascade)
+
+  @@index([shopId])
+  @@map("shop_contacts")
+}
+
+enum ContactType {
+  PHONE
+  EMAIL
+  WHATSAPP
+  TELEGRAM
+  INSTAGRAM
+  FACEBOOK
+  VK
+  TIKTOK
+  YOUTUBE
+  SNAPCHAT
+  X_TWITTER
+}
+
+// CATEGORY (Level 1)
+
+model Category {
+  id      String  @id @default(cuid())
+  key     String  @unique
+  name_en String
+  name_ru String
+  name_am String? // Armenian translation
+  icon    String?
+
+  products      Product[]
+  subcategories Subcategory[]
+
+  @@map("categories")
+}
+
+// SUBCATEGORY (Level 2)
+
+model Subcategory {
+  id         String  @id @default(cuid())
+  key        String  @unique
+  name_en    String
+  name_ru    String
+  name_am    String? // Armenian translation
+  categoryId String
+
+  category         Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  products         Product[]
+  subSubcategories SubSubcategory[]
+
+  @@index([categoryId])
+  @@map("subcategories")
+}
+
+// SUBSUBCATEGORY (Level 3)
+
+model SubSubcategory {
+  id            String  @id @default(cuid())
+  key           String  @unique
+  name_en       String
+  name_ru       String
+  name_am       String? // Armenian translation
+  subcategoryId String
+
+  subcategory Subcategory @relation(fields: [subcategoryId], references: [id], onDelete: Cascade)
+  products    Product[]
+
+  @@index([subcategoryId])
+  @@map("sub_subcategories")
+}
+
+// MALL MODEL (Central location data)
+model Mall {
+  id        String  @id @default(cuid())
+  name      String
+  latitude  Float // Center point for map focus
+  longitude Float
+  address   String?
+
+  // About page content (editable by mall owner)
+  description_en String?
+  description_ru String?
+  description_am String?
+  workingHours   String? // e.g. "Mon-Sat: 10:00-21:00, Sun: 11:00-20:00"
+  contactPhone   String?
+  contactEmail   String?
+  logoUrl        String?
+  socialLinks    Json? // { instagram?: string, facebook?: string, telegram?: string }
+  policies_en    String? // Return/exchange policies
+  policies_ru    String?
+  policies_am    String?
+
+  buildings Building[]
+  venues    Venue[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@map("malls")
+}
+
+// BUILDING MODEL (Physical structures with geo-positioning)
+model Building {
+  id     String @id @default(cuid())
+  mallId String
+  mall   Mall   @relation(fields: [mallId], references: [id], onDelete: Cascade)
+
+  // Venue relation - buildings belong to a venue
+  venueId String
+  venue   Venue  @relation(fields: [venueId], references: [id], onDelete: Cascade)
+
+  name String // "Building 1", "Main Hall"
+  code String // "B1", "B2" (for SVG ID matching)
+
+  // Geo-positioning (all floors of this building share this position)
+  latitude  Float
+  longitude Float
+  rotation  Float @default(0) // Degrees 0-360
+  scale     Float @default(1) // Scale factor for SVG overlay
+
+  floors Floor[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([mallId, code])
+  @@index([mallId])
+  @@index([venueId])
+  @@map("buildings")
+}
+
+// VENUE MODEL (Top-level container for buildings)
+model Venue {
+  id     String @id @default(cuid())
+  mallId String
+  mall   Mall   @relation(fields: [mallId], references: [id], onDelete: Cascade)
+
+  name String // "Main Complex", "North Wing", "Outdoor Area"
+  code String // "V1", "V2" (for SVG ID matching)
+
+  // Geo-positioning (center point for this venue)
+  latitude  Float
+  longitude Float
+
+  // SVG map overlay (optional - venues can have an outdoor area map)
+  svgUrl  String?
+  shopIds String[] @default([])
+
+  // Geo-positioning for SVG overlay
+  rotation Float @default(0)
+  scale    Float @default(1)
+
+  // Wayfinding data for outdoor navigation (optional)
+  wayfindingData Json?
+
+  // Buildings in this venue
+  buildings Building[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([mallId, code])
+  @@index([mallId])
+  @@map("venues")
+}
+
+// FLOOR MODEL (Physical floor level within a building)
+model Floor {
+  id         String   @id @default(cuid())
+  buildingId String
+  building   Building @relation(fields: [buildingId], references: [id], onDelete: Cascade)
+
+  number Int // 1, 2, 3... (0 for ground level if needed)
+  label  String? // Optional: "Ground Floor", "Level 2", "Basement"
+  code   String // "F1", "F2" (for display and SVG ID matching)
+
+  // Per-floor geo-positioning (nullable — falls back to building-level if null)
+  latitude  Float?
+  longitude Float?
+  rotation  Float? @default(0)
+  scale     Float? @default(1)
+
+  // Relations
+  floorMap FloorMap?
+  shops    Shop[]    @relation("FloorShops")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([buildingId, number])
+  @@unique([buildingId, code])
+  @@index([buildingId])
+  @@map("floors")
+}
+
+// FLOOR MAP (SVG for a specific floor of a building)
+model FloorMap {
+  id      String @id @default(cuid())
+  floorId String @unique
+  floor   Floor  @relation(fields: [floorId], references: [id], onDelete: Cascade)
+
+  svgUrl  String
+  shopIds String[] @default([]) // Parsed SVG element IDs for quick reference
+
+  // Wayfinding data for indoor navigation
+  // JSON structure: { vertices: [...], edges: [...], entrances: [...] }
+  // See src/lib/wayfinding/types.ts for WayfindingData interface
+  wayfindingData Json?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@index([floorId])
+  @@map("floor_maps")
+}
+
+model AuditLog {
+  id           String   @id @default(cuid())
+  action       String
+  userId       String?
+  userEmail    String?
+  userRole     String?
+  ipAddress    String?
+  userAgent    String?
+  details      Json?
+  success      Boolean  @default(true)
+  errorMessage String?
+  createdAt    DateTime @default(now())
+
+  @@index([userId])
+  @@index([action])
+  @@index([createdAt])
+  @@map("audit_logs")
+}
