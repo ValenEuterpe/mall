@@ -10,6 +10,9 @@ export const env = createEnv({
   server: {
     // Database
     DATABASE_URL: z.string().url(),
+    DIRECT_URL: z.string().url().optional(), // Optional direct database URL for admin tools (e.g. pgAdmin); should point to the same database as DATABASE_URL
+
+
 
     // NextAuth
     NEXTAUTH_SECRET: z.string().min(32),
@@ -91,6 +94,7 @@ export const env = createEnv({
   runtimeEnv: {
     // Server
     DATABASE_URL: process.env.DATABASE_URL,
+    DIRECT_URL: process.env.DIRECT_URL,
     NEXTAUTH_SECRET: process.env.NEXTAUTH_SECRET,
     NEXTAUTH_URL: process.env.NEXTAUTH_URL,
     JWT_ACCESS_SECRET: process.env.JWT_ACCESS_SECRET,
