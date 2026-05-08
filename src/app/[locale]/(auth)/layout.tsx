@@ -3,6 +3,7 @@ import type { Metadata } from "next";
 
 import { Link } from "@/i18n/routing";
 import { BackButton } from "@/components/auth/BackButton";
+import { LanguageSwitcher } from "@/components/layout/Header";
 
 interface AuthLayoutProps {
   children: ReactNode;
@@ -58,8 +59,9 @@ export default function AuthLayout({
         </div>
 
         <div className="bg-card rounded-xl border p-6 shadow-lg sm:p-8">
-          <div className="mb-4">
+          <div className="mb-4 flex items-center justify-between">
             <BackButton />
+            <LanguageSwitcher />
           </div>
           {children}
         </div>

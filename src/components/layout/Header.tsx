@@ -262,7 +262,7 @@ function stripLocalePrefix(pathname: string): string {
   return rest.length > 0 ? rest : "/";
 }
 
-function LanguageSwitcher() {
+export function LanguageSwitcher() {
   const t = useTranslations("header");
   const locale = useLocale();
   const pathname = usePathname();
