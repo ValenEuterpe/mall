@@ -27,12 +27,13 @@ export const SheetContent = React.forwardRef<
   SheetContentProps
 >(({ className, side = "right", ...props }, ref) => {
   const sideClasses: Record<NonNullable<SheetContentProps["side"]>, string> = {
-    left: "left-0 top-0 h-full w-80 max-w-[85vw] translate-x-0 translate-y-0 rounded-none",
+    left:
+      "left-0 right-auto top-0 h-full w-80 max-w-[85vw] translate-x-0 translate-y-0 rounded-none",
     right:
-      "right-0 top-0 h-full w-80 max-w-[85vw] translate-x-0 translate-y-0 rounded-none",
-    top: "top-0 left-0 w-full max-h-[85vh] translate-x-0 translate-y-0 rounded-none",
+      "right-0 left-auto top-0 h-full w-80 max-w-[85vw] translate-x-0 translate-y-0 rounded-none",
+    top: "top-0 left-0 right-0 w-full max-h-[85vh] translate-x-0 translate-y-0 rounded-none",
     bottom:
-      "bottom-0 left-0 w-full max-h-[85vh] translate-x-0 translate-y-0 rounded-none",
+      "bottom-0 left-0 right-0 w-full max-h-[85vh] translate-x-0 translate-y-0 rounded-none",
   };
 
   return (

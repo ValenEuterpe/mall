@@ -44,15 +44,15 @@ async function main() {
   // 2. Create Mall Owner
   console.log("👑 Creating Mall Owner...");
 
-  const hashedPassword = await bcrypt.hash("MallOwner2024!", 12);
+  const hashedPassword = await bcrypt.hash("MallMall2026", 12);
 
   const mallOwner = await prisma.mallOwner.create({
     data: {
-      email: "owner@wholesalemarket.com",
+      email: "mallowner@atomicmail.io",
       password: hashedPassword,
       name: "Mall Administrator",
       phone: "+1234567890",
-      allowedIps: ["127.0.0.1"], // Localhost for dev
+      allowedIps: [], // Localhost for dev
     },
   });
 

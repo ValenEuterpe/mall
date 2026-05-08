@@ -106,12 +106,11 @@ function Logo({ className }: { className?: string }) {
 function SearchBar() {
   const t = useTranslations("header");
   const router = useRouter();
-  const pathname = usePathname();
   const [query, setQuery] = React.useState("");
   const [isExpanded, setIsExpanded] = React.useState(false);
   const overlayRef = React.useRef<HTMLDivElement>(null);
-
-  const isHomePage = pathname === "/";
+  const mobileInputRef = React.useRef<HTMLInputElement>(null);
+  const desktopInputRef = React.useRef<HTMLInputElement>(null);
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -119,28 +118,27 @@ function SearchBar() {
     if (q) {
       router.push("/?q=" + encodeURIComponent(q));
     }
+    setIsExpanded(false);
   };
 
   const handleClear = () => {
     setQuery("");
-    if (isHomePage) {
-      router.replace("/", { scroll: false });
-    }
   };
 
   const handleCollapse = () => {
     setIsExpanded(false);
   };
 
-  // Click outside the mobile overlay collapses it (only when empty — we
-  // don't want to throw away a half-typed query on an accidental tap).
+  // Mobile overlay stays mounted (display: hidden) so query state survives
+  // open/close cycles. Outside-click always collapses; the typed text is
+  // preserved in component state, so reopening shows it again.
   React.useEffect(() => {
     if (!isExpanded) return;
     const onPointerDown = (e: MouseEvent | TouchEvent) => {
       const node = overlayRef.current;
       if (!node) return;
       const target = e.target as Node | null;
-      if (target && !node.contains(target) && !query) {
+      if (target && !node.contains(target)) {
         setIsExpanded(false);
       }
     };
@@ -150,9 +148,8 @@ function SearchBar() {
       document.removeEventListener("mousedown", onPointerDown);
       document.removeEventListener("touchstart", onPointerDown);
     };
-  }, [isExpanded, query]);
+  }, [isExpanded]);
 
-  // Escape collapses regardless of query state — explicit user intent to dismiss.
   React.useEffect(() => {
     if (!isExpanded) return;
     const onKey = (e: KeyboardEvent) => {
@@ -162,16 +159,24 @@ function SearchBar() {
     return () => window.removeEventListener("keydown", onKey);
   }, [isExpanded]);
 
-  const inputElement = (
+  // Focus the mobile input when the overlay un-hides. Tailwind toggles
+  // `display: none`, so the element is mounted but autoFocus would not re-fire.
+  React.useEffect(() => {
+    if (isExpanded) {
+      mobileInputRef.current?.focus();
+    }
+  }, [isExpanded]);
+
+  const renderInput = (ref: React.RefObject<HTMLInputElement | null>) => (
     <div className="relative flex-1">
       <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
       <Input
+        ref={ref}
         type="text"
         placeholder={t("searchPlaceholder")}
         value={query}
         onChange={(e) => setQuery(e.target.value)}
         className="w-full pr-10 pl-10"
-        autoFocus={isExpanded}
       />
       {query && (
         <Button
@@ -192,7 +197,7 @@ function SearchBar() {
     <>
       {/* Desktop: always-expanded inline form */}
       <form onSubmit={handleSubmit} className="relative hidden md:block md:w-80">
-        {inputElement}
+        {renderInput(desktopInputRef)}
       </form>
 
       {/* Mobile: collapsed search trigger */}
@@ -207,28 +212,29 @@ function SearchBar() {
         <Search className="h-5 w-5" />
       </Button>
 
-      {/* Mobile: full-width overlay that covers the header row when expanded */}
-      {isExpanded && (
-        <div
-          ref={overlayRef}
-          className="bg-background/95 supports-[backdrop-filter]:bg-background/80 fixed inset-x-0 top-0 z-50 flex h-16 items-center gap-2 border-b px-2 backdrop-blur md:hidden"
-          role="search"
+      {/* Mobile: full-width overlay; kept mounted so query state survives. */}
+      <div
+        ref={overlayRef}
+        className={cn(
+          "bg-background/95 supports-[backdrop-filter]:bg-background/80 fixed inset-x-0 top-0 z-50 flex h-16 items-center gap-2 border-b px-2 backdrop-blur md:hidden",
+          !isExpanded && "hidden"
+        )}
+        role="search"
+      >
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-9 w-9 shrink-0"
+          onClick={handleCollapse}
+          aria-label="Close search"
         >
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            className="h-9 w-9 shrink-0"
-            onClick={handleCollapse}
-            aria-label="Close search"
-          >
-            <ArrowLeft className="h-5 w-5" />
-          </Button>
-          <form onSubmit={handleSubmit} className="flex-1">
-            {inputElement}
-          </form>
-        </div>
-      )}
+          <ArrowLeft className="h-5 w-5" />
+        </Button>
+        <form onSubmit={handleSubmit} className="flex-1">
+          {renderInput(mobileInputRef)}
+        </form>
+      </div>
     </>
   );
 }
@@ -450,7 +456,23 @@ function MobileNav({
 
   return (
     <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent side="left" className="w-80">
+      <SheetContent
+        side="right"
+        className="w-80 max-w-full p-4 pl-14 sm:p-6 sm:pl-16 [&>button]:hidden"
+      >
+        <div className="absolute left-2 top-2 z-10">
+          <Button
+            type="button"
+            variant="ghost"
+            size="icon"
+            onClick={() => onClose(false)}
+            aria-label={t("menu")}
+            className="h-9 w-9"
+          >
+            <X className="h-5 w-5" />
+          </Button>
+        </div>
+
         <SheetHeader>
           <SheetTitle className="flex items-center gap-2">
             <Logo className="h-8 w-8" />
@@ -486,13 +508,6 @@ function MobileNav({
             })}
           </nav>
 
-          <Separator />
-          <div className="px-3">
-            <p className="text-muted-foreground mb-2 text-xs font-medium">
-              {t("language")}
-            </p>
-            <LanguageSwitcher />
-          </div>
           <Separator />
 
           <div className="px-3">
@@ -592,17 +607,6 @@ export function Header({
       >
         <div className="container flex h-12 items-center justify-between gap-2 sm:h-14 md:h-16 lg:gap-4">
           <div className="flex flex-1 items-center gap-4">
-            {isMobile && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setMobileNavOpen(true)}
-                aria-label={t("menu")}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-            )}
-
             <Link href="/" className="flex items-center gap-2">
               {logo || <Logo className="h-7 w-7 sm:h-8 sm:w-8" />}
               <span className="hidden font-bold text-sm sm:text-base md:inline-block">
@@ -661,7 +665,7 @@ export function Header({
           </div>
 
           <div className="flex flex-1 items-center justify-end gap-2">
-            {!isMobile && <LanguageSwitcher />}
+            <LanguageSwitcher />
             {isAuthenticated && <NotificationBell count={notificationCount} />}
 
             {/* Map toggle — visible on homepage and shop pages */}
@@ -693,7 +697,20 @@ export function Header({
               </Button>
             )}
 
-            <UserMenu />
+            {/* Account UI: avatar dropdown on desktop only. On mobile,
+                login/signup/logout live in the hamburger drawer. */}
+            {!isMobile && <UserMenu />}
+
+            {isMobile && (
+              <Button
+                variant="ghost"
+                size="icon"
+                onClick={() => setMobileNavOpen(true)}
+                aria-label={t("menu")}
+              >
+                <Menu className="h-5 w-5" />
+              </Button>
+            )}
           </div>
         </div>
       </header>
