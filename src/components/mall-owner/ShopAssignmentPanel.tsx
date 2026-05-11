@@ -15,6 +15,7 @@ import {
   DialogTitle,
 } from "@/components/ui/dialog";
 import { toast } from "@/lib/utils/toast";
+import { mallApiFetch } from "@/lib/api-client";
 import { Store, CheckCircle, Circle, XCircle } from "lucide-react";
 
 // Types
@@ -67,7 +68,7 @@ export function ShopAssignmentPanel({
 
     setLoading(true);
     try {
-      const res = await fetch(
+      const res = await mallApiFetch(
         `/api/v1/mall/buildings/${buildingId}/floors/${floorId}/shops`
       );
       const data = await res.json();
@@ -97,7 +98,7 @@ export function ShopAssignmentPanel({
   // Clear assignment for a shop
   const handleClearAssignment = async (shop: FloorShop) => {
     try {
-      const res = await fetch(`/api/v1/mall/shops/${shop.id}`, {
+      const res = await mallApiFetch(`/api/v1/mall/shops/${shop.id}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ svgId: null }),

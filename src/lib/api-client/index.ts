@@ -10,3 +10,5 @@ export {
 } from "./client";
 
 export { useApi, useMutation } from "./hooks";
+
+export { mallApiFetch } from "./mall-fetch";

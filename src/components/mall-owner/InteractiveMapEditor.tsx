@@ -18,6 +18,7 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 import { toast } from "@/lib/utils/toast";
+import { mallApiFetch } from "@/lib/api-client";
 import { Settings } from "lucide-react";
 import { MallSetupDialog } from "./dialogs/MallSetupDialog";
 import { UploadSvgDialog } from "./dialogs/UploadSvgDialog";
@@ -157,7 +158,7 @@ export function InteractiveMapEditor() {
   const loadMall = useCallback(async () => {
     try {
       setLoading(true);
-      const res = await fetch("/api/v1/mall/info");
+      const res = await mallApiFetch("/api/v1/mall/info");
       const data = await res.json();
 
       if (data.success && data.data) {
@@ -233,7 +234,7 @@ export function InteractiveMapEditor() {
     address?: string
   ) => {
     try {
-      const res = await fetch("/api/v1/mall/info", {
+      const res = await mallApiFetch("/api/v1/mall/info", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, latitude: lat, longitude: lng, address }),
@@ -264,7 +265,7 @@ export function InteractiveMapEditor() {
 
     // Parse SVG for shop IDs (optional - SVG can have no shops defined yet)
     try {
-      const res = await fetch("/api/v1/mall/maps/parse-svg", {
+      const res = await mallApiFetch("/api/v1/mall/maps/parse-svg", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ svgContent: content }),
@@ -297,7 +298,7 @@ export function InteractiveMapEditor() {
     if (selectedBuilding && selectedFloor) {
       // Save to floor-level geo endpoint
       try {
-        const res = await fetch(
+        const res = await mallApiFetch(
           `/api/v1/mall/buildings/${selectedBuilding.id}/floors/${selectedFloor.id}`,
           {
             method: "PUT",
@@ -324,7 +325,7 @@ export function InteractiveMapEditor() {
     } else if (selectedBuilding) {
       // Fallback: save to building-level (no floor selected)
       try {
-        const res = await fetch(
+        const res = await mallApiFetch(
           `/api/v1/mall/buildings/${selectedBuilding.id}`,
           {
             method: "PUT",
@@ -350,7 +351,7 @@ export function InteractiveMapEditor() {
       }
     } else if (selectedVenue) {
       try {
-        const res = await fetch(`/api/v1/mall/venues/${selectedVenue.id}`, {
+        const res = await mallApiFetch(`/api/v1/mall/venues/${selectedVenue.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -387,7 +388,7 @@ export function InteractiveMapEditor() {
       formData.append("file", svgFile);
       formData.append("type", "svg");
 
-      const uploadRes = await fetch("/api/v1/upload", {
+      const uploadRes = await mallApiFetch("/api/v1/upload", {
         method: "POST",
         body: formData,
       });
@@ -412,7 +413,7 @@ export function InteractiveMapEditor() {
       if (selectedBuilding && selectedFloor !== null) {
         // Create or update the floor map for the selected floor
         // First, check if floor already has a map - if so, we need to update via maps API
-        const res = await fetch("/api/v1/mall/maps", {
+        const res = await mallApiFetch("/api/v1/mall/maps", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -435,7 +436,7 @@ export function InteractiveMapEditor() {
         }
       } else if (selectedVenue) {
         // Save venue map with position (rotation/scale)
-        const res = await fetch(`/api/v1/mall/venues/${selectedVenue.id}`, {
+        const res = await mallApiFetch(`/api/v1/mall/venues/${selectedVenue.id}`, {
           method: "PUT",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({
@@ -549,7 +550,7 @@ export function InteractiveMapEditor() {
 
     const loadFloorShops = async () => {
       try {
-        const res = await fetch(
+        const res = await mallApiFetch(
           `/api/v1/mall/buildings/${selectedBuilding.id}/floors/${selectedFloor.id}/shops`
         );
         if (!res.ok) {
@@ -600,7 +601,7 @@ export function InteractiveMapEditor() {
 
   const assignPathToShop = async (pathId: string, shopId: string) => {
     try {
-      const res = await fetch(`/api/v1/mall/shops/${shopId}`, {
+      const res = await mallApiFetch(`/api/v1/mall/shops/${shopId}`, {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ svgId: pathId }),
@@ -611,7 +612,7 @@ export function InteractiveMapEditor() {
         toast.success(t("shopAssignment.assignSuccess"));
         // Refresh floor shops
         if (selectedBuilding && selectedFloor) {
-          const shopsRes = await fetch(
+          const shopsRes = await mallApiFetch(
             `/api/v1/mall/buildings/${selectedBuilding.id}/floors/${selectedFloor.id}/shops`
           );
           if (shopsRes.ok) {
@@ -634,7 +635,7 @@ export function InteractiveMapEditor() {
 
     // First clear the old assignment
     if (pendingPathAssignment.currentShop) {
-      await fetch(
+      await mallApiFetch(
         `/api/v1/mall/shops/${pendingPathAssignment.currentShop.id}`,
         {
           method: "PATCH",
