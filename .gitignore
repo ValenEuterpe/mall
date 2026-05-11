@@ -3,6 +3,7 @@ node_modules/
 .next/
 dist/
 markdown/
+guides/
 .DS_Store
 .sentryclirc
 

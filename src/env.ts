@@ -42,6 +42,11 @@ export const env = createEnv({
     MAX_FILE_SIZE: z.string().default("5242880"), // 5MB
     ALLOWED_FILE_TYPES: z.string().default("image/jpeg,image/png,image/svg+xml"),
 
+    // Supabase Storage (used for file uploads in production — public bucket)
+    SUPABASE_URL: z.string().url(),
+    SUPABASE_SERVICE_ROLE_KEY: z.string().min(1),
+    SUPABASE_STORAGE_BUCKET: z.string().default("uploads"),
+
     // Security
     ADMIN_TOKEN: z.string().min(64),
     ALLOWED_IPS: z.string().optional(),
@@ -113,6 +118,9 @@ export const env = createEnv({
     EMAIL_DELIVERY_MODE: process.env.EMAIL_DELIVERY_MODE,
     MAX_FILE_SIZE: process.env.MAX_FILE_SIZE,
     ALLOWED_FILE_TYPES: process.env.ALLOWED_FILE_TYPES,
+    SUPABASE_URL: process.env.SUPABASE_URL,
+    SUPABASE_SERVICE_ROLE_KEY: process.env.SUPABASE_SERVICE_ROLE_KEY,
+    SUPABASE_STORAGE_BUCKET: process.env.SUPABASE_STORAGE_BUCKET,
     ADMIN_TOKEN: process.env.ADMIN_TOKEN,
     ALLOWED_IPS: process.env.ALLOWED_IPS,
     RATE_LIMIT_MAX: process.env.RATE_LIMIT_MAX,
