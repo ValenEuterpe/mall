@@ -22,7 +22,8 @@ import { useMultiMapData } from "@/hooks/use-multi-map-data";
 import type { BuildingOverlay } from "@/components/home/LeafletMapView";
 import { useShopPopup } from "@/hooks/use-shop-popup";
 import { useMapPins } from "@/hooks/use-map-pins";
-import { useSidebarToggle } from "@/contexts/sidebar-toggle-context";
+import { useSidebarToggle, SIDEBAR_PANELS } from "@/contexts/sidebar-toggle-context";
+import { MobilePanelSheet } from "@/components/layout/MobilePanelSheet";
 import {
   UserProductCard,
   UserProductCardSkeleton,
@@ -164,6 +165,7 @@ export const ShopDetailClient = memo(function ShopDetailClient({
 }) {
   const t = useTranslations("shop");
   const tc = useTranslations("common");
+  const tHome = useTranslations("home");
   const router = useRouter();
   const locale = useLocale();
   const isMobile = useIsMobile();
@@ -230,7 +232,7 @@ export const ShopDetailClient = memo(function ShopDetailClient({
     isSelected,
   } = useMapPins();
 
-  const { filterOpen, mapOpen } = useSidebarToggle();
+  const { filterOpen, mapOpen, setMapOpen, toggleMap } = useSidebarToggle();
 
   // ---- Filter state ----
   const [selectedCategory, setSelectedCategory] = useState("all");
@@ -330,8 +332,15 @@ export const ShopDetailClient = memo(function ShopDetailClient({
         setFloorForBuilding(buildingFromCode, floorFromCode);
       }
     }
+    if (!mapOpen) {
+      if (isMobile) {
+        toggleMap();
+      } else {
+        setMapOpen(true);
+      }
+    }
     setTimeout(() => handleShopClick(shop.svgId!), 100);
-  }, [shop?.svgId, buildingFromCode, floorFromCode, mapBuildings, setFloorForBuilding, handleShopClick]);
+  }, [shop?.svgId, buildingFromCode, floorFromCode, mapBuildings, setFloorForBuilding, handleShopClick, mapOpen, isMobile, toggleMap, setMapOpen]);
 
   // ---- Derived ----
   const title =
@@ -677,6 +686,15 @@ export const ShopDetailClient = memo(function ShopDetailClient({
           </div>
         </div>
       )}
+
+      {/* Mobile Map Panel — opened via header Map button or "View on Map" */}
+      <MobilePanelSheet name={SIDEBAR_PANELS.map} title={tHome("map.title")}>
+        <div className="h-full p-3">
+          <div className="border-accent h-full rounded-lg border-4 shadow-lg">
+            <MapPanel {...mapPanelProps} />
+          </div>
+        </div>
+      </MobilePanelSheet>
 
       <ProductDetailModal
         productId={selectedProductId}
