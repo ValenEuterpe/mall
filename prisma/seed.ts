@@ -41,24 +41,7 @@ async function main() {
 
   console.log("✅ Database cleaned");
 
-  // 2. Create Mall Owner
-  console.log("👑 Creating Mall Owner...");
-
-  const hashedPassword = await bcrypt.hash("MallMall2026", 12);
-
-  const mallOwner = await prisma.mallOwner.create({
-    data: {
-      email: "mallowner@atomicmail.io",
-      password: hashedPassword,
-      name: "Mall Administrator",
-      phone: "+1234567890",
-      allowedIps: [], // Localhost for dev
-    },
-  });
-
-  console.log(`✅ Mall Owner created: ${mallOwner.email}`);
-
-  // 3. Seed Categories
+  // 2. Seed Categories
   console.log("📚 Seeding categories...");
 
   const enData = JSON.parse(
