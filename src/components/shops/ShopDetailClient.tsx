@@ -324,6 +324,8 @@ export const ShopDetailClient = memo(function ShopDetailClient({
 
   const handleShowOnMap = useCallback(() => {
     if (!shop?.svgId) return;
+    const svgId = shop.svgId;
+
     if (buildingFromCode) {
       const building = mapBuildings.find(
         (b) => b.buildingCode === buildingFromCode
@@ -332,14 +334,45 @@ export const ShopDetailClient = memo(function ShopDetailClient({
         setFloorForBuilding(buildingFromCode, floorFromCode);
       }
     }
+
     if (!mapOpen) {
-      if (isMobile) {
-        toggleMap();
-      } else {
-        setMapOpen(true);
-      }
+      if (isMobile) toggleMap();
+      else setMapOpen(true);
     }
-    setTimeout(() => handleShopClick(shop.svgId!), 100);
+
+    // The mobile sheet animates in (~200ms) and Leaflet lazy-renders the SVG
+    // overlay. Firing handleShopClick during either phase measures a moving
+    // rect, so the fixed-position popup lands offscreen. Poll via rAF until
+    // the element exists and its rect has been stable for two frames, then
+    // measure. ~120 frames (≈2s) cap guarantees the poll exits.
+    let lastTop: number | null = null;
+    let stableFrames = 0;
+    let attempts = 0;
+    const tick = (): void => {
+      const el =
+        document.querySelector(
+          `.svgwrapper svg [id="${CSS.escape(svgId)}"]`
+        ) ||
+        document.querySelector(`.svgwrapper [id="${CSS.escape(svgId)}"]`);
+      if (el) {
+        const rect = el.getBoundingClientRect();
+        if (rect.width > 0 && rect.height > 0) {
+          if (lastTop !== null && Math.abs(rect.top - lastTop) < 0.5) {
+            stableFrames += 1;
+            if (stableFrames >= 2) {
+              handleShopClick(svgId);
+              return;
+            }
+          } else {
+            stableFrames = 0;
+          }
+          lastTop = rect.top;
+        }
+      }
+      attempts += 1;
+      if (attempts < 120) requestAnimationFrame(tick);
+    };
+    requestAnimationFrame(tick);
   }, [shop?.svgId, buildingFromCode, floorFromCode, mapBuildings, setFloorForBuilding, handleShopClick, mapOpen, isMobile, toggleMap, setMapOpen]);
 
   // ---- Derived ----
@@ -655,11 +688,42 @@ export const ShopDetailClient = memo(function ShopDetailClient({
   // ===========================================================================
   // Layout
   // ===========================================================================
+  // Mirrors the home page (UnifiedPageClient): mobile and desktop are separate
+  // returns so the <MapPanel> mounts in exactly one place. Mounting it in both
+  // the sticky aside AND the MobilePanelSheet simultaneously causes the shop
+  // popup positioner (use-shop-popup.ts) to find the hidden copy first via
+  // document.querySelector and read getBoundingClientRect() = {0,0}.
+  // Document scrolls naturally in both — one scrollbar, footer reachable.
+
+  // ---- Mobile ----
+  if (isMobile) {
+    return (
+      <div className="relative w-full overflow-x-hidden">
+        {shopContent}
+
+        <MobilePanelSheet name={SIDEBAR_PANELS.map} title={tHome("map.title")}>
+          <div className="h-full p-3">
+            <div className="border-accent h-full rounded-lg border-4 shadow-lg">
+              <MapPanel {...mapPanelProps} />
+            </div>
+          </div>
+        </MobilePanelSheet>
+
+        <ProductDetailModal
+          productId={selectedProductId}
+          onClose={handleCloseProductDetail}
+          onRemoveFromMap={handleRemoveSelectedFromMap}
+          context="user"
+        />
+      </div>
+    );
+  }
+
+  // ---- Desktop ----
   return (
-    <div className="flex h-[calc(100vh-4rem)] w-full overflow-hidden">
-      {/* Filter Sidebar */}
-      {!isMobile && filterOpen && (
-        <div className="w-64 shrink-0 p-3 transition-all duration-200">
+    <div className="flex w-full">
+      {filterOpen && (
+        <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-64 shrink-0 self-start p-3 md:block">
           <div className="border-accent bg-background h-full overflow-y-auto rounded-lg border-4 p-4 shadow-lg">
             <ProductFilterPanel
               categories={categories}
@@ -672,29 +736,18 @@ export const ShopDetailClient = memo(function ShopDetailClient({
               onReset={handleResetFilters}
             />
           </div>
-        </div>
+        </aside>
       )}
 
-      {/* Scrollable content */}
-      <div className="flex-1 overflow-y-auto">{shopContent}</div>
+      <div className="min-w-0 flex-1">{shopContent}</div>
 
-      {/* Map sidebar (desktop) */}
-      {!isMobile && mapOpen && (
-        <div className="w-1/3 shrink-0 p-3 transition-all duration-200">
+      {mapOpen && (
+        <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-1/3 shrink-0 self-start p-3 md:block">
           <div className="border-accent h-full rounded-lg border-4 shadow-lg">
             <MapPanel {...mapPanelProps} />
           </div>
-        </div>
+        </aside>
       )}
-
-      {/* Mobile Map Panel — opened via header Map button or "View on Map" */}
-      <MobilePanelSheet name={SIDEBAR_PANELS.map} title={tHome("map.title")}>
-        <div className="h-full p-3">
-          <div className="border-accent h-full rounded-lg border-4 shadow-lg">
-            <MapPanel {...mapPanelProps} />
-          </div>
-        </div>
-      </MobilePanelSheet>
 
       <ProductDetailModal
         productId={selectedProductId}
