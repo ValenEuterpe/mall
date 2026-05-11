@@ -85,7 +85,11 @@ export const env = createEnv({
      * Sentry DSN. When unset, the SDK is a no-op — no errors leave the app.
      * Same value is used for client + server + edge runtimes.
      */
-    NEXT_PUBLIC_SENTRY_DSN: z.string().url().optional(),
+    NEXT_PUBLIC_SENTRY_DSN: z
+      .string()
+      .optional()
+      .transform((v) => (v === "" ? undefined : v))
+      .pipe(z.string().url().optional()),
   },
 
   /**
