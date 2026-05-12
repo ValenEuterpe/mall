@@ -218,7 +218,6 @@ export const ShopDetailClient = memo(function ShopDetailClient({
 
   const {
     activeShopSvgId,
-    shopPopupPos,
     activeShop,
     handleShopClick,
     handleCloseShopPopup,
@@ -324,8 +323,6 @@ export const ShopDetailClient = memo(function ShopDetailClient({
 
   const handleShowOnMap = useCallback(() => {
     if (!shop?.svgId) return;
-    const svgId = shop.svgId;
-
     if (buildingFromCode) {
       const building = mapBuildings.find(
         (b) => b.buildingCode === buildingFromCode
@@ -334,45 +331,14 @@ export const ShopDetailClient = memo(function ShopDetailClient({
         setFloorForBuilding(buildingFromCode, floorFromCode);
       }
     }
-
     if (!mapOpen) {
       if (isMobile) toggleMap();
       else setMapOpen(true);
     }
-
-    // The mobile sheet animates in (~200ms) and Leaflet lazy-renders the SVG
-    // overlay. Firing handleShopClick during either phase measures a moving
-    // rect, so the fixed-position popup lands offscreen. Poll via rAF until
-    // the element exists and its rect has been stable for two frames, then
-    // measure. ~120 frames (≈2s) cap guarantees the poll exits.
-    let lastTop: number | null = null;
-    let stableFrames = 0;
-    let attempts = 0;
-    const tick = (): void => {
-      const el =
-        document.querySelector(
-          `.svgwrapper svg [id="${CSS.escape(svgId)}"]`
-        ) ||
-        document.querySelector(`.svgwrapper [id="${CSS.escape(svgId)}"]`);
-      if (el) {
-        const rect = el.getBoundingClientRect();
-        if (rect.width > 0 && rect.height > 0) {
-          if (lastTop !== null && Math.abs(rect.top - lastTop) < 0.5) {
-            stableFrames += 1;
-            if (stableFrames >= 2) {
-              handleShopClick(svgId);
-              return;
-            }
-          } else {
-            stableFrames = 0;
-          }
-          lastTop = rect.top;
-        }
-      }
-      attempts += 1;
-      if (attempts < 120) requestAnimationFrame(tick);
-    };
-    requestAnimationFrame(tick);
+    // Position is re-measured live by useLiveSvgPosition inside MapPanel —
+    // the popup re-anchors every frame as the sheet animates in and Leaflet
+    // mounts, so we can set the active shop immediately.
+    handleShopClick(shop.svgId);
   }, [shop?.svgId, buildingFromCode, floorFromCode, mapBuildings, setFloorForBuilding, handleShopClick, mapOpen, isMobile, toggleMap, setMapOpen]);
 
   // ---- Derived ----
@@ -493,7 +459,6 @@ export const ShopDetailClient = memo(function ShopDetailClient({
     onRemoveProduct: handleRemoveFromMap,
     onViewProduct: handleViewProduct,
     activeShop,
-    shopPopupPos,
     onCloseShopPopup: handleCloseShopPopup,
     buildings: buildingOverlays,
   };

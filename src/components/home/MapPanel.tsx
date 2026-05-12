@@ -10,6 +10,7 @@ import type { BuildingOverlay } from "./LeafletMapView";
 import { ShopPinOverlay } from "./ShopPinOverlay";
 import { ShopInfoPopup } from "./ShopInfoPopup";
 import { usePromotions } from "@/hooks/use-promotions";
+import { useLiveSvgPosition } from "@/hooks/use-live-svg-position";
 import { PromotionOverlay } from "./PromotionOverlay";
 
 const LeafletMapView = dynamic(
@@ -43,7 +44,6 @@ export interface MapPanelProps {
   currentFloor?: string;
   onFloorChange?: (floor: string) => void;
   activeShop: ShopPopupData | null;
-  shopPopupPos: { x: number; y: number } | null;
   onCloseShopPopup: () => void;
   /** Multi-building mode */
   buildings?: BuildingOverlay[];
@@ -68,12 +68,16 @@ export function MapPanel({
   currentFloor,
   onFloorChange,
   activeShop,
-  shopPopupPos,
   onCloseShopPopup,
   buildings,
 }: MapPanelProps): React.ReactElement {
   const { currentPromotion, position, isFading, animationKey } =
     usePromotions();
+
+  // Live-tracked screen coords for the open shop popup. Re-measures on every
+  // Leaflet pan/zoom so the popup stays glued to its shop — same pattern as
+  // ShopPinOverlay uses for product pins.
+  const livePopupPos = useLiveSvgPosition(activeShop ? activeShopSvgId : null);
 
   return (
     <div className="relative h-full w-full">
@@ -109,10 +113,10 @@ export function MapPanel({
         onViewProduct={onViewProduct}
       />
 
-      {activeShop && shopPopupPos && (
+      {activeShop && livePopupPos && (
         <ShopInfoPopup
           shop={activeShop}
-          position={shopPopupPos}
+          position={livePopupPos}
           onClose={onCloseShopPopup}
         />
       )}

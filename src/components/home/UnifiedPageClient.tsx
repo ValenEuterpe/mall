@@ -95,7 +95,6 @@ export function UnifiedPageClient(): React.ReactElement {
   // Shop popup
   const {
     activeShopSvgId,
-    shopPopupPos,
     activeShop,
     handleShopClick,
     handleCloseShopPopup,
@@ -178,7 +177,6 @@ export function UnifiedPageClient(): React.ReactElement {
     onRemoveProduct: handleRemoveFromMap,
     onViewProduct: handleViewProduct,
     activeShop,
-    shopPopupPos,
     onCloseShopPopup: handleCloseShopPopup,
     buildings: buildingOverlays,
   };
