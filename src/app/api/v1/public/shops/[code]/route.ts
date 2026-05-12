@@ -11,6 +11,22 @@ import { logger } from "@/lib/utils/logger";
 import { enforceRateLimit, publicReadRateLimiter } from "@/lib/utils/rate-limit";
 import { shopCodeSchema, shopProductsQuerySchema } from "./schemas";
 
+type SupportedLocale = "en" | "ru" | "am";
+
+function parseLocale(value: string | null): SupportedLocale {
+  if (value === "ru" || value === "am" || value === "en") return value;
+  return "en";
+}
+
+function getLocalizedText(
+  locale: SupportedLocale,
+  values: { legacy: string | null; en: string | null; ru: string | null; am: string | null }
+): string | null {
+  if (locale === "ru") return values.ru ?? values.en ?? values.am ?? values.legacy;
+  if (locale === "am") return values.am ?? values.en ?? values.ru ?? values.legacy;
+  return values.en ?? values.ru ?? values.am ?? values.legacy;
+}
+
 export async function GET(
   request: NextRequest,
   context: { params: Promise<{ code: string }> }
@@ -20,6 +36,7 @@ export async function GET(
     if (limited) return limited.response;
 
     const { searchParams } = new URL(request.url);
+    const locale = parseLocale(searchParams.get("locale"));
     const queryParsed = shopProductsQuerySchema.safeParse({
       page: searchParams.get("page"),
       limit: searchParams.get("limit"),
@@ -115,7 +132,13 @@ export async function GET(
         select: {
           id: true,
           name: true,
+          name_en: true,
+          name_ru: true,
+          name_am: true,
           description: true,
+          description_en: true,
+          description_ru: true,
+          description_am: true,
           basePrice: true,
           stockQuantity: true,
           images: true,
@@ -159,8 +182,19 @@ export async function GET(
       }
       return {
         id: p.id,
-        name: p.name,
-        description: p.description,
+        name:
+          getLocalizedText(locale, {
+            legacy: p.name,
+            en: p.name_en,
+            ru: p.name_ru,
+            am: p.name_am,
+          }) ?? "",
+        description: getLocalizedText(locale, {
+          legacy: p.description,
+          en: p.description_en,
+          ru: p.description_ru,
+          am: p.description_am,
+        }),
         basePrice: p.basePrice,
         effectivePrice: activeDiscount ? effectivePrice : undefined,
         hasDiscount: !!activeDiscount,

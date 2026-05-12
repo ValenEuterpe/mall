@@ -6,6 +6,13 @@ import {
 } from "../helpers/selects";
 import { transformProductForList } from "../helpers/transform";
 
+type SupportedLocale = "en" | "ru" | "am";
+
+function parseLocale(value: string | null): SupportedLocale {
+  if (value === "ru" || value === "am" || value === "en") return value;
+  return "en";
+}
+
 /**
  * Fisher-Yates shuffle (in place).
  */
@@ -31,6 +38,7 @@ export async function getPromotionsHandler(
   const { searchParams } = new URL(request.url);
   const limitParam = parseInt(searchParams.get("limit") ?? "10", 10);
   const limit = Math.min(Math.max(1, limitParam), 20);
+  const locale = parseLocale(searchParams.get("locale"));
 
   // Step 1: Lightweight query for eligible product IDs
   const candidates = await prisma.product.findMany({
@@ -62,7 +70,7 @@ export async function getPromotionsHandler(
 
   // Transform and filter to only those with svgId
   const transformed = products
-    .map(transformProductForList)
+    .map((product) => transformProductForList(product, locale))
     .filter((p) => p.shop.svgId);
 
   // Shuffle the result to avoid ordering by ID

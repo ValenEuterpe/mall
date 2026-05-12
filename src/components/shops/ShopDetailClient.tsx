@@ -366,7 +366,7 @@ export const ShopDetailClient = memo(function ShopDetailClient({
         setLoading(true);
         const res = await apiClient.get<ShopDetailResponse>(
           `/public/shops/${code}`,
-          { page: 1, limit: 20 }
+          { page: 1, limit: 20, locale }
         );
         if (!res.success) throw new Error(res.error.message);
         if (cancelled) return;
@@ -389,7 +389,7 @@ export const ShopDetailClient = memo(function ShopDetailClient({
     return () => {
       cancelled = true;
     };
-  }, [code]);
+  }, [code, locale]);
 
   // ---- Auto-switch building/floor & highlight shop on map (once on load) ----
   const initialMapSyncDone = useRef(false);
@@ -427,6 +427,7 @@ export const ShopDetailClient = memo(function ShopDetailClient({
             .get<ShopDetailResponse>(`/public/shops/${code}`, {
               page: nextPage,
               limit: 20,
+              locale,
             })
             .then((res) => {
               if (!res.success) throw new Error(res.error.message);
@@ -443,7 +444,7 @@ export const ShopDetailClient = memo(function ShopDetailClient({
 
     observer.observe(sentinel);
     return () => observer.disconnect();
-  }, [code, hasMore, loading, loadingMore, page]);
+  }, [code, hasMore, loading, loadingMore, page, locale]);
 
   // ---- Map panel props ----
   const mapPanelProps = {

@@ -130,6 +130,7 @@ export function useProductSearch(
           limit,
           sortBy,
           sortOrder,
+          locale,
         };
 
         if (debouncedSearch) {
@@ -194,6 +195,7 @@ export function useProductSearch(
     limit,
     sortBy,
     sortOrder,
+    locale,
   ]);
 
   // Load categories

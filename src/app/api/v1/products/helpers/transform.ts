@@ -2,8 +2,29 @@ import { Prisma } from "@/prisma/generated/client";
 
 type ProductDetail = Prisma.ProductGetPayload<{ select: typeof import("./selects").PRODUCT_DETAIL_SELECT }>;
 
+type SupportedLocale = "en" | "ru" | "am";
+
+function getLocalizedText(
+    locale: SupportedLocale,
+    values: {
+        legacy: string | null;
+        en: string | null;
+        ru: string | null;
+        am: string | null;
+    }
+): string | null {
+    if (locale === "ru") {
+        return values.ru ?? values.en ?? values.am ?? values.legacy;
+    }
+    if (locale === "am") {
+        return values.am ?? values.en ?? values.ru ?? values.legacy;
+    }
+    return values.en ?? values.ru ?? values.am ?? values.legacy;
+}
+
 export function transformProductForList(
-    product: Prisma.ProductGetPayload<{ select: typeof import("./selects").PRODUCT_LIST_SELECT }>
+    product: Prisma.ProductGetPayload<{ select: typeof import("./selects").PRODUCT_LIST_SELECT }>,
+    locale: SupportedLocale = "en"
 ) {
     const activeDiscount = product.discounts[0];
 
@@ -19,8 +40,19 @@ export function transformProductForList(
 
     return {
         id: product.id,
-        name: product.name,
-        description: product.description,
+        name:
+            getLocalizedText(locale, {
+                legacy: product.name,
+                en: product.name_en,
+                ru: product.name_ru,
+                am: product.name_am,
+            }) ?? "",
+        description: getLocalizedText(locale, {
+            legacy: product.description,
+            en: product.description_en,
+            ru: product.description_ru,
+            am: product.description_am,
+        }),
         basePrice: product.basePrice,
         effectivePrice: Math.max(0, effectivePrice),
         stockQuantity: product.stockQuantity,
@@ -66,7 +98,7 @@ export function transformProductForList(
     };
 }
 
-export function transformProductForDetail(product: ProductDetail) {
+export function transformProductForDetail(product: ProductDetail, locale: SupportedLocale = "en") {
     const activeDiscount = product.discounts[0] ?? null;
 
     let effectivePrice = Number(product.basePrice);
@@ -81,8 +113,19 @@ export function transformProductForDetail(product: ProductDetail) {
 
     return {
         id: product.id,
-        name: product.name,
-        description: product.description,
+        name:
+            getLocalizedText(locale, {
+                legacy: product.name,
+                en: product.name_en,
+                ru: product.name_ru,
+                am: product.name_am,
+            }) ?? "",
+        description: getLocalizedText(locale, {
+            legacy: product.description,
+            en: product.description_en,
+            ru: product.description_ru,
+            am: product.description_am,
+        }),
 
         pricing: {
             basePrice: product.basePrice,

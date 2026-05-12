@@ -9,6 +9,13 @@ import { isValidProductId } from "../../helpers/utils";
 import { transformProductForDetail } from "../../helpers/transform";
 import { incrementViewCount } from "../../helpers/utils";
 
+type SupportedLocale = "en" | "ru" | "am";
+
+function parseLocale(value: string | null): SupportedLocale {
+    if (value === "ru" || value === "am" || value === "en") return value;
+    return "en";
+}
+
 
 export async function getProductDetailHandler(
     request: NextRequest,
@@ -16,6 +23,8 @@ export async function getProductDetailHandler(
 ): Promise<NextResponse> {
     const { id } = await params;
     const user = optionalAuth(request);
+    const { searchParams } = new URL(request.url);
+    const locale = parseLocale(searchParams.get("locale"));
 
     // Validate ID format
     if (!isValidProductId(id)) {
@@ -42,7 +51,7 @@ export async function getProductDetailHandler(
     });
 
     // Transform for response
-    const transformedProduct = transformProductForDetail(product);
+    const transformedProduct = transformProductForDetail(product, locale);
 
     // Log view for analytics
     logger.debug("Product viewed", {

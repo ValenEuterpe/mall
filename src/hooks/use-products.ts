@@ -1,6 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useLocale } from "next-intl";
 
 import { apiClient } from "@/lib/api-client";
 import { usePagination } from "./use-pagination";
@@ -237,6 +238,7 @@ function createFiltersKey(filters: ProductFilters, sort?: ProductSorting): strin
 // ============================================================================
 
 export function useProducts(options: UseProductsOptions = {}): UseProductsReturn {
+  const locale = useLocale();
   const {
     initialPage = 1,
     initialLimit = DEFAULT_LIMIT,
@@ -304,6 +306,7 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
 
       try {
         const params = buildQueryParams(pagination.page, pagination.limit, stableFilters, stableSort);
+        params.locale = locale;
 
         // baseUrl is already `/api/v1`, so we call `"/products"`
         const response = await apiClient.get<ProductListItem[]>("/products", params, {
@@ -337,7 +340,7 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
         }));
       }
     },
-    [enabled, pagination.page, pagination.limit, stableFilters, stableSort]
+    [enabled, pagination.page, pagination.limit, stableFilters, stableSort, locale]
   );
 
   useEffect(() => {
@@ -387,6 +390,7 @@ export function useProduct(
   id: string | null | undefined,
   options: UseProductOptions = {}
 ): UseProductReturn {
+  const locale = useLocale();
   const { enabled = true, onSuccess, onError } = options;
 
   const [state, setState] = useState<ProductState>({
@@ -417,10 +421,14 @@ export function useProduct(
     setState((prev) => ({ ...prev, isLoading: true, error: null }));
 
     try {
-      const response = await apiClient.get<ProductDetail>(`/products/${id}`, undefined, {
+      const response = await apiClient.get<ProductDetail>(
+        `/products/${id}`,
+        { locale },
+        {
         signal: abortControllerRef.current.signal,
         showErrorToast: false,
-      });
+        }
+      );
 
       if (!isMountedRef.current) return;
 
@@ -439,7 +447,7 @@ export function useProduct(
       setState({ product: null, isLoading: false, error: err });
       onErrorRef.current?.(err);
     }
-  }, [id, enabled]);
+  }, [id, enabled, locale]);
 
   useEffect(() => {
     isMountedRef.current = true;

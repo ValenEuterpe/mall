@@ -117,8 +117,9 @@ export const ProductDetailModal = memo(function ProductDetailModal({
       try {
         const res = await apiClient.get<ProductDetail>(
           `/products/${productId}`,
+          { locale },
           {
-            showErrorToast: false,
+            showErrorToast: false
           }
         );
         if (!cancelled && res.success) {
@@ -138,7 +139,7 @@ export const ProductDetailModal = memo(function ProductDetailModal({
     return () => {
       cancelled = true;
     };
-  }, [productId, t]);
+  }, [productId, t, locale]);
 
   const handlePrevImage = useCallback(() => {
     if (!product) return;

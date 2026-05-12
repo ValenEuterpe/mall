@@ -22,9 +22,17 @@ import { parseProductFilters, buildFilterConditions } from "../helpers/filters";
 import { transformProductForList } from "../helpers/transform";
 import { logProductSearch } from "../helpers/utils";
 
+type SupportedLocale = "en" | "ru" | "am";
+
+function parseLocale(value: string | null): SupportedLocale {
+    if (value === "ru" || value === "am" || value === "en") return value;
+    return "en";
+}
+
 export async function getProductsHandler(request: NextRequest): Promise<NextResponse> {
     const user = optionalAuth(request);
     const { searchParams } = new URL(request.url);
+    const locale = parseLocale(searchParams.get("locale"));
 
     // Parse and validate pagination
     const pagination = parsePaginationQuery(searchParams, {
@@ -77,7 +85,9 @@ export async function getProductsHandler(request: NextRequest): Promise<NextResp
         ]);
 
         // Transform products for response
-        const transformedProducts = products.map(transformProductForList);
+        const transformedProducts = products.map((product) =>
+            transformProductForList(product, locale)
+        );
 
         // Generate pagination metadata
         const meta = getPaginationMeta(pagination.page, pagination.limit, total);
