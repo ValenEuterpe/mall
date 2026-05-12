@@ -170,7 +170,7 @@ const QuickActionButtons = memo(function QuickActionButtons({
   );
 
   return (
-    <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-0 transition-opacity group-hover:opacity-100">
+    <div className="absolute top-2 right-2 flex flex-col gap-2 opacity-100 transition-opacity md:opacity-0 md:group-hover:opacity-100">
       <TooltipProvider>
         <Tooltip>
           <TooltipTrigger asChild>
