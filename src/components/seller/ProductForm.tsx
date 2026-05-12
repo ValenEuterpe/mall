@@ -938,7 +938,7 @@ function DiscountSection({ productId }: DiscountSectionProps) {
                   <div>
                     <span className="text-sm font-medium">{displayName || t("noDiscounts")}</span>
                     <span className="text-muted-foreground ml-2 text-xs">
-                      {d.discountType === "percentage" ? `-${d.discountValue}%` : `-${d.discountValue} AMD`}
+                      {d.discountType === "percentage" ? `-${d.discountValue}%` : `-${d.discountValue} ֏`}
                       {dateRange}
                     </span>
                   </div>

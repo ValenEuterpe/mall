@@ -1,3 +1,5 @@
+import { formatAmdPrice } from "@/lib/utils/price";
+
 export interface ProductCardShop {
   id: string;
   fullCode: string;
@@ -101,13 +103,7 @@ export function getStockStatus(quantity: number): StockStatusInfo {
 
 export function formatPrice(
   price: number,
-  locale: string,
-  currency: string = "USD"
+  locale: string
 ): string {
-  return new Intl.NumberFormat(locale, {
-    style: "currency",
-    currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(price);
+  return formatAmdPrice(price, locale);
 }

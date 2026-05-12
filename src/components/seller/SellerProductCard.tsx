@@ -593,7 +593,7 @@ export const SellerProductCard = memo(function SellerProductCard({
                 <Badge key={d.id} variant="secondary" className="gap-1 bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">
                   <Percent className="h-3 w-3" />
                   {displayName ? `${displayName}: ` : ""}
-                  {d.discountType === "percentage" ? `-${d.discountValue}%` : `-${d.discountValue} AMD`}
+                  {d.discountType === "percentage" ? `-${d.discountValue}%` : `-${formatPrice(d.discountValue, locale)}`}
                   <button
                     className="ml-0.5 hover:text-red-900"
                     onClick={() => void handleDeleteDiscount(d.id)}

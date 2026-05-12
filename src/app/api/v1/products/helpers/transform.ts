@@ -130,7 +130,7 @@ export function transformProductForDetail(product: ProductDetail, locale: Suppor
         pricing: {
             basePrice: product.basePrice,
             effectivePrice: Number(effectivePrice.toFixed(2)),
-            currency: "USD",
+            currency: "AMD",
             hasDiscount: !!activeDiscount,
             discountInfo: activeDiscount
                 ? {

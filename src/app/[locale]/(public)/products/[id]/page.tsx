@@ -24,6 +24,7 @@ import { useCart } from "@/hooks/use-cart";
 import type { CartProduct } from "@/lib/cart/types";
 import { toast } from "@/lib/utils/toast";
 import { cn } from "@/lib/utils";
+import { formatAmdPrice } from "@/lib/utils/price";
 import {
   useProduct,
   useProducts,
@@ -52,10 +53,7 @@ export default function ProductDetailPage({
 
   const formattedPrice = useMemo(() => {
     if (!product) return "";
-    return new Intl.NumberFormat(locale, {
-      style: "currency",
-      currency: product.pricing.currency,
-    }).format(product.pricing.effectivePrice);
+    return formatAmdPrice(product.pricing.effectivePrice, locale);
   }, [locale, product]);
 
   const categoryLabel = useMemo(() => {

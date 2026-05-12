@@ -2,8 +2,10 @@
 
 import React, { memo, useRef, useEffect, useState } from "react";
 import Image from "next/image";
+import { useLocale } from "next-intl";
 import { ImageOff } from "lucide-react";
 import type { PromotionProduct } from "@/hooks/use-promotions";
+import { formatAmdPrice } from "@/lib/utils/price";
 
 // ============================================================================
 // Types
@@ -28,6 +30,7 @@ export const PromotionOverlay = memo(function PromotionOverlay({
   animationKey,
   onViewProduct,
 }: PromotionOverlayProps) {
+  const locale = useLocale();
   const cardRef = useRef<HTMLDivElement>(null);
   const [dims, setDims] = useState({ w: 0, h: 0, perimeter: 0 });
 
@@ -138,7 +141,7 @@ export const PromotionOverlay = memo(function PromotionOverlay({
                 <div className="bg-destructive text-destructive-foreground absolute bottom-0 left-0 rounded-tr-md px-1 text-[9px] font-bold">
                   {promotion.discount.type === "percentage"
                     ? `-${promotion.discount.value}%`
-                    : `-${Number(promotion.discount.value).toLocaleString()} ֏`}
+                    : `-${formatAmdPrice(Number(promotion.discount.value), locale)}`}
                 </div>
               )}
             </div>
@@ -153,15 +156,15 @@ export const PromotionOverlay = memo(function PromotionOverlay({
               {hasDiscount ? (
                 <div className="mt-0.5 flex items-baseline gap-1">
                   <span className="text-destructive text-xs font-semibold">
-                    {promotion.effectivePrice.toLocaleString()} ֏
+                    {formatAmdPrice(promotion.effectivePrice, locale)}
                   </span>
                   <span className="text-muted-foreground text-[10px] line-through">
-                    {Number(promotion.basePrice).toLocaleString()} ֏
+                    {formatAmdPrice(Number(promotion.basePrice), locale)}
                   </span>
                 </div>
               ) : (
                 <p className="text-accent-foreground mt-0.5 text-xs font-semibold">
-                  {Number(promotion.basePrice).toLocaleString()} ֏
+                  {formatAmdPrice(Number(promotion.basePrice), locale)}
                 </p>
               )}
 
