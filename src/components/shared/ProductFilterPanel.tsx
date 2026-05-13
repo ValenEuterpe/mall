@@ -90,7 +90,14 @@ export const ProductFilterPanel = memo(function ProductFilterPanel({
             <SelectContent>
               <SelectItem value="all">{t("allCategories")}</SelectItem>
               {categories.map((cat) => (
-                <SelectItem key={cat.id} value={cat.id}>
+                <SelectItem
+                  key={cat.id}
+                  value={cat.id}
+                  className={cat.type === "subcategory" ? "pl-6" : undefined}
+                >
+                  {cat.type === "subcategory" && (
+                    <span className="text-muted-foreground mr-1">└─ </span>
+                  )}
                   {cat.name}
                   {cat.productCount !== undefined && (
                     <span className="text-muted-foreground ml-2">
