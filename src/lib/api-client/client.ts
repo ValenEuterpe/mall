@@ -631,6 +631,8 @@ export class ApiClient {
       successMessage,
       errorMessage,
       signal,
+      skipCsrf = false,
+      _isRetryAfterCsrf = false,
     } = config;
 
     const formData = new FormData();
@@ -641,6 +643,21 @@ export class ApiClient {
         formData.append(key, value);
       });
     }
+
+    // POST is unsafe — attach CSRF unless explicitly skipped.
+    const csrfToken = !skipCsrf
+      ? csrfTokenManager.getToken() ?? (await csrfTokenManager.fetchToken())
+      : null;
+
+    const retryAfterCsrfRefresh = async (): Promise<ApiResponse<T>> => {
+      csrfTokenManager.clear();
+      const refreshed = await csrfTokenManager.fetchToken();
+      if (!refreshed) return null as never;
+      return this.upload<T>(endpoint, file, {
+        ...config,
+        _isRetryAfterCsrf: true,
+      });
+    };
 
     if (onProgress) {
       return new Promise((resolve, reject) => {
@@ -668,6 +685,17 @@ export class ApiClient {
               { ok: false, status: xhr.status } as Response,
               data
             );
+
+            if (
+              xhr.status === 403 &&
+              err.code === "CSRF_ERROR" &&
+              !skipCsrf &&
+              !_isRetryAfterCsrf
+            ) {
+              retryAfterCsrfRefresh().then(resolve).catch(reject);
+              return;
+            }
+
             if (showErrorToast) toast.error(errorMessage || err.message);
             reject(err);
           } catch {
@@ -711,6 +739,10 @@ export class ApiClient {
         xhr.timeout = timeout;
         xhr.withCredentials = true;
 
+        if (csrfToken) {
+          xhr.setRequestHeader("x-csrf-token", csrfToken);
+        }
+
         if (signal) {
           signal.addEventListener("abort", () => xhr.abort());
         }
@@ -723,6 +755,7 @@ export class ApiClient {
       method: "POST",
       body: formData,
       credentials: "include",
+      headers: csrfToken ? { "x-csrf-token": csrfToken } : undefined,
       signal,
     });
 
@@ -730,6 +763,16 @@ export class ApiClient {
 
     if (!response.ok) {
       const err = this.createError(response, data);
+
+      if (
+        response.status === 403 &&
+        err.code === "CSRF_ERROR" &&
+        !skipCsrf &&
+        !_isRetryAfterCsrf
+      ) {
+        return retryAfterCsrfRefresh();
+      }
+
       if (showErrorToast) toast.error(errorMessage || err.message);
       throw err;
     }
