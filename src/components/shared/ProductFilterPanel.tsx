@@ -87,7 +87,7 @@ export const ProductFilterPanel = memo(function ProductFilterPanel({
             <SelectTrigger>
               <SelectValue placeholder={t("allCategories")} />
             </SelectTrigger>
-            <SelectContent>
+            <SelectContent className="max-h-[300px] overflow-y-auto">
               <SelectItem value="all">{t("allCategories")}</SelectItem>
               {categories.map((cat) => (
                 <SelectItem
