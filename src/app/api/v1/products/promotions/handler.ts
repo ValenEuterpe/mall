@@ -5,13 +5,7 @@ import {
   getProductListSelect,
 } from "../helpers/selects";
 import { transformProductForList } from "../helpers/transform";
-
-type SupportedLocale = "en" | "ru" | "am";
-
-function parseLocale(value: string | null): SupportedLocale {
-  if (value === "ru" || value === "am" || value === "en") return value;
-  return "en";
-}
+import { parseLocale } from "@/lib/i18n/locale";
 
 /**
  * Fisher-Yates shuffle (in place).

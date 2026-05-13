@@ -10,22 +10,7 @@ import { activeDiscountWhere } from "@/app/api/v1/products/helpers/selects";
 import { logger } from "@/lib/utils/logger";
 import { enforceRateLimit, publicReadRateLimiter } from "@/lib/utils/rate-limit";
 import { shopCodeSchema, shopProductsQuerySchema } from "./schemas";
-
-type SupportedLocale = "en" | "ru" | "am";
-
-function parseLocale(value: string | null): SupportedLocale {
-  if (value === "ru" || value === "am" || value === "en") return value;
-  return "en";
-}
-
-function getLocalizedText(
-  locale: SupportedLocale,
-  values: { legacy: string | null; en: string | null; ru: string | null; am: string | null }
-): string | null {
-  if (locale === "ru") return values.ru ?? values.en ?? values.am ?? values.legacy;
-  if (locale === "am") return values.am ?? values.en ?? values.ru ?? values.legacy;
-  return values.en ?? values.ru ?? values.am ?? values.legacy;
-}
+import { parseLocale, getLocalizedText } from "@/lib/i18n/locale";
 
 export async function GET(
   request: NextRequest,

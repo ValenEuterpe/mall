@@ -27,7 +27,8 @@
       "Bash(awk '$1 >= 3')",
       "Bash(echo \"Exit: $?\")",
       "WebSearch",
-      "Bash(npm test *)"
+      "Bash(npm test *)",
+      "Bash(git show *)"
     ]
   }
 }

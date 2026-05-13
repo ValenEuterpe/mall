@@ -8,13 +8,7 @@ import { getProductDetailSelect } from "../../helpers/selects";
 import { isValidProductId } from "../../helpers/utils";
 import { transformProductForDetail } from "../../helpers/transform";
 import { incrementViewCount } from "../../helpers/utils";
-
-type SupportedLocale = "en" | "ru" | "am";
-
-function parseLocale(value: string | null): SupportedLocale {
-    if (value === "ru" || value === "am" || value === "en") return value;
-    return "en";
-}
+import { parseLocale } from "@/lib/i18n/locale";
 
 
 export async function getProductDetailHandler(

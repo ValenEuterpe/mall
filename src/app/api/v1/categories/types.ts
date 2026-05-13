@@ -1,3 +1,5 @@
+export type { SupportedLocale } from "@/lib/i18n/locale";
+
 export interface FormattedCategory {
   id: string;
   key: string;
@@ -13,5 +15,3 @@ export interface FormattedSubcategory {
   name: string;
   productCount: number;
 }
-
-export type SupportedLocale = "en" | "ru" | "am";

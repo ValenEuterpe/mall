@@ -2,7 +2,7 @@ import { Prisma } from "@/prisma/generated/client";
 
 import type { FormattedCategory, SupportedLocale } from "../types";
 import { CATEGORY_SELECT } from "../selects";
-import { getLocalizedName } from "./get-localized-name";
+import { getLocalizedName } from "@/lib/i18n/locale";
 
 export function formatCategory(
   category: Prisma.CategoryGetPayload<{ select: typeof CATEGORY_SELECT }>,

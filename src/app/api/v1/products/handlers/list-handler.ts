@@ -21,13 +21,7 @@ import { getProductListSelect } from "../helpers/selects";
 import { parseProductFilters, buildFilterConditions } from "../helpers/filters";
 import { transformProductForList } from "../helpers/transform";
 import { logProductSearch } from "../helpers/utils";
-
-type SupportedLocale = "en" | "ru" | "am";
-
-function parseLocale(value: string | null): SupportedLocale {
-    if (value === "ru" || value === "am" || value === "en") return value;
-    return "en";
-}
+import { parseLocale } from "@/lib/i18n/locale";
 
 export async function getProductsHandler(request: NextRequest): Promise<NextResponse> {
     const user = optionalAuth(request);

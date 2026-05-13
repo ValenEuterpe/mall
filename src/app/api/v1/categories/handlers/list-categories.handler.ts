@@ -5,7 +5,7 @@ import { successResponse } from "@/lib/api/response";
 import type { FormattedCategory } from "../types";
 import { CATEGORY_SELECT } from "../selects";
 import { CACHE_MAX_AGE, CACHE_STALE_WHILE_REVALIDATE } from "../constants";
-import { parseLocale } from "../utils/parse-locale";
+import { parseLocale } from "@/lib/i18n/locale";
 import { formatCategory } from "../utils/format-category";
 import { flattenCategories } from "../utils/flatten-categories";
 

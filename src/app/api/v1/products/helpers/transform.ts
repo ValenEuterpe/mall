@@ -1,26 +1,8 @@
 import { Prisma } from "@/prisma/generated/client";
 
+import { getLocalizedText, type SupportedLocale } from "@/lib/i18n/locale";
+
 type ProductDetail = Prisma.ProductGetPayload<{ select: typeof import("./selects").PRODUCT_DETAIL_SELECT }>;
-
-type SupportedLocale = "en" | "ru" | "am";
-
-function getLocalizedText(
-    locale: SupportedLocale,
-    values: {
-        legacy: string | null;
-        en: string | null;
-        ru: string | null;
-        am: string | null;
-    }
-): string | null {
-    if (locale === "ru") {
-        return values.ru ?? values.en ?? values.am ?? values.legacy;
-    }
-    if (locale === "am") {
-        return values.am ?? values.en ?? values.ru ?? values.legacy;
-    }
-    return values.en ?? values.ru ?? values.am ?? values.legacy;
-}
 
 export function transformProductForList(
     product: Prisma.ProductGetPayload<{ select: typeof import("./selects").PRODUCT_LIST_SELECT }>,
