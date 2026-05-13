@@ -32,6 +32,14 @@ export interface UserProductCardProps {
   isInCart?: boolean;
   isFavorite?: boolean;
   onAddToMap?: () => void;
+  /**
+   * Called when the user presses the footer button while the product is on the
+   * map. When the parent owns the map-selection state (home/search/shop pages),
+   * pass this so removal is delegated to the parent — keeping the parent's
+   * `isInCart` prop authoritative. When omitted, the card falls back to its
+   * internal `useMapSelection` instance.
+   */
+  onRemoveFromMap?: () => void;
   onToggleFavorite?: () => void;
   onShowDetails?: () => void;
   showShopInfo?: boolean;
@@ -240,6 +248,7 @@ export const UserProductCard = memo(function UserProductCard({
   isInCart: isInCartProp,
   isFavorite = false,
   onAddToMap,
+  onRemoveFromMap,
   onToggleFavorite,
   onShowDetails,
   showShopInfo = true,
@@ -247,9 +256,10 @@ export const UserProductCard = memo(function UserProductCard({
   className,
 }: UserProductCardProps) {
   const t = useTranslations("products.card");
+  const tProducts = useTranslations("products");
   const locale = useLocale();
 
-  const { addProduct, isSelected } = useMapSelection();
+  const { addProduct, removeProduct, isSelected } = useMapSelection();
   const { addItem, isInCart: cartIsInCart } = useCart();
   const inRoute = isInCartProp ?? isSelected(product.id);
   const inShoppingCart = cartIsInCart(product.id);
@@ -308,15 +318,20 @@ export const UserProductCard = memo(function UserProductCard({
     toast.success(t("addedToCart"));
   }, [addItem, inShoppingCart, inStock, product, t]);
 
-  const handleAddToMapClick = useCallback(
+  const handleToggleMapClick = useCallback(
     (e: React.MouseEvent) => {
       e.preventDefault();
       e.stopPropagation();
 
       if (inRoute) {
-        toast.info(t("alreadyInRoute"), {
-          description: t("alreadyInRouteDescription"),
-        });
+        // Delegate to the parent when it owns the canonical selection state
+        // (home/search/shop pages); otherwise fall back to local mutation.
+        if (onRemoveFromMap) {
+          onRemoveFromMap();
+          return;
+        }
+        removeProduct(product.id);
+        toast.success(tProducts("removedFromMap"));
         return;
       }
 
@@ -332,7 +347,17 @@ export const UserProductCard = memo(function UserProductCard({
         description: t("addedToRouteDescription"),
       });
     },
-    [addProduct, inRoute, inStock, onAddToMap, product.id, t]
+    [
+      addProduct,
+      inRoute,
+      inStock,
+      onAddToMap,
+      onRemoveFromMap,
+      product.id,
+      removeProduct,
+      t,
+      tProducts,
+    ]
   );
 
   const handleShowDetailsClick = useCallback(
@@ -492,12 +517,6 @@ export const UserProductCard = memo(function UserProductCard({
           ) : (
             <p className="text-primary text-xl font-bold">{formattedPrice}</p>
           )}
-          {inRoute && (
-            <Badge variant="outline" className="text-xs">
-              <MapPin className="mr-1 h-3 w-3" />
-              {t("inRoute")}
-            </Badge>
-          )}
         </div>
       </CardContent>
 
@@ -506,11 +525,11 @@ export const UserProductCard = memo(function UserProductCard({
           variant={inRoute ? "secondary" : "outline"}
           size="sm"
           className="w-full"
-          onClick={handleAddToMapClick}
-          disabled={!inStock || inRoute}
+          onClick={handleToggleMapClick}
+          disabled={!inStock && !inRoute}
         >
           <MapPin className="mr-1.5 h-4 w-4" />
-          {inRoute ? t("inRoute") : t("addToRoute")}
+          {inRoute ? tProducts("removeFromMap") : tProducts("addToMap")}
         </Button>
       </CardFooter>
     </Card>

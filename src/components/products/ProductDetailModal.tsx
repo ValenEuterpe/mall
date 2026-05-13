@@ -97,7 +97,7 @@ export const ProductDetailModal = memo(function ProductDetailModal({
   const [product, setProduct] = useState<ProductDetail | null>(null);
   const [loading, setLoading] = useState(false);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
-  const [isOnMap, setIsOnMap] = useState(isOnMapProp ?? false);
+  const isOnMap = isOnMapProp ?? false;
 
   const { addItem, isInCart: cartIsInCart } = useCart();
 
@@ -158,10 +158,8 @@ export const ProductDetailModal = memo(function ProductDetailModal({
   const handleToggleMap = useCallback(() => {
     if (isOnMap) {
       onRemoveFromMap?.();
-      setIsOnMap(false);
     } else {
       onAddToMap?.();
-      setIsOnMap(true);
     }
   }, [isOnMap, onRemoveFromMap, onAddToMap]);
 

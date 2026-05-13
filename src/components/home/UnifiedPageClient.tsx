@@ -151,6 +151,17 @@ export function UnifiedPageClient(): React.ReactElement {
     }
   }, [selectedProductId, handleRemoveFromMap]);
 
+  const selectedProduct = useMemo(
+    () => products.find((p) => p.id === selectedProductId) ?? null,
+    [products, selectedProductId]
+  );
+
+  const handleAddSelectedToMap = useCallback(() => {
+    if (selectedProduct) {
+      handleAddToMap(selectedProduct);
+    }
+  }, [selectedProduct, handleAddToMap]);
+
   const handleCategoryClick = useCallback(
     (categoryId: string) => {
       setSelectedCategory(categoryId);
@@ -199,6 +210,7 @@ export function UnifiedPageClient(): React.ReactElement {
             onResetFilters={handleResetFilters}
             onViewProduct={handleViewProduct}
             onAddToMap={handleAddToMap}
+            onRemoveFromMap={handleRemoveFromMap}
             isSelected={isSelected}
             isFavorite={isFavorite}
             onToggleFavorite={toggleFavorite}
@@ -213,6 +225,7 @@ export function UnifiedPageClient(): React.ReactElement {
             onClearCategory={handleClearCategory}
             onViewProduct={handleViewProduct}
             onAddToMap={handleAddToMap}
+            onRemoveFromMap={handleRemoveFromMap}
             isSelected={isSelected}
             isFavorite={isFavorite}
             onToggleFavorite={toggleFavorite}
@@ -248,7 +261,9 @@ export function UnifiedPageClient(): React.ReactElement {
         <ProductDetailModal
           productId={selectedProductId}
           onClose={handleCloseProductDetail}
+          onAddToMap={selectedProduct ? () => handleAddToMap(selectedProduct) : undefined}
           onRemoveFromMap={handleRemoveSelectedFromMap}
+          isOnMap={selectedProductId ? isSelected(selectedProductId) : false}
           context="user"
         />
       </div>
@@ -277,6 +292,7 @@ export function UnifiedPageClient(): React.ReactElement {
             onClearCategory={handleClearCategory}
             onViewProduct={handleViewProduct}
             onAddToMap={handleAddToMap}
+            onRemoveFromMap={handleRemoveFromMap}
             isSelected={isSelected}
             isFavorite={isFavorite}
             onToggleFavorite={toggleFavorite}
@@ -294,7 +310,9 @@ export function UnifiedPageClient(): React.ReactElement {
         <ProductDetailModal
           productId={selectedProductId}
           onClose={handleCloseProductDetail}
+          onAddToMap={selectedProduct ? () => handleAddToMap(selectedProduct) : undefined}
           onRemoveFromMap={handleRemoveSelectedFromMap}
+          isOnMap={selectedProductId ? isSelected(selectedProductId) : false}
           context="user"
         />
       </div>
@@ -336,6 +354,7 @@ export function UnifiedPageClient(): React.ReactElement {
           onResetFilters={handleResetFilters}
           onViewProduct={handleViewProduct}
           onAddToMap={handleAddToMap}
+          onRemoveFromMap={handleRemoveFromMap}
           isSelected={isSelected}
           isFavorite={isFavorite}
           onToggleFavorite={toggleFavorite}
@@ -354,7 +373,9 @@ export function UnifiedPageClient(): React.ReactElement {
       <ProductDetailModal
         productId={selectedProductId}
         onClose={handleCloseProductDetail}
+        onAddToMap={selectedProduct ? () => handleAddToMap(selectedProduct) : undefined}
         onRemoveFromMap={handleRemoveSelectedFromMap}
+        isOnMap={selectedProductId ? isSelected(selectedProductId) : false}
         context="user"
       />
     </div>

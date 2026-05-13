@@ -28,7 +28,9 @@
       "Bash(echo \"Exit: $?\")",
       "WebSearch",
       "Bash(npm test *)",
-      "Bash(git show *)"
+      "Bash(git show *)",
+      "Bash(awk 'NR<=1450 && /^    \"/{ns=$0} NR==1444{print ns}' src/messages/en.json)",
+      "Bash(awk 'NR<=1080 && /^  \"/{ns=$0} NR==1074{print ns}' src/messages/en.json)"
     ]
   }
 }

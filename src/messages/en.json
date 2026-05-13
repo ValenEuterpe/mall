@@ -1071,6 +1071,7 @@
     }
   },
   "products": {
+    "removeFromMap": "Remove from map",
     "removedFromMap": "Removed from map",
     "featuredProducts": "Featured Products",
     "newArrivals": "New Arrivals",
@@ -1441,7 +1442,7 @@
       "tryDifferentSearch": "Try adjusting your search or filters",
       "loadMore": "Load More",
       "addToMap": "Show on Map",
-      "removeFromMap": "Remove",
+"removeFromMap": "Remove from Map",
       "addedToMap": "Product added to map",
       "noShopLocation": "This product's shop location is not available on the map",
       "viewDetail": "View Detail",
@@ -1752,7 +1753,7 @@
     "editProduct": "Edit Product",
     "addToMap": "Add to Map",
     "addToCart": "Add to Cart",
-    "removeFromMap": "Remove",
+    "removeFromMap": "Remove from Map",
     "viewShop": "View Shop",
     "inStock": "in stock",
     "outOfStock": "Out of Stock",

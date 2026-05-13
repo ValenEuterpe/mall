@@ -21,6 +21,7 @@ interface HomeLandingContentProps {
   onClearCategory: () => void;
   onViewProduct: (productId: string) => void;
   onAddToMap: (product: ProductSearchItem) => void;
+  onRemoveFromMap: (productId: string) => void;
   isSelected: (productId: string) => boolean;
   isFavorite: (productId: string) => boolean;
   onToggleFavorite: (productId: string) => void;
@@ -35,6 +36,7 @@ export function HomeLandingContent({
   onClearCategory,
   onViewProduct,
   onAddToMap,
+  onRemoveFromMap,
   isSelected,
   isFavorite,
   onToggleFavorite,
@@ -241,6 +243,7 @@ export function HomeLandingContent({
                   isFavorite={isFavorite(product.id)}
                   onToggleFavorite={() => onToggleFavorite(product.id)}
                   onAddToMap={() => onAddToMap(product)}
+                  onRemoveFromMap={() => onRemoveFromMap(product.id)}
                   onShowDetails={() => onViewProduct(product.id)}
                   showShopInfo
                 />

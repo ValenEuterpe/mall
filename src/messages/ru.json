@@ -1071,6 +1071,7 @@
     }
   },
   "products": {
+    "removeFromMap": "Удалить с карты",
     "removedFromMap": "Удалено с карты",
     "featuredProducts": "Рекомендуемые товары",
     "newArrivals": "Новинки",

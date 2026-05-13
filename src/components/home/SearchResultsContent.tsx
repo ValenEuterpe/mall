@@ -17,6 +17,7 @@ interface SearchResultsContentProps {
   onResetFilters: () => void;
   onViewProduct: (productId: string) => void;
   onAddToMap: (product: ProductSearchItem) => void;
+  onRemoveFromMap: (productId: string) => void;
   isSelected: (productId: string) => boolean;
   isFavorite: (productId: string) => boolean;
   onToggleFavorite: (productId: string) => void;
@@ -32,6 +33,7 @@ export function SearchResultsContent({
   onResetFilters,
   onViewProduct,
   onAddToMap,
+  onRemoveFromMap,
   isSelected,
   isFavorite,
   onToggleFavorite,
@@ -109,6 +111,7 @@ export function SearchResultsContent({
                     isFavorite={isFavorite(product.id)}
                     onToggleFavorite={() => onToggleFavorite(product.id)}
                     onAddToMap={() => onAddToMap(product)}
+                    onRemoveFromMap={() => onRemoveFromMap(product.id)}
                     onShowDetails={() => onViewProduct(product.id)}
                     showShopInfo
                   />

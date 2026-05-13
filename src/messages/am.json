@@ -1071,6 +1071,7 @@
     }
   },
   "products": {
+    "removeFromMap": "Հեռացնել քարտեզից",
     "removedFromMap": "Հեռացվեց քարտեզից",
     "featuredProducts": "Առանձնացված ապրանքներ",
     "newArrivals": "Նոր տեսականի",

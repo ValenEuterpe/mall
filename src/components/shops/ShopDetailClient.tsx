@@ -632,6 +632,7 @@ export const ShopDetailClient = memo(function ShopDetailClient({
               onAddToMap={() =>
                 mapPinsAddToMap({ id: p.id, shop: { svgId: shop.svgId } })
               }
+              onRemoveFromMap={() => handleRemoveFromMap(p.id)}
               onShowDetails={() => handleViewProduct(p.id)}
               showShopInfo={false}
             />
@@ -718,7 +719,12 @@ export const ShopDetailClient = memo(function ShopDetailClient({
       <ProductDetailModal
         productId={selectedProductId}
         onClose={handleCloseProductDetail}
+        onAddToMap={() =>
+          selectedProductId &&
+          mapPinsAddToMap({ id: selectedProductId, shop: { svgId: shop?.svgId } })
+        }
         onRemoveFromMap={handleRemoveSelectedFromMap}
+        isOnMap={selectedProductId ? isSelected(selectedProductId) : false}
         context="user"
       />
     </div>
