@@ -22,74 +22,81 @@ let lastVerifiedAt: Date | null = null;
  * Create or get the email transporter
  */
 export function getTransporter(): nodemailer.Transporter<SMTPPool.SentMessageInfo> {
-    if (!transporter) {
-        transporter = nodemailer.createTransport({
-            pool: true,
-            host: EMAIL_CONFIG.smtp.host,
-            port: EMAIL_CONFIG.smtp.port,
-            secure: EMAIL_CONFIG.smtp.secure,
-            auth: {
-                user: EMAIL_CONFIG.smtp.user,
-                pass: EMAIL_CONFIG.smtp.password,
-            },
-            maxConnections: EMAIL_CONFIG.pool.maxConnections,
-            maxMessages: EMAIL_CONFIG.pool.maxMessages,
-        });
-    }
+  if (!transporter) {
+    console.log("[EMAIL-DEBUG] Creating SMTP transporter", {
+      host: EMAIL_CONFIG.smtp.host,
+      port: EMAIL_CONFIG.smtp.port,
+      secure: EMAIL_CONFIG.smtp.secure,
+      user: EMAIL_CONFIG.smtp.user,
+      deliveryMode: EMAIL_CONFIG.deliveryMode,
+    });
+    transporter = nodemailer.createTransport({
+      pool: true,
+      host: EMAIL_CONFIG.smtp.host,
+      port: EMAIL_CONFIG.smtp.port,
+      secure: EMAIL_CONFIG.smtp.secure,
+      auth: {
+        user: EMAIL_CONFIG.smtp.user,
+        pass: EMAIL_CONFIG.smtp.password,
+      },
+      maxConnections: EMAIL_CONFIG.pool.maxConnections,
+      maxMessages: EMAIL_CONFIG.pool.maxMessages,
+    });
+  }
 
-    return transporter;
+  return transporter;
 }
 
 /**
  * Verify the email transporter connection
  */
 export async function verifyEmailConnection(): Promise<EmailConnectionResult> {
-    try {
-        const transport = getTransporter();
-        await transport.verify();
-        isVerified = true;
-        lastVerifiedAt = new Date();
-        logger.info("Email service connected");
-        return { connected: true };
-    } catch (error) {
-        const message = error instanceof Error ? error.message : "Unknown error";
-        logger.error("Email service connection failed", { error: message });
-        isVerified = false;
-        return { connected: false, error: message };
-    }
+  try {
+    const transport = getTransporter();
+    await transport.verify();
+    isVerified = true;
+    lastVerifiedAt = new Date();
+    logger.info("Email service connected");
+    return { connected: true };
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "Unknown error";
+    logger.error("Email service connection failed", { error: message });
+    isVerified = false;
+    return { connected: false, error: message };
+  }
 }
 
 /**
  * Close the email transporter connection
  */
 export async function closeEmailConnection(): Promise<void> {
-    if (transporter) {
-        transporter.close();
-        transporter = null;
-        isVerified = false;
-        lastVerifiedAt = null;
-        logger.info("Email service connection closed");
-    }
+  if (transporter) {
+    transporter.close();
+    transporter = null;
+    isVerified = false;
+    lastVerifiedAt = null;
+    logger.info("Email service connection closed");
+  }
 }
 
 /**
  * Get transporter status
  */
 export function getTransporterStatus(): {
-    created: boolean;
-    verified: boolean;
-    lastVerifiedAt: Date | null;
+  created: boolean;
+  verified: boolean;
+  lastVerifiedAt: Date | null;
 } {
-    return {
-        created: transporter !== null,
-        verified: isVerified,
-        lastVerifiedAt,
-    };
+  return {
+    created: transporter !== null,
+    verified: isVerified,
+    lastVerifiedAt,
+  };
 }
 
 /**
  * Get the from address
  */
 export function getFromAddress(): string {
-    return EMAIL_CONFIG.smtp.from;
+  return EMAIL_CONFIG.smtp.from;
 }

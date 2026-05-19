@@ -125,6 +125,68 @@ async function callGeminiAPI(prompt: string): Promise<string> {
 }
 
 /**
+ * Call Gemini API and get JSON response
+ * Used for structured output like AI metadata extraction
+ */
+export async function callGeminiJsonAPI<T>(
+  prompt: string,
+  responseSchema: object
+): Promise<T> {
+  const apiKey = env.GEMINI_API_KEY;
+
+  if (!apiKey) {
+    throw new Error("GEMINI_API_KEY is not configured");
+  }
+
+  const response = await fetch(
+    `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
+    {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        contents: [
+          {
+            parts: [
+              {
+                text: prompt,
+              },
+            ],
+          },
+        ],
+        generationConfig: {
+          responseMimeType: "application/json",
+          responseSchema,
+          temperature: 0.2,
+          topP: 0.8,
+          topK: 40,
+          maxOutputTokens: 2048,
+        },
+      }),
+    }
+  );
+
+  if (!response.ok) {
+    const errorText = await response.text();
+    throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
+  }
+
+  const data = await response.json();
+  const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
+
+  if (!content) {
+    throw new Error("No content in Gemini response");
+  }
+
+  try {
+    return JSON.parse(content.trim());
+  } catch {
+    throw new Error(`Failed to parse JSON response: ${content}`);
+  }
+}
+
+/**
  * Translate a single text to a target language
  */
 async function translateToLanguage(
@@ -306,4 +368,73 @@ ${fieldsList}`;
  */
 export function isTranslationAvailable(): boolean {
   return !!env.GEMINI_API_KEY;
+}
+
+/**
+ * AI Tagging Service
+ * Suggests tags from a controlled vocabulary based on product details.
+ */
+export async function suggestTags(
+  productInfo: {
+    name: string;
+    description?: string;
+    categoryName: string;
+  },
+  availableTags: Array<{ key: string; name_en: string }>
+): Promise<string[]> {
+  if (!env.GEMINI_API_KEY) {
+    return [];
+  }
+
+  if (availableTags.length === 0) {
+    return [];
+  }
+
+  const tagsList = availableTags
+    .map((t) => `- ${t.key}: ${t.name_en}`)
+    .join("\n");
+
+  const prompt = `Act as an expert e-commerce catalog manager.
+Analyze the following product and suggest the most relevant tags from the provided controlled vocabulary.
+
+PRODUCT:
+- Name: ${productInfo.name}
+- Category: ${productInfo.categoryName}
+- Description: ${productInfo.description || "N/A"}
+
+AVAILABLE TAGS:
+${tagsList}
+
+INSTRUCTIONS:
+1. Select only the most relevant tags (usually 1-3).
+2. If no tags are relevant, return an empty array.
+3. Output ONLY a JSON array of tag keys.
+
+Output format: ["tag_key1", "tag_key2"]`;
+
+  try {
+    const response = await callGeminiAPI(prompt);
+    
+    // Parse JSON response (handle potential markdown code blocks)
+    let jsonStr = response;
+    if (response.includes("```json")) {
+      jsonStr = response.replace(/```json\n?/g, "").replace(/```\n?/g, "");
+    } else if (response.includes("```")) {
+      jsonStr = response.replace(/```\n?/g, "");
+    }
+    
+    const suggestedKeys = JSON.parse(jsonStr.trim());
+    
+    if (!Array.isArray(suggestedKeys)) {
+      console.error("Gemini returned non-array for tags:", suggestedKeys);
+      return [];
+    }
+
+    // Validate that returned keys exist in available tags
+    const validKeys = availableTags.map(t => t.key);
+    return suggestedKeys.filter(key => validKeys.includes(key));
+  } catch (error) {
+    console.error("AI tagging failed:", error);
+    return [];
+  }
 }

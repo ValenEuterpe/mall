@@ -18,6 +18,7 @@ import { MallOwnerSellersPanel } from "@/components/mall-owner/MallOwnerSellersP
 import { MallOwnerStructurePanel } from "@/components/mall-owner/MallOwnerStructurePanel";
 import { MallOwnerCategoriesPanel } from "@/components/mall-owner/MallOwnerCategoriesPanel";
 import { MallOwnerMapsPanel } from "@/components/mall-owner/MallOwnerMapsPanel";
+import { MallOwnerTagsPanel } from "@/components/mall-owner/MallOwnerTagsPanel";
 import { MallOwnerAboutPanel } from "@/components/mall-owner/MallOwnerAboutPanel";
 
 type VerifyState = "idle" | "submitting";
@@ -122,29 +123,34 @@ export default function MallOwnerDashboardClient(): React.ReactElement {
         <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
         <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
       </div>
+<Tabs defaultValue="sellers">
+  <TabsList className="grid w-full grid-cols-6">
+    <TabsTrigger value="sellers">{t("tabs.sellers")}</TabsTrigger>
+    <TabsTrigger value="structure">{t("tabs.structure")}</TabsTrigger>
+    <TabsTrigger value="categories">{t("tabs.categories")}</TabsTrigger>
+    <TabsTrigger value="tags">{t("tabs.tags")}</TabsTrigger>
+    <TabsTrigger value="maps">{t("tabs.maps")}</TabsTrigger>
+    <TabsTrigger value="about">{t("tabs.about")}</TabsTrigger>
+  </TabsList>
 
-      <Tabs defaultValue="sellers">
-        <TabsList className="grid w-full grid-cols-5">
-          <TabsTrigger value="sellers">{t("tabs.sellers")}</TabsTrigger>
-          <TabsTrigger value="structure">{t("tabs.structure")}</TabsTrigger>
-          <TabsTrigger value="categories">{t("tabs.categories")}</TabsTrigger>
-          <TabsTrigger value="maps">{t("tabs.maps")}</TabsTrigger>
-          <TabsTrigger value="about">{t("tabs.about")}</TabsTrigger>
-        </TabsList>
+  <TabsContent value="sellers" className="pt-4">
+    <MallOwnerSellersPanel />
+  </TabsContent>
 
-        <TabsContent value="sellers" className="pt-4">
-          <MallOwnerSellersPanel />
-        </TabsContent>
+  <TabsContent value="structure" className="pt-4">
+    <MallOwnerStructurePanel />
+  </TabsContent>
 
-        <TabsContent value="structure" className="pt-4">
-          <MallOwnerStructurePanel />
-        </TabsContent>
+  <TabsContent value="categories" className="pt-4">
+    <MallOwnerCategoriesPanel />
+  </TabsContent>
 
-        <TabsContent value="categories" className="pt-4">
-          <MallOwnerCategoriesPanel />
-        </TabsContent>
+  <TabsContent value="tags" className="pt-4">
+    <MallOwnerTagsPanel />
+  </TabsContent>
 
-        <TabsContent value="maps" className="pt-4">
+  <TabsContent value="maps" className="pt-4">
+...
           <MallOwnerMapsPanel />
         </TabsContent>
 

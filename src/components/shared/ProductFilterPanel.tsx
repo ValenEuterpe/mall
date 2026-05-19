@@ -23,6 +23,9 @@ interface ProductFilterPanelProps {
   categories: ProductCategory[];
   selectedCategory: string;
   onCategoryChange: (value: string) => void;
+  availableTags?: Array<{ id: string; name: string; key: string }>;
+  selectedTagIds?: string[];
+  onTagChange?: (value: string[]) => void;
   priceRange: [number, number];
   onPriceRangeChange: (value: [number, number]) => void;
   maxPrice: number;
@@ -39,6 +42,9 @@ export const ProductFilterPanel = memo(function ProductFilterPanel({
   categories,
   selectedCategory,
   onCategoryChange,
+  availableTags = [],
+  selectedTagIds = [],
+  onTagChange,
   priceRange,
   onPriceRangeChange,
   maxPrice,
@@ -109,6 +115,34 @@ export const ProductFilterPanel = memo(function ProductFilterPanel({
             </SelectContent>
           </Select>
         </div>
+
+        {/* Tag Filters */}
+        {availableTags.length > 0 && onTagChange && (
+          <div className="space-y-2 pt-2">
+            <label className="text-sm font-medium">{t("tags")}</label>
+            <div className="flex flex-wrap gap-2">
+              {availableTags.map((tag) => {
+                const isSelected = selectedTagIds.includes(tag.id);
+                return (
+                  <Button
+                    key={tag.id}
+                    variant={isSelected ? "default" : "outline"}
+                    size="sm"
+                    className="h-7 px-2 text-xs transition-all"
+                    onClick={() => {
+                      const next = isSelected
+                        ? selectedTagIds.filter((id) => id !== tag.id)
+                        : [...selectedTagIds, tag.id];
+                      onTagChange(next);
+                    }}
+                  >
+                    {tag.name}
+                  </Button>
+                );
+              })}
+            </div>
+          </div>
+        )}
 
         {/* Price Range Filter */}
         <div className="space-y-5">

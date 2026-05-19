@@ -12,8 +12,6 @@ export const env = createEnv({
     DATABASE_URL: z.string().url(),
     DIRECT_URL: z.string().url().optional(), // Optional direct database URL for admin tools (e.g. pgAdmin); should point to the same database as DATABASE_URL
 
-
-
     // NextAuth
     NEXTAUTH_SECRET: z.string().min(32),
     NEXTAUTH_URL: z.string().url(),
@@ -40,7 +38,9 @@ export const env = createEnv({
 
     // Upload
     MAX_FILE_SIZE: z.string().default("5242880"), // 5MB
-    ALLOWED_FILE_TYPES: z.string().default("image/jpeg,image/png,image/svg+xml"),
+    ALLOWED_FILE_TYPES: z
+      .string()
+      .default("image/jpeg,image/png,image/svg+xml"),
 
     // Supabase Storage (used for file uploads in production — public bucket)
     SUPABASE_URL: z.string().url(),
@@ -55,9 +55,21 @@ export const env = createEnv({
 
     // Database pool
     DB_POOL_MAX: z.coerce.number().int().positive().default(10),
-    DB_POOL_IDLE_TIMEOUT_MS: z.coerce.number().int().nonnegative().default(30_000),
-    DB_POOL_CONNECTION_TIMEOUT_MS: z.coerce.number().int().nonnegative().default(10_000),
-    DB_STATEMENT_TIMEOUT_MS: z.coerce.number().int().nonnegative().default(15_000),
+    DB_POOL_IDLE_TIMEOUT_MS: z.coerce
+      .number()
+      .int()
+      .nonnegative()
+      .default(30_000),
+    DB_POOL_CONNECTION_TIMEOUT_MS: z.coerce
+      .number()
+      .int()
+      .nonnegative()
+      .default(10_000),
+    DB_STATEMENT_TIMEOUT_MS: z.coerce
+      .number()
+      .int()
+      .nonnegative()
+      .default(15_000),
 
     // Environment
     NODE_ENV: z.enum(["development", "production", "test"]),

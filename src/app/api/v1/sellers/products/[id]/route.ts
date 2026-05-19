@@ -3,6 +3,10 @@
 import { NextRequest } from "next/server";
 import prisma from "@/lib/db/prisma";
 import { Prisma } from "@/prisma/generated/client";
+import { isTranslationAvailable } from "@/lib/translation";
+import { generateSearchMetadata } from "@/lib/search/ai-metadata";
+import { buildSearchTokens } from "@/lib/search/tokens";
+import { logger } from "@/lib/utils/logger";
 
 import { withMiddleware } from "@/lib/api/middleware";
 import { requireProductOwnership } from "@/lib/auth/ownership";
@@ -39,6 +43,7 @@ interface ProductResponse {
   status: string;
   sku: string | null;
   barcode: string | null;
+  tagIds?: string[];
   priceTiers?: unknown[];
   discounts?: unknown[];
   category?: unknown;
@@ -51,6 +56,11 @@ type ProductWithRelations = Prisma.ProductGetPayload<{
     subcategory: true;
     priceTiers: true;
     discounts: true;
+    productTags: {
+      select: {
+        tagId: true;
+      };
+    };
   };
 }>;
 
@@ -75,6 +85,7 @@ function mapProductToResponse(product: ProductWithRelations): ProductResponse {
     status: product.status,
     sku: product.sku,
     barcode: product.barcode,
+    tagIds: product.productTags.map((pt) => pt.tagId),
     priceTiers: product.priceTiers,
     discounts: product.discounts,
     category: product.category ?? undefined,
@@ -82,9 +93,21 @@ function mapProductToResponse(product: ProductWithRelations): ProductResponse {
   };
 }
 
-function buildProductUpdateData(input: ProductUpdateInput): Prisma.ProductUpdateInput {
-  const { categoryId, subcategoryId, priceTiers, autoTranslate, ...rest } = input;
+function buildProductUpdateData(
+  input: ProductUpdateInput
+): Prisma.ProductUpdateInput {
+  const {
+    categoryId,
+    subcategoryId,
+    priceTiers,
+    autoTranslate,
+    tagIds,
+    tags,
+    ...rest
+  } = input;
   void autoTranslate;
+  void tagIds;
+  void tags;
 
   const data: Prisma.ProductUpdateInput = {
     ...rest,
@@ -122,6 +145,7 @@ async function getHandler(
       subcategory: true,
       priceTiers: true,
       discounts: true,
+      productTags: { select: { tagId: true } },
     },
   });
 
@@ -137,20 +161,116 @@ async function putHandler(
   await requireProductOwnership(request, id);
 
   const input = await validateBody(request, productUpdateSchema);
-  const data = buildProductUpdateData(input);
 
-  const updated = await prisma.product.update({
+  let finalTagIds = input.tagIds;
+  let data = buildProductUpdateData(input);
+
+  // AI Tagging if autoTranslate is requested
+  if (input.autoTranslate && isTranslationAvailable()) {
+    try {
+      const currentProduct = await prisma.product.findUnique({
+        where: { id },
+        select: {
+          categoryId: true,
+          name_en: true,
+          description_en: true,
+          category: { select: { name_en: true } },
+        },
+      });
+
+      const categoryId = input.categoryId || currentProduct?.categoryId;
+      if (categoryId) {
+        const availableTags = await prisma.tag.findMany({
+          where: { categoryId },
+          select: { id: true, key: true, name_en: true },
+        });
+
+        if (availableTags.length > 0) {
+          const metadata = await generateSearchMetadata({
+            name: input.name_en || currentProduct?.name_en || "",
+            description:
+              input.description_en || currentProduct?.description_en || null,
+            categoryId,
+            availableTags,
+          });
+
+          if (metadata.tagIds.length > 0) {
+            finalTagIds = Array.from(
+              new Set([...(finalTagIds || []), ...metadata.tagIds])
+            );
+          }
+
+          if (metadata.keywords.length > 0) data.keywords = metadata.keywords;
+          if (metadata.productType) data.productType = metadata.productType;
+          if (metadata.brand && !input.brand) data.brand = metadata.brand;
+        }
+      }
+    } catch (error) {
+      logger.error("AI metadata generation during update failed", { error });
+    }
+  }
+
+  const updated = await prisma.$transaction(async (tx) => {
+    const p = await tx.product.update({
+      where: { id },
+      data,
+      include: {
+        category: true,
+        subcategory: true,
+        priceTiers: true,
+        discounts: true,
+        productTags: { select: { tagId: true } },
+      },
+    });
+
+    if (finalTagIds !== undefined) {
+      // Sync tags: delete existing and create new
+      await tx.productTag.deleteMany({ where: { productId: id } });
+      if (finalTagIds.length > 0) {
+        await tx.productTag.createMany({
+          data: finalTagIds.map((tagId) => ({
+            productId: id,
+            tagId,
+          })),
+        });
+      }
+    }
+
+    return p;
+  });
+
+  // Re-fetch to get updated tagIds
+  const fullUpdated = await prisma.product.findUniqueOrThrow({
     where: { id },
-    data,
     include: {
       category: true,
       subcategory: true,
       priceTiers: true,
       discounts: true,
+      productTags: { select: { tagId: true } },
     },
   });
 
-  return successResponse(mapProductToResponse(updated), {
+  // Recompute searchTokens from the merged post-update view
+  await prisma.product.update({
+    where: { id },
+    data: {
+      searchTokens: buildSearchTokens({
+        name_en: fullUpdated.name_en,
+        name_ru: fullUpdated.name_ru,
+        name_am: fullUpdated.name_am,
+        description_en: fullUpdated.description_en,
+        description_ru: fullUpdated.description_ru,
+        description_am: fullUpdated.description_am,
+        brand: fullUpdated.brand,
+        productType: fullUpdated.productType,
+        keywords: fullUpdated.keywords,
+        sku: fullUpdated.sku,
+      }),
+    },
+  });
+
+  return successResponse(mapProductToResponse(fullUpdated), {
     message: "Product updated successfully",
   });
 }

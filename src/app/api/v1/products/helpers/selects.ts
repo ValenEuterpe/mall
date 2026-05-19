@@ -59,6 +59,19 @@ export function getProductListSelect() {
         name_ru: true,
       },
     },
+    productTags: {
+      select: {
+        tag: {
+          select: {
+            id: true,
+            key: true,
+            name_en: true,
+            name_ru: true,
+            name_am: true,
+          },
+        },
+      },
+    },
     discounts: {
       where: activeDiscountWhere(),
       take: 1,
@@ -139,6 +152,19 @@ export function getProductDetailSelect() {
         key: true,
         name_en: true,
         name_ru: true,
+      },
+    },
+    productTags: {
+      select: {
+        tag: {
+          select: {
+            id: true,
+            key: true,
+            name_en: true,
+            name_ru: true,
+            name_am: true,
+          },
+        },
       },
     },
     priceTiers: {

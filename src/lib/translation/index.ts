@@ -4,10 +4,11 @@
  * Provides AI-powered translation services using Google Gemini.
  */
 
-export { 
-  translateText, 
+export {
+  translateText,
   translateBatch,
   isTranslationAvailable,
+  suggestTags,
   type SupportedLocale,
   type TranslationResult,
   type BatchTranslationInput,

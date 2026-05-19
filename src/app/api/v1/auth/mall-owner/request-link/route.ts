@@ -58,8 +58,16 @@ export async function POST(request: NextRequest) {
 
     const mallOwner = await findMallOwnerByEmail(email);
 
+    console.log("[EMAIL-DEBUG] request-link: mallOwner lookup result", {
+      email,
+      found: !!mallOwner,
+    });
+
     // If not found, just log a safe event and return generic success
     if (!mallOwner) {
+      console.log(
+        "[EMAIL-DEBUG] request-link: mallOwner NOT found — returning generic success (no email sent)"
+      );
       logMagicLinkEvent("magic_link_requested", null, ip, userAgent, {
         reason: "not_found",
       });
@@ -72,7 +80,15 @@ export async function POST(request: NextRequest) {
 
     // Create token
     const tokenResult = await createMagicLinkToken(email);
+    console.log("[EMAIL-DEBUG] request-link: token creation result", {
+      success: tokenResult.success,
+      error: tokenResult.success ? undefined : tokenResult.error,
+    });
+
     if (!tokenResult.success) {
+      console.log(
+        "[EMAIL-DEBUG] request-link: token creation FAILED — returning generic success (no email sent)"
+      );
       logMagicLinkEvent("magic_link_failed", email, ip, userAgent, {
         error: tokenResult.error,
       });
@@ -82,6 +98,11 @@ export async function POST(request: NextRequest) {
     // Send email (fire-and-forget failure handling: we still return generic success)
     const baseUrl = env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
     const loginUrl = `${baseUrl}/${locale}${AUTH_CONFIG.mallOwner.verify.redirectUrl}?token=${encodeURIComponent(tokenResult.token)}`;
+    console.log("[EMAIL-DEBUG] request-link: dispatching email", {
+      email,
+      loginUrl,
+      deliveryMode: process.env.EMAIL_DELIVERY_MODE,
+    });
     dispatch(() => sendMagicLinkEmail(email, loginUrl));
     logMagicLinkEvent("magic_link_sent", email, ip, userAgent);
     return genericSuccess;
@@ -99,6 +120,9 @@ export async function POST(request: NextRequest) {
 
     return createGenericMagicLinkSuccessResponse();
   } finally {
-    await ensureMinResponseTime(startTime, AUTH_CONFIG.mallOwner.minResponseTime);
+    await ensureMinResponseTime(
+      startTime,
+      AUTH_CONFIG.mallOwner.minResponseTime
+    );
   }
 }

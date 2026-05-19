@@ -11,6 +11,7 @@ interface ProductFilters {
     inStock?: string;
     isFeatured?: string;
     brand?: string;
+    tagIds?: string;
 }
 
 export function parseProductFilters(searchParams: URLSearchParams): ProductFilters {
@@ -23,6 +24,7 @@ export function parseProductFilters(searchParams: URLSearchParams): ProductFilte
         inStock: searchParams.get("inStock") ?? undefined,
         isFeatured: searchParams.get("isFeatured") ?? undefined,
         brand: searchParams.get("brand") ?? undefined,
+        tagIds: searchParams.get("tagIds") ?? undefined,
     };
 }
 
@@ -50,6 +52,18 @@ export function buildFilterConditions(filters: ProductFilters): Prisma.ProductWh
             equals: filters.brand,
             mode: "insensitive",
         };
+    }
+
+    // Tag filter
+    if (filters.tagIds) {
+        const tagIdArray = filters.tagIds.split(",").filter(id => isValidId(id));
+        if (tagIdArray.length > 0) {
+            conditions.productTags = {
+                some: {
+                    tagId: { in: tagIdArray }
+                }
+            };
+        }
     }
 
     // Price range filter

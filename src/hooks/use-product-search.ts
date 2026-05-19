@@ -74,6 +74,9 @@ export interface UseProductSearchReturn {
   categories: ProductCategory[];
   selectedCategory: string;
   setSelectedCategory: (id: string) => void;
+  availableTags: Array<{ id: string; name: string; key: string }>;
+  selectedTagIds: string[];
+  setSelectedTagIds: (ids: string[]) => void;
   priceRange: [number, number];
   setPriceRange: (range: [number, number]) => void;
   maxPrice: number;
@@ -111,11 +114,44 @@ export function useProductSearch(
   const debouncedSearch = useDebounce(searchQuery, 300);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
+  const [availableTags, setAvailableTags] = useState<Array<{ id: string; name: string; key: string }>>([]);
+  const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([
     0,
     DEFAULT_MAX_PRICE,
   ]);
   const [maxPrice] = useState(DEFAULT_MAX_PRICE);
+
+  // Load available tags when category changes
+  useEffect(() => {
+    async function loadTags(): Promise<void> {
+      if (!selectedCategory || selectedCategory === "all") {
+        setAvailableTags([]);
+        return;
+      }
+
+      // If it's a subcategory, we should probably get tags for its parent category
+      const cat = categories.find(c => c.id === selectedCategory);
+      const categoryId = cat?.type === "subcategory" ? cat.parentId : selectedCategory;
+
+      if (!categoryId) return;
+
+      try {
+        const res = await apiClient.get<any[]>(`/mall-owner/tags?categoryId=${categoryId}`);
+        if (res.success) {
+          setAvailableTags(res.data.map((t: any) => ({
+            id: t.id,
+            key: t.key,
+            name: t[`name_${locale}`] || t.name_en,
+          })));
+        }
+      } catch {
+        // Silent fail
+      }
+    }
+
+    void loadTags();
+  }, [selectedCategory, categories, locale]);
 
   // Load products
   useEffect(() => {
@@ -144,6 +180,10 @@ export function useProductSearch(
           } else {
             params.categoryId = selectedCategory;
           }
+        }
+
+        if (selectedTagIds.length > 0) {
+          params.tagIds = selectedTagIds.join(",");
         }
 
         if (priceRange[0] > 0) {
@@ -224,7 +264,7 @@ export function useProductSearch(
   // Reset page when search/filters change
   useEffect(() => {
     setPage(1);
-  }, [debouncedSearch, selectedCategory, priceRange]);
+  }, [debouncedSearch, selectedCategory, priceRange, selectedTagIds]);
 
   // Load more
   const handleLoadMore = useCallback(() => {
@@ -236,6 +276,7 @@ export function useProductSearch(
   // Reset all
   const handleResetFilters = useCallback(() => {
     setSelectedCategory("all");
+    setSelectedTagIds([]);
     setPriceRange([0, maxPrice]);
     setSearchQuery("");
     setPage(1);
@@ -245,9 +286,10 @@ export function useProductSearch(
   const activeFiltersCount = useMemo(() => {
     let count = 0;
     if (selectedCategory !== "all") count++;
+    if (selectedTagIds.length > 0) count++;
     if (priceRange[0] > 0 || priceRange[1] < maxPrice) count++;
     return count;
-  }, [selectedCategory, priceRange, maxPrice]);
+  }, [selectedCategory, priceRange, maxPrice, selectedTagIds]);
 
   return {
     products,
@@ -260,6 +302,9 @@ export function useProductSearch(
     categories,
     selectedCategory,
     setSelectedCategory,
+    availableTags,
+    selectedTagIds,
+    setSelectedTagIds,
     priceRange,
     setPriceRange,
     maxPrice,

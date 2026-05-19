@@ -47,6 +47,12 @@ export type AuditAction =
   | "CATEGORY_CREATED"
   | "CATEGORY_UPDATED"
   | "CATEGORY_DELETED"
+  // Tags (mall owner + seller-authored)
+  | "TAG_CREATED"
+  | "TAG_CREATED_BY_SELLER"
+  | "TAG_UPDATED"
+  | "TAG_DELETED"
+  | "TAGS_SEEDED"
   // Uploads
   | "FILE_UPLOADED";
 

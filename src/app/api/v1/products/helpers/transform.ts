@@ -77,6 +77,16 @@ export function transformProductForList(
                 },
             }
             : null,
+        tags: product.productTags.map((pt) => ({
+            id: pt.tag.id,
+            key: pt.tag.key,
+            name: getLocalizedText(locale, {
+                legacy: null,
+                en: pt.tag.name_en,
+                ru: pt.tag.name_ru,
+                am: pt.tag.name_am,
+            }),
+        })),
     };
 }
 
@@ -187,6 +197,17 @@ export function transformProductForDetail(product: ProductDetail, locale: Suppor
                 },
             }
             : null,
+
+        tags: product.productTags.map((pt) => ({
+            id: pt.tag.id,
+            key: pt.tag.key,
+            name: getLocalizedText(locale, {
+                legacy: null,
+                en: pt.tag.name_en,
+                ru: pt.tag.name_ru,
+                am: pt.tag.name_am,
+            }),
+        })),
 
         meta: {
             isFeatured: product.isFeatured,

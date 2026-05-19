@@ -69,7 +69,8 @@ const productBaseSchema = z.object({
     .array(z.string().min(1))
     .max(5, "Maximum 5 images allowed")
     .default([]),
-  tags: z.array(z.string()).default([]),
+  tags: z.array(z.string()).default([]), // Old free-form tags
+  tagIds: z.array(z.string()).default([]), // New controlled tags
   status: z.nativeEnum(ProductStatus).default(ProductStatus.DRAFT),
   isFeatured: z.boolean().default(false),
   priceTiers: z.array(priceTierSchema).optional(),
@@ -110,11 +111,14 @@ export const productUpdateSchema = z.object({
   subcategoryId: z.string().cuid().nullable().optional(),
   subSubcategoryId: z.string().cuid().nullable().optional(),
   brand: z.string().max(100).nullable().optional(),
+  keywords: z.array(z.string()).optional(),
+  productType: z.string().max(100).nullable().optional(),
   sku: z.string().max(100).nullable().optional(),
   barcode: z.string().max(100).nullable().optional(),
   unitType: z.string().optional(),
   images: z.array(z.string().min(1)).max(5).optional(),
-  tags: z.array(z.string()).optional(),
+  tags: z.array(z.string()).optional(), // Old free-form tags
+  tagIds: z.array(z.string()).optional(), // New controlled tags
   status: z.nativeEnum(ProductStatus).optional(),
   isFeatured: z.boolean().optional(),
   priceTiers: z.array(priceTierSchema).optional(),

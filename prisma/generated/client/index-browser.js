@@ -24,12 +24,12 @@ exports.Prisma = Prisma
 exports.$Enums = {}
 
 /**
- * Prisma Client JS version: 7.3.0
- * Query Engine version: 9d6ad21cbbceab97458517b147a6a09ff43aa735
+ * Prisma Client JS version: 7.8.0
+ * Query Engine version: 3c6e192761c0362d496ed980de936e2f3cebcd3a
  */
 Prisma.prismaVersion = {
-  client: "7.3.0",
-  engine: "9d6ad21cbbceab97458517b147a6a09ff43aa735"
+  client: "7.8.0",
+  engine: "3c6e192761c0362d496ed980de936e2f3cebcd3a"
 }
 
 Prisma.PrismaClientKnownRequestError = () => {
@@ -265,6 +265,9 @@ exports.Prisma.ProductScalarFieldEnum = {
   brand: 'brand',
   barcode: 'barcode',
   tags: 'tags',
+  keywords: 'keywords',
+  productType: 'productType',
+  searchTokens: 'searchTokens',
   images: 'images',
   status: 'status',
   isActive: 'isActive',
@@ -332,6 +335,28 @@ exports.Prisma.CategoryScalarFieldEnum = {
   name_ru: 'name_ru',
   name_am: 'name_am',
   icon: 'icon'
+};
+
+exports.Prisma.TagScalarFieldEnum = {
+  id: 'id',
+  key: 'key',
+  categoryId: 'categoryId',
+  subcategoryId: 'subcategoryId',
+  name_en: 'name_en',
+  name_ru: 'name_ru',
+  name_am: 'name_am',
+  transliteration: 'transliteration',
+  sortOrder: 'sortOrder',
+  createdBySellerId: 'createdBySellerId',
+  canonicalTagId: 'canonicalTagId',
+  createdAt: 'createdAt',
+  updatedAt: 'updatedAt'
+};
+
+exports.Prisma.ProductTagScalarFieldEnum = {
+  productId: 'productId',
+  tagId: 'tagId',
+  createdAt: 'createdAt'
 };
 
 exports.Prisma.SubcategoryScalarFieldEnum = {
@@ -508,6 +533,8 @@ exports.Prisma.ModelName = {
   ProductDiscount: 'ProductDiscount',
   ShopContact: 'ShopContact',
   Category: 'Category',
+  Tag: 'Tag',
+  ProductTag: 'ProductTag',
   Subcategory: 'Subcategory',
   SubSubcategory: 'SubSubcategory',
   Mall: 'Mall',

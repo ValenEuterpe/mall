@@ -48,6 +48,7 @@ import {
 } from "lucide-react";
 import { useSidebarToggle } from "@/contexts/sidebar-toggle-context";
 import { useCart } from "@/hooks/use-cart";
+import { SearchSuggestionsDropdown } from "@/components/shared/SearchSuggestionsDropdown";
 
 interface NavItem {
   label: string;
@@ -60,7 +61,6 @@ export interface HeaderProps {
   showSearch?: boolean;
   navItems?: NavItem[];
   showCart?: boolean;
-  notificationCount?: number;
   logo?: React.ReactNode;
   sticky?: boolean;
   transparent?: boolean;
@@ -108,9 +108,25 @@ function SearchBar() {
   const router = useRouter();
   const [query, setQuery] = React.useState("");
   const [isExpanded, setIsExpanded] = React.useState(false);
+  const [dropdownOpen, setDropdownOpen] = React.useState(false);
   const overlayRef = React.useRef<HTMLDivElement>(null);
   const mobileInputRef = React.useRef<HTMLInputElement>(null);
   const desktopInputRef = React.useRef<HTMLInputElement>(null);
+  const blurTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleSuggestionSelect = (
+    kind: "product",
+    id: string,
+    label: string
+  ) => {
+    setDropdownOpen(false);
+    setQuery("");
+    router.push(`/products/${id}`);
+  };
+
+  const handleDropdownClose = () => {
+    setDropdownOpen(false);
+  };
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
@@ -153,11 +169,17 @@ function SearchBar() {
   React.useEffect(() => {
     if (!isExpanded) return;
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") setIsExpanded(false);
+      if (e.key === "Escape") {
+        if (dropdownOpen) {
+          setDropdownOpen(false);
+        } else {
+          setIsExpanded(false);
+        }
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [isExpanded]);
+  }, [isExpanded, dropdownOpen]);
 
   // Focus the mobile input when the overlay un-hides. Tailwind toggles
   // `display: none`, so the element is mounted but autoFocus would not re-fire.
@@ -175,7 +197,21 @@ function SearchBar() {
         type="text"
         placeholder={t("searchPlaceholder")}
         value={query}
-        onChange={(e) => setQuery(e.target.value)}
+        onChange={(e) => {
+          setQuery(e.target.value);
+          if (e.target.value.trim().length >= 2) setDropdownOpen(true);
+          else setDropdownOpen(false);
+        }}
+        onFocus={() => {
+          if (blurTimerRef.current) {
+            clearTimeout(blurTimerRef.current);
+            blurTimerRef.current = null;
+          }
+          if (query.trim().length >= 2) setDropdownOpen(true);
+        }}
+        onBlur={() => {
+          blurTimerRef.current = setTimeout(() => setDropdownOpen(false), 150);
+        }}
         className="w-full pr-10 pl-10"
       />
       {query && (
@@ -196,8 +232,17 @@ function SearchBar() {
   return (
     <>
       {/* Desktop: always-expanded inline form */}
-      <form onSubmit={handleSubmit} className="relative hidden md:block md:w-80">
+      <form
+        onSubmit={handleSubmit}
+        className="relative hidden md:block md:w-80"
+      >
         {renderInput(desktopInputRef)}
+        <SearchSuggestionsDropdown
+          query={query}
+          open={dropdownOpen && query.trim().length >= 2}
+          onSelect={handleSuggestionSelect}
+          onClose={handleDropdownClose}
+        />
       </form>
 
       {/* Mobile: collapsed search trigger */}
@@ -231,8 +276,14 @@ function SearchBar() {
         >
           <ArrowLeft className="h-5 w-5" />
         </Button>
-        <form onSubmit={handleSubmit} className="flex-1">
+        <form onSubmit={handleSubmit} className="relative flex-1">
           {renderInput(mobileInputRef)}
+          <SearchSuggestionsDropdown
+            query={query}
+            open={dropdownOpen && query.trim().length >= 2}
+            onSelect={handleSuggestionSelect}
+            onClose={handleDropdownClose}
+          />
         </form>
       </div>
     </>
@@ -311,29 +362,6 @@ export function LanguageSwitcher() {
         ))}
       </DropdownMenuContent>
     </DropdownMenu>
-  );
-}
-
-function NotificationBell({ count = 0 }: { count?: number }) {
-  const t = useTranslations("header");
-
-  return (
-    <Button
-      variant="ghost"
-      size="icon"
-      className="relative"
-      aria-label={t("notifications")}
-    >
-      <Bell className="h-5 w-5" />
-      {count > 0 && (
-        <Badge
-          variant="destructive"
-          className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full p-0 text-xs"
-        >
-          {count > 99 ? "99+" : count}
-        </Badge>
-      )}
-    </Button>
   );
 }
 
@@ -460,7 +488,7 @@ function MobileNav({
         side="right"
         className="w-80 max-w-full p-4 pl-14 sm:p-6 sm:pl-16 [&>button]:hidden"
       >
-        <div className="absolute left-2 top-2 z-10">
+        <div className="absolute top-2 left-2 z-10">
           <Button
             type="button"
             variant="ghost"
@@ -566,7 +594,6 @@ export function Header({
   showSearch = true,
   navItems = [],
   showCart = true,
-  notificationCount = 0,
   logo,
   sticky = true,
   transparent = false,
@@ -609,7 +636,7 @@ export function Header({
           <div className="flex flex-1 items-center gap-4">
             <Link href="/" className="flex items-center gap-2">
               {logo || <Logo className="h-7 w-7 sm:h-8 sm:w-8" />}
-              <span className="hidden font-bold text-sm sm:text-base md:inline-block">
+              <span className="hidden text-sm font-bold sm:text-base md:inline-block">
                 Wholesale Market
               </span>
             </Link>
@@ -666,7 +693,6 @@ export function Header({
 
           <div className="flex flex-1 items-center justify-end gap-2">
             <LanguageSwitcher />
-            {isAuthenticated && <NotificationBell count={notificationCount} />}
 
             {/* Map toggle — visible on homepage and shop pages */}
             {(isHomePage || isShopPage) && (

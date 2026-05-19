@@ -51,6 +51,9 @@ export function UnifiedPageClient(): React.ReactElement {
     categories,
     selectedCategory,
     setSelectedCategory,
+    availableTags,
+    selectedTagIds,
+    setSelectedTagIds,
     priceRange,
     setPriceRange,
     maxPrice,
@@ -239,6 +242,9 @@ export function UnifiedPageClient(): React.ReactElement {
               categories={categories}
               selectedCategory={selectedCategory}
               onCategoryChange={setSelectedCategory}
+              availableTags={availableTags}
+              selectedTagIds={selectedTagIds}
+              onTagChange={setSelectedTagIds}
               priceRange={priceRange}
               onPriceRangeChange={setPriceRange}
               maxPrice={maxPrice}
@@ -332,6 +338,9 @@ export function UnifiedPageClient(): React.ReactElement {
               categories={categories}
               selectedCategory={selectedCategory}
               onCategoryChange={setSelectedCategory}
+              availableTags={availableTags}
+              selectedTagIds={selectedTagIds}
+              onTagChange={setSelectedTagIds}
               priceRange={priceRange}
               onPriceRangeChange={setPriceRange}
               maxPrice={maxPrice}

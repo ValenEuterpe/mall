@@ -419,23 +419,26 @@ export function MallOwnerSellersPanel(): React.ReactElement {
   // Remove seller handler
   // ============================================================================
 
-  const handleRemoveSeller = useCallback(async (password: string) => {
-    if (!removeSellerTarget) return;
+  const handleRemoveSeller = useCallback(
+    async (password: string) => {
+      if (!removeSellerTarget) return;
 
-    try {
-      await apiClient.delete(
-        `/mall/sellers/${removeSellerTarget.id}?confirm=${encodeURIComponent(removeSellerTarget.email)}`,
-        { body: { password } }
-      );
+      try {
+        await apiClient.delete(
+          `/mall/sellers/${removeSellerTarget.id}?confirm=${encodeURIComponent(removeSellerTarget.email)}`,
+          { body: { password } }
+        );
 
-      toast.success(t("sellers.removeSellerSuccess"));
-      setRemoveSellerDialogOpen(false);
-      setRemoveSellerTarget(null);
-      await fetchAll();
-    } catch (err) {
-      toast.apiError(err, t("errors.saveFailed"));
-    }
-  }, [removeSellerTarget, fetchAll, t, toast]);
+        toast.success(t("sellers.removeSellerSuccess"));
+        setRemoveSellerDialogOpen(false);
+        setRemoveSellerTarget(null);
+        await fetchAll();
+      } catch (err) {
+        toast.apiError(err, t("errors.saveFailed"));
+      }
+    },
+    [removeSellerTarget, fetchAll, t, toast]
+  );
 
   // ============================================================================
   // Helpers
@@ -561,7 +564,7 @@ export function MallOwnerSellersPanel(): React.ReactElement {
                         placeholder={t("sellers.shopSelectPlaceholder")}
                       />
                     </SelectTrigger>
-                    <SelectContent>
+                    <SelectContent className="max-h-60">
                       {vacantShops.map((shop) => (
                         <SelectItem key={shop.id} value={shop.id}>
                           {formatShopLocation(shop.code, commonT)}
@@ -582,7 +585,9 @@ export function MallOwnerSellersPanel(): React.ReactElement {
                   {/* Selected shop indicator */}
                   {inviteShopCode && (
                     <p className="text-muted-foreground text-sm">
-                      {t("sellers.selectedShop", { code: formatShopLocation(inviteShopCode, commonT) })}
+                      {t("sellers.selectedShop", {
+                        code: formatShopLocation(inviteShopCode, commonT),
+                      })}
                     </p>
                   )}
                   {!inviteShopCode && inviteMapVisible && (
@@ -844,7 +849,7 @@ export function MallOwnerSellersPanel(): React.ReactElement {
                     placeholder={t("sellers.shopSelectPlaceholder")}
                   />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="max-h-60">
                   {vacantShops.map((shop) => (
                     <SelectItem key={shop.id} value={shop.id}>
                       {formatShopLocation(shop.code, commonT)}
@@ -854,11 +859,18 @@ export function MallOwnerSellersPanel(): React.ReactElement {
               </Select>
 
               {assignMapVisible &&
-                renderMapPicker(assignActiveSvgId, handleAssignMapShopClick, `assign-map`, assignMapKey)}
+                renderMapPicker(
+                  assignActiveSvgId,
+                  handleAssignMapShopClick,
+                  `assign-map`,
+                  assignMapKey
+                )}
 
               {assigningShopCode && (
                 <p className="text-muted-foreground text-sm">
-                  {t("sellers.selectedShop", { code: formatShopLocation(assigningShopCode, commonT) })}
+                  {t("sellers.selectedShop", {
+                    code: formatShopLocation(assigningShopCode, commonT),
+                  })}
                 </p>
               )}
               {!assigningShopCode && assignMapVisible && (

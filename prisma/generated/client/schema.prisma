@@ -274,7 +274,15 @@ model Product {
   subSubcategoryId String?
   brand            String?
   barcode          String?
+  // @deprecated free-form tags - kept for backward compatibility. New tag system is ProductTag.
   tags             String[]
+
+  // AI-derived search metadata (populated on save via generateSearchMetadata)
+  keywords    String[] @default([])
+  productType String?
+
+  // Precomputed lowercased + transliterated tokens for pg_trgm / array overlap search
+  searchTokens String[] @default([])
 
   // Media (max 5 images)
   images String[]
@@ -297,6 +305,7 @@ model Product {
   discounts      ProductDiscount[]
   views          ProductView[]
   favorites      Favorite[]
+  productTags    ProductTag[]
 
   sku            String?
   viewCount      Int      @default(0) // Legacy total count - kept for quick queries
@@ -310,6 +319,7 @@ model Product {
   @@index([status])
   @@index([barcode])
   @@index([sku])
+  @@index([searchTokens], type: Gin)
   @@map("products")
 }
 
@@ -435,8 +445,56 @@ model Category {
 
   products      Product[]
   subcategories Subcategory[]
+  tags          Tag[]
 
   @@map("categories")
+}
+
+// TAG (Controlled vocabulary - mall-owner curated, seller-authored)
+model Tag {
+  id                String       @id @default(cuid())
+  key               String // slug, lowercase (e.g. "joggers", "ipa")
+  categoryId        String
+  category          Category     @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  subcategoryId     String?
+  subcategory       Subcategory? @relation(fields: [subcategoryId], references: [id], onDelete: SetNull)
+  name_en           String
+  name_ru           String
+  name_am           String?
+  // Latin-form precompute (built from name_ru/name_am via buildTransliterations) for in-DB fuzzy matching
+  transliteration   String?
+  sortOrder         Int          @default(0)
+  // null = seeded or mall-owner-created
+  createdBySellerId String?
+  // Future-proofing for merge tooling. NULL = canonical; set = synonym of another tag.
+  canonicalTagId    String?
+  canonicalTag      Tag?         @relation("TagCanonical", fields: [canonicalTagId], references: [id], onDelete: SetNull)
+  synonyms          Tag[]        @relation("TagCanonical")
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  products ProductTag[]
+
+  @@unique([categoryId, key])
+  @@index([categoryId])
+  @@index([subcategoryId])
+  @@index([canonicalTagId])
+  @@map("tags")
+}
+
+// PRODUCT TAG (Join between Product and Tag - canonical assignment)
+model ProductTag {
+  productId String
+  tagId     String
+  createdAt DateTime @default(now())
+
+  product Product @relation(fields: [productId], references: [id], onDelete: Cascade)
+  tag     Tag     @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  @@id([productId, tagId])
+  @@index([tagId])
+  @@index([productId])
+  @@map("product_tags")
 }
 
 // SUBCATEGORY (Level 2)
@@ -452,6 +510,7 @@ model Subcategory {
   category         Category         @relation(fields: [categoryId], references: [id], onDelete: Cascade)
   products         Product[]
   subSubcategories SubSubcategory[]
+  tags             Tag[]
 
   @@index([categoryId])
   @@map("subcategories")

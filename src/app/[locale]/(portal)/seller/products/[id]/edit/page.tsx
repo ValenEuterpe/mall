@@ -38,6 +38,7 @@ export default function EditProductPage() {
           images: string[];
           isActive: boolean;
           status: string;
+          tagIds?: string[];
         }>(`/sellers/products/${productId}`);
 
         if (response.success && response.data) {
@@ -57,6 +58,7 @@ export default function EditProductPage() {
             barcode: product.barcode || "",
             categoryId: product.categoryId || "",
             subcategoryId: product.subcategoryId || "",
+            tagIds: product.tagIds || [],
             images: product.images || [],
             isActive: product.isActive,
             status: (product.status === "PUBLISHED" ? "PUBLISHED" : "DRAFT") as "DRAFT" | "PUBLISHED",

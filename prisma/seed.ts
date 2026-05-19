@@ -6,6 +6,8 @@ import pg from "pg";
 import path from "path";
 import { PrismaPg } from "@prisma/adapter-pg";
 
+import { buildTransliterations } from "../src/lib/search/transliterate";
+
 config({ path: path.join(process.cwd(), ".env.local") });
 
 const connectionString = process.env.DATABASE_URL;
@@ -27,7 +29,9 @@ async function main() {
 
   await prisma.productDiscount.deleteMany();
   await prisma.priceTier.deleteMany();
+  await prisma.productTag.deleteMany();
   await prisma.product.deleteMany();
+  await prisma.tag.deleteMany();
   await prisma.subcategory.deleteMany();
   await prisma.category.deleteMany();
   await prisma.shopContact.deleteMany();
@@ -89,6 +93,59 @@ async function main() {
   }
 
   console.log("✅ Categories seeded");
+
+  // 3a. Seed category tags (controlled vocabulary)
+  console.log("🏷️  Seeding category tags...");
+
+  const tagsByCategoryKey: Record<
+    string,
+    { key: string; name_en: string; name_ru: string; name_am: string | null }[]
+  > = JSON.parse(
+    fs.readFileSync(
+      path.join(process.cwd(), "prisma/seeds/category-tags.json"),
+      "utf-8"
+    )
+  );
+
+  let tagInserted = 0;
+  let tagSkipped = 0;
+
+  for (const [categoryKey, tags] of Object.entries(tagsByCategoryKey)) {
+    const category = await prisma.category.findUnique({
+      where: { key: categoryKey },
+      select: { id: true },
+    });
+    if (!category) {
+      console.warn(`⚠️  Skipping tags for unknown category "${categoryKey}"`);
+      continue;
+    }
+    for (let i = 0; i < tags.length; i++) {
+      const tag = tags[i];
+      const existing = await prisma.tag.findUnique({
+        where: { categoryId_key: { categoryId: category.id, key: tag.key } },
+        select: { id: true },
+      });
+      if (existing) {
+        tagSkipped++;
+        continue;
+      }
+      const transliteration = buildTransliterations([tag.name_ru, tag.name_am]).join(" ") || null;
+      await prisma.tag.create({
+        data: {
+          categoryId: category.id,
+          key: tag.key,
+          name_en: tag.name_en,
+          name_ru: tag.name_ru,
+          name_am: tag.name_am ?? null,
+          transliteration,
+          sortOrder: i,
+        },
+      });
+      tagInserted++;
+    }
+  }
+
+  console.log(`✅ Tags seeded (inserted ${tagInserted}, skipped ${tagSkipped})`);
 
   // 3b. Seed Shop Types
   console.log("🏪 Seeding shop types...");

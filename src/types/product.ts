@@ -31,6 +31,7 @@ export interface ProductCardData {
   stockQuantity: number;
   images: string[];
   brand?: string | null;
+  tagIds?: string[];
   shop?: ProductCardShop;
   category?: ProductCardCategory | null;
 }
@@ -58,6 +59,7 @@ export interface SellerProductCardData {
   isActive: boolean;
   status: "PUBLISHED" | "DRAFT" | "OUT_OF_STOCK" | string;
   sku?: string | null;
+  tagIds?: string[];
   discounts?: ProductDiscountData[];
   category?: {
     id: string;

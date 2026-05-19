@@ -22,11 +22,14 @@ import {
   Globe,
   ImagePlus,
   Loader2,
+  Plus,
   Save,
   Sparkles,
+  Tag as TagIcon,
   Trash2,
   X
 } from "lucide-react";
+import { CreateTagDialog } from "@/components/seller/CreateTagDialog";
 import { format } from "date-fns";
 import { Calendar } from "@/components/ui/calendar";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -52,6 +55,7 @@ export interface ProductFormData {
   barcode: string;
   categoryId: string;
   subcategoryId: string;
+  tagIds: string[];
   isActive: boolean;
   status: "DRAFT" | "PUBLISHED";
   images: string[];
@@ -79,6 +83,7 @@ const EMPTY_FORM: ProductFormData = {
   barcode: "",
   categoryId: "",
   subcategoryId: "",
+  tagIds: [],
   isActive: true,
   status: "DRAFT",
   images: [],
@@ -99,11 +104,41 @@ export function ProductForm({ mode, initialData, productId, onSuccess }: Product
     ...EMPTY_FORM,
     ...initialData,
   }));
+  const [availableTags, setAvailableTags] = useState<
+    Array<{ id: string; name_en: string; name_ru?: string; name_am?: string | null; key: string }>
+  >([]);
+  const [tagsLoading, setTagsLoading] = useState(false);
+  const [createTagOpen, setCreateTagOpen] = useState(false);
   const [errors, setErrors] = useState<Partial<Record<keyof ProductFormData, string>>>({});
   const [isSaving, setIsSaving] = useState(false);
   const [isTranslating, setIsTranslating] = useState(false);
   const [isUploading, setIsUploading] = useState(false);
   const [activeTranslationTab, setActiveTranslationTab] = useState<"en" | "ru" | "am">("en");
+
+  // Fetch tags when category or subcategory changes.
+  // Subcategory-scoped fetch returns: tags for the subcategory + category-level tags (no subcategory).
+  useEffect(() => {
+    const fetchTags = async () => {
+      if (!formData.categoryId) {
+        setAvailableTags([]);
+        return;
+      }
+      setTagsLoading(true);
+      try {
+        const qs = new URLSearchParams({ categoryId: formData.categoryId });
+        if (formData.subcategoryId) qs.set("subcategoryId", formData.subcategoryId);
+        const res = await apiClient.get<any[]>(`/tags?${qs.toString()}`);
+        if (res.success) {
+          setAvailableTags(res.data || []);
+        }
+      } catch (err) {
+        console.error("Failed to fetch tags", err);
+      } finally {
+        setTagsLoading(false);
+      }
+    };
+    void fetchTags();
+  }, [formData.categoryId, formData.subcategoryId]);
 
   // Get subcategories for selected category
   const selectedCategory = categories.find((c) => c.id === formData.categoryId);
@@ -289,6 +324,8 @@ export function ProductForm({ mode, initialData, productId, onSuccess }: Product
         barcode: formData.barcode || undefined,
         categoryId: formData.categoryId || undefined,
         subcategoryId: formData.subcategoryId || undefined,
+        tagIds: formData.tagIds,
+        autoTranslate: true, // Always enable for AI tagging/translation fallback
         status: formData.status,
         isActive: formData.isActive,
         images: formData.images.length > 0 ? formData.images : undefined,
@@ -666,11 +703,86 @@ export function ProductForm({ mode, initialData, productId, onSuccess }: Product
             </CardContent>
           </Card>
 
-          {/* Images Card */}
+          {/* Tags Card */}
           <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
             <CardHeader className="bg-muted/30 pb-4 border-b">
               <CardTitle className="text-xl flex items-center gap-2">
                 <Badge variant="outline" className="h-6 w-6 rounded-full p-0 flex items-center justify-center bg-primary text-white border-none shadow-sm shadow-primary/20">6</Badge>
+                <TagIcon className="h-5 w-5 text-primary" />
+                {t("tags")}
+              </CardTitle>
+              <CardDescription>{t("tagsHelp")}</CardDescription>
+            </CardHeader>
+            <CardContent className="pt-6 space-y-4">
+              {!formData.categoryId ? (
+                <p className="text-sm text-muted-foreground italic">
+                  {t("selectCategoryForTags")}
+                </p>
+              ) : tagsLoading ? (
+                <div className="flex items-center gap-2 py-2">
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                  <span className="text-sm">{t("loadingTags")}</span>
+                </div>
+              ) : availableTags.length === 0 ? (
+                <p className="text-sm text-muted-foreground">
+                  {t("noTagsInCategory")}
+                </p>
+              ) : (
+                <div className="flex flex-wrap gap-2">
+                  {availableTags.map((tag) => (
+                    <Badge
+                      key={tag.id}
+                      variant={formData.tagIds.includes(tag.id) ? "default" : "outline"}
+                      className={cn(
+                        "cursor-pointer transition-all hover:scale-105 py-1.5 px-3",
+                        formData.tagIds.includes(tag.id)
+                          ? "bg-primary text-primary-foreground border-primary"
+                          : "bg-background hover:bg-muted"
+                      )}
+                      onClick={() => {
+                        const newTagIds = formData.tagIds.includes(tag.id)
+                          ? formData.tagIds.filter(id => id !== tag.id)
+                          : [...formData.tagIds, tag.id];
+                        handleChange("tagIds", newTagIds);
+                      }}
+                    >
+                      {tag.name_en}
+                    </Badge>
+                  ))}
+                  <Badge
+                    variant="outline"
+                    className="cursor-pointer transition-all hover:scale-105 py-1.5 px-3 border-dashed text-primary hover:bg-primary/10"
+                    onClick={() => setCreateTagOpen(true)}
+                  >
+                    <Plus className="h-3 w-3 mr-1" />
+                    {t("createNewTag")}
+                  </Badge>
+                </div>
+              )}
+              {formData.categoryId && availableTags.length === 0 && !tagsLoading && (
+                <Badge
+                  variant="outline"
+                  className="cursor-pointer transition-all hover:scale-105 py-1.5 px-3 border-dashed text-primary hover:bg-primary/10 mt-2"
+                  onClick={() => setCreateTagOpen(true)}
+                >
+                  <Plus className="h-3 w-3 mr-1" />
+                  {t("createNewTag")}
+                </Badge>
+              )}
+              <div className="pt-2 flex items-center gap-2">
+                <Sparkles className="h-4 w-4 text-primary animate-pulse" />
+                <p className="text-[10px] text-muted-foreground italic">
+                  {t("aiTaggingTip")}
+                </p>
+              </div>
+            </CardContent>
+          </Card>
+
+          {/* Images Card */}
+          <Card className="border-none shadow-md overflow-hidden bg-white/50 backdrop-blur-sm">
+            <CardHeader className="bg-muted/30 pb-4 border-b">
+              <CardTitle className="text-xl flex items-center gap-2">
+                <Badge variant="outline" className="h-6 w-6 rounded-full p-0 flex items-center justify-center bg-primary text-white border-none shadow-sm shadow-primary/20">7</Badge>
                 <ImagePlus className="h-5 w-5 text-primary" />
                 {t("images")}
               </CardTitle>
@@ -795,6 +907,22 @@ export function ProductForm({ mode, initialData, productId, onSuccess }: Product
           )}
         </div>
       </form>
+
+      {formData.categoryId && (
+        <CreateTagDialog
+          open={createTagOpen}
+          onOpenChange={setCreateTagOpen}
+          categoryId={formData.categoryId}
+          subcategoryId={formData.subcategoryId || null}
+          onCreated={(tag) => {
+            setAvailableTags((prev) => (prev.some((p) => p.id === tag.id) ? prev : [...prev, tag]));
+            setFormData((prev) =>
+              prev.tagIds.includes(tag.id) ? prev : { ...prev, tagIds: [...prev.tagIds, tag.id] }
+            );
+            toast.success(t("tagCreated"));
+          }}
+        />
+      )}
     </div>
   );
 }
