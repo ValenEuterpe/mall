@@ -11,7 +11,6 @@ import {
   CommandEmpty,
 } from "@/components/ui/command";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Search } from "lucide-react";
 
 type SuggestionProduct = {
   id: string;
@@ -148,7 +147,15 @@ export function SearchSuggestionsDropdown({
                     value={`product-${p.id}`}
                     onSelect={() => onSelect("product", p.id, p.name)}
                   >
-                    <Search className="mr-2 h-4 w-4 shrink-0 opacity-50" />
+                    {p.image ? (
+                      <img
+                        src={p.image}
+                        alt={p.name}
+                        className="mr-3 h-8 w-8 shrink-0 rounded object-cover"
+                      />
+                    ) : (
+                      <div className="mr-3 h-8 w-8 shrink-0 rounded bg-muted" />
+                    )}
                     <span className="truncate">{p.name}</span>
                   </CommandItem>
                 ))}
