@@ -48,7 +48,7 @@ import {
 } from "lucide-react";
 import { useSidebarToggle } from "@/contexts/sidebar-toggle-context";
 import { useCart } from "@/hooks/use-cart";
-import { SearchSuggestionsDropdown } from "@/components/shared/SearchSuggestionsDropdown";
+import { SearchSuggestionsDropdown, type SearchSuggestionsDropdownHandle } from "@/components/shared/SearchSuggestionsDropdown";
 
 interface NavItem {
   label: string;
@@ -113,6 +113,8 @@ function SearchBar() {
   const mobileInputRef = React.useRef<HTMLInputElement>(null);
   const desktopInputRef = React.useRef<HTMLInputElement>(null);
   const blurTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
+  const desktopDropdownRef = React.useRef<SearchSuggestionsDropdownHandle>(null);
+  const mobileDropdownRef = React.useRef<SearchSuggestionsDropdownHandle>(null);
 
   const handleSuggestionSelect = (
     kind: "product",
@@ -135,6 +137,27 @@ function SearchBar() {
       router.push("/?q=" + encodeURIComponent(q));
     }
     setIsExpanded(false);
+  };
+
+  const handleInputKeyDown = (
+    e: React.KeyboardEvent<HTMLInputElement>,
+    dropdownRef: React.RefObject<SearchSuggestionsDropdownHandle | null>
+  ) => {
+    if (!dropdownOpen) return;
+
+    if (e.key === "ArrowDown") {
+      e.preventDefault();
+      dropdownRef.current?.moveDown();
+    } else if (e.key === "ArrowUp") {
+      e.preventDefault();
+      dropdownRef.current?.moveUp();
+    } else if (e.key === "Enter") {
+      const handled = dropdownRef.current?.selectActive() ?? false;
+      if (handled) {
+        e.preventDefault();
+        setDropdownOpen(false);
+      }
+    }
   };
 
   const handleClear = () => {
@@ -189,7 +212,10 @@ function SearchBar() {
     }
   }, [isExpanded]);
 
-  const renderInput = (ref: React.RefObject<HTMLInputElement | null>) => (
+  const renderInput = (
+    ref: React.RefObject<HTMLInputElement | null>,
+    dropdownRef: React.RefObject<SearchSuggestionsDropdownHandle | null>
+  ) => (
     <div className="relative flex-1">
       <Search className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2" />
       <Input
@@ -212,6 +238,7 @@ function SearchBar() {
         onBlur={() => {
           blurTimerRef.current = setTimeout(() => setDropdownOpen(false), 150);
         }}
+        onKeyDown={(e) => handleInputKeyDown(e, dropdownRef)}
         className="w-full pr-10 pl-10"
       />
       {query && (
@@ -236,8 +263,9 @@ function SearchBar() {
         onSubmit={handleSubmit}
         className="relative hidden md:block md:w-80"
       >
-        {renderInput(desktopInputRef)}
+        {renderInput(desktopInputRef, desktopDropdownRef)}
         <SearchSuggestionsDropdown
+          ref={desktopDropdownRef}
           query={query}
           open={dropdownOpen && query.trim().length >= 2}
           onSelect={handleSuggestionSelect}
@@ -277,8 +305,9 @@ function SearchBar() {
           <ArrowLeft className="h-5 w-5" />
         </Button>
         <form onSubmit={handleSubmit} className="relative flex-1">
-          {renderInput(mobileInputRef)}
+          {renderInput(mobileInputRef, mobileDropdownRef)}
           <SearchSuggestionsDropdown
+            ref={mobileDropdownRef}
             query={query}
             open={dropdownOpen && query.trim().length >= 2}
             onSelect={handleSuggestionSelect}

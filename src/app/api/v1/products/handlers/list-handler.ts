@@ -22,18 +22,21 @@ import { transformProductForList } from "../helpers/transform";
 import { logProductSearch } from "../helpers/utils";
 import { parseLocale } from "@/lib/i18n/locale";
 
-function buildFilterSqlAndParams(filters: {
-  categoryId?: string;
-  subcategoryId?: string;
-  minPrice?: string;
-  maxPrice?: string;
-  inStock?: string;
-  brand?: string;
-  tagIds?: string;
-}): { sql: string; params: any[] } {
+function buildFilterSqlAndParams(
+  filters: {
+    categoryId?: string;
+    subcategoryId?: string;
+    minPrice?: string;
+    maxPrice?: string;
+    inStock?: string;
+    brand?: string;
+    tagIds?: string;
+  },
+  startIdx: number = 1
+): { sql: string; params: any[] } {
   const parts: string[] = [`p.status = 'PUBLISHED'`, `p."isActive" = true`];
   const params: any[] = [];
-  let idx = 1;
+  let idx = startIdx;
 
   const ph = () => `$${idx++}`;
 
@@ -129,12 +132,17 @@ export async function getProductsHandler(
     if (searchQuery.trim().length >= 2) {
       const q = searchQuery.trim().toLowerCase();
       const tokenizedQ = q.split(/\s+/).filter((w) => w.length >= 2);
+      const prefix = `${q}%`;
 
       const { sql: filterSql, params: filterParams } =
-        buildFilterSqlAndParams(filters);
+        buildFilterSqlAndParams(filters, 4); // Start at $4 since $1=$tokenizedQ, $2=$q, $3=$prefix
 
       const searchSql = `
                 p."searchTokens" && $1::text[]
+                OR p.name_en ILIKE $3
+                OR p.name_ru ILIKE $3
+                OR p.name_am ILIKE $3
+                OR EXISTS (SELECT 1 FROM unnest(p."searchTokens") AS token WHERE token ILIKE $3)
                 OR p.name_en % $2
                 OR p.name_ru % $2
                 OR p.name_am % $2
@@ -150,17 +158,25 @@ export async function getProductsHandler(
         `SELECT COUNT(*) as count FROM products p WHERE ${filterSql} AND (${searchSql})`,
         tokenizedQ,
         q,
+        prefix,
         ...filterParams
       );
       total = Number(countResult[0]?.count ?? 0);
 
       if (total > 0) {
         const offset = (pagination.page - 1) * pagination.limit;
+        const limitIdx = 4 + filterParams.length;
+        const offsetIdx = limitIdx + 1;
+
         const rows = await prisma.$queryRawUnsafe<
           { id: string; score: number }[]
         >(
           `SELECT p.id,
                             GREATEST(
+                              CASE WHEN p.name_en ILIKE $3 THEN 1 ELSE 0 END,
+                              CASE WHEN p.name_ru ILIKE $3 THEN 1 ELSE 0 END,
+                              CASE WHEN p.name_am ILIKE $3 THEN 1 ELSE 0 END,
+                              CASE WHEN EXISTS (SELECT 1 FROM unnest(p."searchTokens") AS token WHERE token ILIKE $3) THEN 1 ELSE 0 END,
                               similarity(p.name_en, $2),
                               similarity(p.name_ru, $2),
                               similarity(p.name_am, $2),
@@ -174,9 +190,10 @@ export async function getProductsHandler(
                      FROM products p
                      WHERE ${filterSql} AND (${searchSql})
                      ORDER BY score DESC NULLS LAST, p."createdAt" DESC
-                     LIMIT $3 OFFSET $4`,
+                     LIMIT $${limitIdx} OFFSET $${offsetIdx}`,
           tokenizedQ,
           q,
+          prefix,
           ...filterParams,
           pagination.limit,
           offset
