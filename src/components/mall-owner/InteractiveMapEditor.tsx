@@ -275,7 +275,9 @@ export function InteractiveMapEditor() {
       if (data.success) {
         setParsedShopIds(data.data.shopIds);
         if (data.data.matchedCount > 0) {
-          toast.success(t("messages.shopElementsFound", { count: data.data.matchedCount }));
+          toast.success(
+            t("messages.shopElementsFound", { count: data.data.matchedCount })
+          );
         } else {
           toast.info(t("messages.svgLoadedNoShops"));
         }
@@ -317,7 +319,9 @@ export function InteractiveMapEditor() {
           toast.success(t("messages.positionUpdated"));
           loadMall();
         } else {
-          toast.error(data.error?.message || t("messages.updatePositionFailed"));
+          toast.error(
+            data.error?.message || t("messages.updatePositionFailed")
+          );
         }
       } catch (error) {
         toast.error(t("messages.updatePositionFailed"));
@@ -344,30 +348,37 @@ export function InteractiveMapEditor() {
           toast.success(t("messages.positionUpdated"));
           loadMall();
         } else {
-          toast.error(data.error?.message || t("messages.updatePositionFailed"));
+          toast.error(
+            data.error?.message || t("messages.updatePositionFailed")
+          );
         }
       } catch (error) {
         toast.error(t("messages.updatePositionFailed"));
       }
     } else if (selectedVenue) {
       try {
-        const res = await mallApiFetch(`/api/v1/mall/venues/${selectedVenue.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            latitude: position.lat,
-            longitude: position.lng,
-            rotation,
-            scale,
-          }),
-        });
+        const res = await mallApiFetch(
+          `/api/v1/mall/venues/${selectedVenue.id}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              latitude: position.lat,
+              longitude: position.lng,
+              rotation,
+              scale,
+            }),
+          }
+        );
         const data = await res.json();
 
         if (data.success) {
           toast.success(t("messages.positionUpdated"));
           loadMall();
         } else {
-          toast.error(data.error?.message || t("messages.updatePositionFailed"));
+          toast.error(
+            data.error?.message || t("messages.updatePositionFailed")
+          );
         }
       } catch (error) {
         toast.error(t("messages.updatePositionFailed"));
@@ -436,15 +447,18 @@ export function InteractiveMapEditor() {
         }
       } else if (selectedVenue) {
         // Save venue map with position (rotation/scale)
-        const res = await mallApiFetch(`/api/v1/mall/venues/${selectedVenue.id}`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            svgUrl,
-            rotation,
-            scale,
-          }),
-        });
+        const res = await mallApiFetch(
+          `/api/v1/mall/venues/${selectedVenue.id}`,
+          {
+            method: "PUT",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              svgUrl,
+              rotation,
+              scale,
+            }),
+          }
+        );
         const data = await res.json();
 
         if (data.success) {
@@ -555,7 +569,11 @@ export function InteractiveMapEditor() {
         );
         if (!res.ok) {
           if (res.status !== 404) {
-            console.error("Failed to load floor shops:", res.status, res.statusText);
+            console.error(
+              "Failed to load floor shops:",
+              res.status,
+              res.statusText
+            );
           }
           return;
         }
@@ -766,10 +784,14 @@ export function InteractiveMapEditor() {
               <CardHeader className="pb-2">
                 <Tabs
                   value={activeTab}
-                  onValueChange={(v) => setActiveTab(v as "buildings" | "venues")}
+                  onValueChange={(v) =>
+                    setActiveTab(v as "buildings" | "venues")
+                  }
                 >
                   <TabsList className="grid w-full grid-cols-2">
-                    <TabsTrigger value="buildings">{t("buildings")}</TabsTrigger>
+                    <TabsTrigger value="buildings">
+                      {t("buildings")}
+                    </TabsTrigger>
                     <TabsTrigger value="venues">{t("venues")}</TabsTrigger>
                   </TabsList>
                 </Tabs>
@@ -798,7 +820,9 @@ export function InteractiveMapEditor() {
                             }}
                           >
                             <SelectTrigger id="building-select">
-                              <SelectValue placeholder={t("selectBuildingPlaceholder")} />
+                              <SelectValue
+                                placeholder={t("selectBuildingPlaceholder")}
+                              />
                             </SelectTrigger>
                             <SelectContent>
                               {mall.buildings.map((building) => (
@@ -817,7 +841,9 @@ export function InteractiveMapEditor() {
                         {/* Floor Selector - only show when building is selected */}
                         {selectedBuilding && (
                           <div className="space-y-2">
-                            <Label htmlFor="floor-select">{t("selectFloor")}</Label>
+                            <Label htmlFor="floor-select">
+                              {t("selectFloor")}
+                            </Label>
                             {selectedBuilding.floors.length === 0 ? (
                               <p className="text-muted-foreground py-2 text-sm">
                                 {t("messages.noFloorsYet")}
@@ -831,7 +857,10 @@ export function InteractiveMapEditor() {
                                   );
                                   if (floor) {
                                     setSelectedFloor(floor);
-                                    const geo = getFloorGeo(floor, selectedBuilding);
+                                    const geo = getFloorGeo(
+                                      floor,
+                                      selectedBuilding
+                                    );
                                     const pos = { lat: geo.lat, lng: geo.lng };
                                     setPosition(pos);
                                     setRotation(geo.rotation);
@@ -844,7 +873,9 @@ export function InteractiveMapEditor() {
                                 }}
                               >
                                 <SelectTrigger id="floor-select">
-                                  <SelectValue placeholder={t("selectFloorPlaceholder")} />
+                                  <SelectValue
+                                    placeholder={t("selectFloorPlaceholder")}
+                                  />
                                 </SelectTrigger>
                                 <SelectContent>
                                   {selectedBuilding.floors.map((floor) => (
@@ -867,10 +898,16 @@ export function InteractiveMapEditor() {
                           <div className="space-y-3 border-t pt-2">
                             <div className="flex items-center justify-between">
                               <div>
-                                <p className="text-sm font-medium">{t("floorMap")}</p>
+                                <p className="text-sm font-medium">
+                                  {t("floorMap")}
+                                </p>
                                 <p className="text-muted-foreground text-xs">
                                   {selectedFloor.floorMap
-                                    ? t("svgUploaded", { count: selectedFloor.floorMap.shopIds?.length || 0 })
+                                    ? t("svgUploaded", {
+                                        count:
+                                          selectedFloor.floorMap.shopIds
+                                            ?.length || 0,
+                                      })
                                     : t("noMapUploaded")}
                                 </p>
                               </div>
@@ -919,7 +956,9 @@ export function InteractiveMapEditor() {
                       <>
                         {/* Venue Selector */}
                         <div className="space-y-2">
-                          <Label htmlFor="venue-select">{t("selectVenue")}</Label>
+                          <Label htmlFor="venue-select">
+                            {t("selectVenue")}
+                          </Label>
                           <Select
                             value={selectedVenue?.id || ""}
                             onValueChange={(venueId) => {
@@ -930,7 +969,9 @@ export function InteractiveMapEditor() {
                             }}
                           >
                             <SelectTrigger id="venue-select">
-                              <SelectValue placeholder={t("selectVenuePlaceholder")} />
+                              <SelectValue
+                                placeholder={t("selectVenuePlaceholder")}
+                              />
                             </SelectTrigger>
                             <SelectContent>
                               {mall.venues.map((venue) => (
@@ -948,10 +989,15 @@ export function InteractiveMapEditor() {
                           <div className="space-y-3 border-t pt-2">
                             <div className="flex items-center justify-between">
                               <div>
-                                <p className="text-sm font-medium">{t("venueMap")}</p>
+                                <p className="text-sm font-medium">
+                                  {t("venueMap")}
+                                </p>
                                 <p className="text-muted-foreground text-xs">
                                   {selectedVenue.svgUrl
-                                    ? t("svgUploaded", { count: selectedVenue.shopIds?.length || 0 })
+                                    ? t("svgUploaded", {
+                                        count:
+                                          selectedVenue.shopIds?.length || 0,
+                                      })
                                     : t("noMapUploaded")}
                                 </p>
                               </div>
@@ -1007,6 +1053,7 @@ export function InteractiveMapEditor() {
                     }}
                     isEditMode={isEditMode}
                     showOtherFloors={showOtherFloors}
+                    dialogOpen={showUploadSvg}
                     shopAssignmentMode={!!selectedFloor?.floorMap}
                     shopAssignments={floorShops.map((s) => ({
                       shopId: s.id,
@@ -1027,7 +1074,10 @@ export function InteractiveMapEditor() {
                     {/* Header with mode toggle */}
                     <div className="flex items-center justify-between">
                       <h3 className="font-medium">
-                        {t("positioning", { name: selectedBuilding?.name || selectedVenue?.name || "" })}
+                        {t("positioning", {
+                          name:
+                            selectedBuilding?.name || selectedVenue?.name || "",
+                        })}
                       </h3>
                       <div className="flex items-center gap-4">
                         {/* Edit/Preview toggle */}
@@ -1077,7 +1127,9 @@ export function InteractiveMapEditor() {
                           />
                         </div>
                         <div>
-                          <Label>{t("scale", { value: scale.toFixed(2) })}</Label>
+                          <Label>
+                            {t("scale", { value: scale.toFixed(2) })}
+                          </Label>
                           <Slider
                             value={[scale]}
                             onValueChange={([v]) => handleScaleChange(v)}

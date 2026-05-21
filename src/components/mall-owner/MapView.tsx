@@ -8,9 +8,12 @@ import "leaflet/dist/leaflet.css";
 // Fix for default marker icons in Leaflet with webpack/Next.js
 delete L.Icon.Default.prototype._getIconUrl;
 L.Icon.Default.mergeOptions({
-  iconRetinaUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
-  iconUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
-  shadowUrl: "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
+  iconRetinaUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon-2x.png",
+  iconUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-icon.png",
+  shadowUrl:
+    "https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/images/marker-shadow.png",
 });
 
 interface FloorMap {
@@ -73,7 +76,7 @@ interface MapViewProps {
   onFloorChange: (floor: Floor | null) => void;
   isEditMode: boolean;
   showOtherFloors: boolean;
-  // Shop assignment mode props
+  dialogOpen?: boolean;
   shopAssignmentMode?: boolean;
   shopAssignments?: ShopAssignment[];
   selectedShopForAssignment?: string | null;
@@ -94,6 +97,7 @@ export function MapView({
   onFloorChange,
   isEditMode,
   showOtherFloors,
+  dialogOpen = false,
   shopAssignmentMode = false,
   shopAssignments = [],
   selectedShopForAssignment = null,
@@ -104,7 +108,7 @@ export function MapView({
   const containerRef = useRef<HTMLDivElement>(null);
   const svgMarkerRef = useRef<L.Marker | null>(null);
   const otherMarkersRef = useRef<L.Marker[]>([]);
-  
+
   // Counter to trigger coloring effect when marker is recreated
   const [markerVersion, setMarkerVersion] = useState(0);
 
@@ -114,7 +118,7 @@ export function MapView({
     rotation,
     position,
     aspectRatio: 1,
-    isEditMode
+    isEditMode,
   });
 
   useEffect(() => {
@@ -123,14 +127,17 @@ export function MapView({
       rotation,
       position,
       aspectRatio: stateRef.current.aspectRatio,
-      isEditMode
+      isEditMode,
     };
   }, [scale, rotation, position, isEditMode]);
 
   const baseZoomRef = useRef<number>(18);
   const baseZoomInitializedRef = useRef<boolean>(false); // Track if baseZoom was initialized for current SVG
   const [svgContent, setSvgContent] = useState<string | null>(null);
-  const processedSvgRef = useRef<{ content: string; aspectRatio: number } | null>(null);
+  const processedSvgRef = useRef<{
+    content: string;
+    aspectRatio: number;
+  } | null>(null);
 
   // Get current SVG URL based on selection
   const getCurrentSvgUrl = useCallback((): string | null => {
@@ -144,119 +151,145 @@ export function MapView({
   }, [selectedBuilding, selectedVenue, selectedFloor]);
 
   // Get other floor SVGs
-  const getOtherFloorSvgs = useCallback((): { floor: number; svgUrl: string }[] => {
-    if (!selectedBuilding || selectedFloor === null || !showOtherFloors) return [];
+  const getOtherFloorSvgs = useCallback((): {
+    floor: number;
+    svgUrl: string;
+  }[] => {
+    if (!selectedBuilding || selectedFloor === null || !showOtherFloors)
+      return [];
     return selectedBuilding.floors
-      .filter(f => f.id !== selectedFloor.id && f.floorMap?.svgUrl)
-      .map(f => ({ floor: f.number, svgUrl: f.floorMap!.svgUrl }));
+      .filter((f) => f.id !== selectedFloor.id && f.floorMap?.svgUrl)
+      .map((f) => ({ floor: f.number, svgUrl: f.floorMap!.svgUrl }));
   }, [selectedBuilding, selectedFloor, showOtherFloors]);
 
   // Fetch SVG content
-  const fetchSvgContent = useCallback(async (url: string): Promise<string | null> => {
-    try {
-      const response = await fetch(url);
-      return await response.text();
-    } catch (error) {
-      console.error("Failed to fetch SVG:", error);
-      return null;
-    }
-  }, []);
+  const fetchSvgContent = useCallback(
+    async (url: string): Promise<string | null> => {
+      try {
+        const response = await fetch(url);
+        return await response.text();
+      } catch (error) {
+        console.error("Failed to fetch SVG:", error);
+        return null;
+      }
+    },
+    []
+  );
 
   // Process SVG content with tight bounding box - strictly following HTML fix
   // Also applies shop assignment coloring when in assignment mode
-  const processSvgContent = useCallback((
-    content: string,
-    applyAssignmentColors: boolean = false,
-    assignments: ShopAssignment[] = [],
-    selectedShopId: string | null = null
-  ): { content: string; aspectRatio: number; pathIds: string[] } => {
-    const measureLayer = document.createElement("div");
-    // Ensure measure layer styles match the HTML fix for accurate bbox
-    measureLayer.style.cssText = "position: absolute; visibility: hidden; pointer-events: none;";
-    document.body.appendChild(measureLayer);
-    measureLayer.innerHTML = content;
+  const processSvgContent = useCallback(
+    (
+      content: string,
+      applyAssignmentColors: boolean = false,
+      assignments: ShopAssignment[] = [],
+      selectedShopId: string | null = null
+    ): { content: string; aspectRatio: number; pathIds: string[] } => {
+      const measureLayer = document.createElement("div");
+      // Ensure measure layer styles match the HTML fix for accurate bbox
+      measureLayer.style.cssText =
+        "position: absolute; visibility: hidden; pointer-events: none;";
+      document.body.appendChild(measureLayer);
+      measureLayer.innerHTML = content;
 
-    const svgEl = measureLayer.querySelector("svg");
-    const pathIds: string[] = [];
+      const svgEl = measureLayer.querySelector("svg");
+      const pathIds: string[] = [];
 
-    if (svgEl) {
-      try {
-        const bbox = svgEl.getBBox();
+      if (svgEl) {
+        try {
+          const bbox = svgEl.getBBox();
 
-        // Redefine the viewBox to match exactly the content bounds
-        svgEl.setAttribute("viewBox", `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`);
-        svgEl.setAttribute("width", "100%");
-        svgEl.setAttribute("height", "100%");
-        svgEl.setAttribute("preserveAspectRatio", "xMidYMid meet");
-
-        // Find all clickable elements (paths, rects, polygons, etc. with IDs)
-        if (applyAssignmentColors) {
-          const clickableElements = svgEl.querySelectorAll("[id]");
-          const assignedPathIds = new Set(
-            assignments.filter(a => a.svgId).map(a => a.svgId!)
+          // Redefine the viewBox to match exactly the content bounds
+          svgEl.setAttribute(
+            "viewBox",
+            `${bbox.x} ${bbox.y} ${bbox.width} ${bbox.height}`
           );
-          const selectedShopSvgId = assignments.find(a => a.shopId === selectedShopId)?.svgId;
+          svgEl.setAttribute("width", "100%");
+          svgEl.setAttribute("height", "100%");
+          svgEl.setAttribute("preserveAspectRatio", "xMidYMid meet");
 
-          clickableElements.forEach((el) => {
-            const id = el.getAttribute("id");
-            if (!id) return;
+          // Find all clickable elements (paths, rects, polygons, etc. with IDs)
+          if (applyAssignmentColors) {
+            const clickableElements = svgEl.querySelectorAll("[id]");
+            const assignedPathIds = new Set(
+              assignments.filter((a) => a.svgId).map((a) => a.svgId!)
+            );
+            const selectedShopSvgId = assignments.find(
+              (a) => a.shopId === selectedShopId
+            )?.svgId;
 
-            // Skip non-shape elements
-            const tagName = el.tagName.toLowerCase();
-            if (!["path", "rect", "polygon", "polyline", "circle", "ellipse", "g"].includes(tagName)) {
-              return;
-            }
+            clickableElements.forEach((el) => {
+              const id = el.getAttribute("id");
+              if (!id) return;
 
-            pathIds.push(id);
+              // Skip non-shape elements
+              const tagName = el.tagName.toLowerCase();
+              if (
+                ![
+                  "path",
+                  "rect",
+                  "polygon",
+                  "polyline",
+                  "circle",
+                  "ellipse",
+                  "g",
+                ].includes(tagName)
+              ) {
+                return;
+              }
 
-            // Store original styles
-            const originalFill = el.getAttribute("fill") || "";
-            const originalStroke = el.getAttribute("stroke") || "";
-            el.setAttribute("data-original-fill", originalFill);
-            el.setAttribute("data-original-stroke", originalStroke);
-            el.setAttribute("data-path-id", id);
+              pathIds.push(id);
 
-            // Apply coloring based on assignment status
-            if (id === selectedShopSvgId) {
-              // This path belongs to the currently selected shop - blue
-              el.setAttribute("fill", "rgba(59, 130, 246, 0.4)");
-              el.setAttribute("stroke", "#3b82f6");
-              el.setAttribute("stroke-width", "2");
-            } else if (assignedPathIds.has(id)) {
-              // Already assigned to another shop - red
-              el.setAttribute("fill", "rgba(239, 68, 68, 0.3)");
-              el.setAttribute("stroke", "#ef4444");
-              el.setAttribute("stroke-width", "1");
-            } else {
-              // Available/unassigned - green
-              el.setAttribute("fill", "rgba(34, 197, 94, 0.3)");
-              el.setAttribute("stroke", "#22c55e");
-              el.setAttribute("stroke-width", "1");
-            }
+              // Store original styles
+              const originalFill = el.getAttribute("fill") || "";
+              const originalStroke = el.getAttribute("stroke") || "";
+              el.setAttribute("data-original-fill", originalFill);
+              el.setAttribute("data-original-stroke", originalStroke);
+              el.setAttribute("data-path-id", id);
 
-            // Add cursor and hover class
-            el.setAttribute("style", "cursor: pointer;");
-            el.classList.add("svg-clickable-path");
-          });
+              // Apply coloring based on assignment status
+              if (id === selectedShopSvgId) {
+                // This path belongs to the currently selected shop - blue
+                el.setAttribute("fill", "rgba(59, 130, 246, 0.4)");
+                el.setAttribute("stroke", "#3b82f6");
+                el.setAttribute("stroke-width", "2");
+              } else if (assignedPathIds.has(id)) {
+                // Already assigned to another shop - red
+                el.setAttribute("fill", "rgba(239, 68, 68, 0.3)");
+                el.setAttribute("stroke", "#ef4444");
+                el.setAttribute("stroke-width", "1");
+              } else {
+                // Available/unassigned - green
+                el.setAttribute("fill", "rgba(34, 197, 94, 0.3)");
+                el.setAttribute("stroke", "#22c55e");
+                el.setAttribute("stroke-width", "1");
+              }
+
+              // Add cursor and hover class
+              el.setAttribute("style", "cursor: pointer;");
+              el.classList.add("svg-clickable-path");
+            });
+          }
+
+          const processedContent = new XMLSerializer().serializeToString(svgEl);
+          const aspectRatio = bbox.width / bbox.height;
+
+          document.body.removeChild(measureLayer);
+          return { content: processedContent, aspectRatio, pathIds };
+        } catch (e) {
+          // Fallback
+          document.body.removeChild(measureLayer);
+          svgEl.setAttribute("width", "100%");
+          svgEl.setAttribute("height", "100%");
+          return { content: content, aspectRatio: 1, pathIds: [] };
         }
-
-        const processedContent = new XMLSerializer().serializeToString(svgEl);
-        const aspectRatio = bbox.width / bbox.height;
-
-        document.body.removeChild(measureLayer);
-        return { content: processedContent, aspectRatio, pathIds };
-      } catch (e) {
-        // Fallback
-        document.body.removeChild(measureLayer);
-        svgEl.setAttribute("width", "100%");
-        svgEl.setAttribute("height", "100%");
-        return { content: content, aspectRatio: 1, pathIds: [] };
       }
-    }
 
-    document.body.removeChild(measureLayer);
-    return { content, aspectRatio: 1, pathIds: [] };
-  }, []);
+      document.body.removeChild(measureLayer);
+      return { content, aspectRatio: 1, pathIds: [] };
+    },
+    []
+  );
 
   // Initialize map
   useEffect(() => {
@@ -299,7 +332,7 @@ export function MapView({
       return;
     }
 
-    fetchSvgContent(svgUrl).then(content => {
+    fetchSvgContent(svgUrl).then((content) => {
       if (content) {
         setSvgContent(content);
       }
@@ -363,7 +396,9 @@ export function MapView({
 
     const activeClass = isEditMode ? "svg-overlay-active" : "";
     // Border style strictly from HTML/Requirement
-    const borderStyle = isEditMode ? "outline: 2px dashed #3b82f6; background: rgba(59, 130, 246, 0.05);" : "";
+    const borderStyle = isEditMode
+      ? "outline: 2px dashed #3b82f6; background: rgba(59, 130, 246, 0.05);"
+      : "";
 
     const icon = L.divIcon({
       className: "svg-marker-wrapper",
@@ -393,9 +428,9 @@ export function MapView({
     if (svgMarkerRef.current) svgMarkerRef.current.remove();
     marker.addTo(map);
     svgMarkerRef.current = marker;
-    
+
     // Trigger coloring effect to re-run after marker is created
-    setMarkerVersion(v => v + 1);
+    setMarkerVersion((v) => v + 1);
 
     // Direct DOM Event Listeners for smooth manipulation
     setTimeout(() => {
@@ -419,7 +454,10 @@ export function MapView({
 
       if (!isEditMode) return;
 
-      const setupHandle = (selector: string, handler: (e: MouseEvent) => void) => {
+      const setupHandle = (
+        selector: string,
+        handler: (e: MouseEvent) => void
+      ) => {
         const el = wrapper.querySelector(selector) as HTMLElement;
         if (el) {
           el.onmousedown = (e) => {
@@ -447,15 +485,15 @@ export function MapView({
           let newH = startHeight;
 
           // Assuming "all sides" means scaling from any handle
-          if (dir.includes('e')) newW = startWidth + dx;
-          if (dir.includes('w')) newW = startWidth - dx;
-          if (dir.includes('s')) newH = startHeight + dy;
-          if (dir.includes('n')) newH = startHeight - dy;
+          if (dir.includes("e")) newW = startWidth + dx;
+          if (dir.includes("w")) newW = startWidth - dx;
+          if (dir.includes("s")) newH = startHeight + dy;
+          if (dir.includes("n")) newH = startHeight - dy;
 
           const ar = stateRef.current.aspectRatio;
 
           // Driven logic
-          if (dir === 'n' || dir === 's') {
+          if (dir === "n" || dir === "s") {
             newW = newH * ar;
           } else {
             newH = newW / ar;
@@ -468,14 +506,15 @@ export function MapView({
           wrapper.style.height = `${newH}px`;
 
           // Apply Translation to keep opposite edge fixed visually
-          let tx = 0, ty = 0;
+          let tx = 0,
+            ty = 0;
           const wDiff = newW - startWidth;
           const hDiff = newH - startHeight;
 
-          if (dir.includes('w')) tx = -wDiff / 2;
-          if (dir.includes('e')) tx = wDiff / 2;
-          if (dir.includes('n')) ty = -hDiff / 2;
-          if (dir.includes('s')) ty = hDiff / 2;
+          if (dir.includes("w")) tx = -wDiff / 2;
+          if (dir.includes("e")) tx = wDiff / 2;
+          if (dir.includes("n")) ty = -hDiff / 2;
+          if (dir.includes("s")) ty = hDiff / 2;
 
           wrapper.style.transform = `rotate(${stateRef.current.rotation}deg) translate(${tx}px, ${ty}px)`;
 
@@ -496,9 +535,11 @@ export function MapView({
           if (tx !== 0 || ty !== 0) {
             const currentPos = stateRef.current.position;
             if (currentPos && mapRef.current) {
-              const centerPoint = mapRef.current.latLngToContainerPoint(currentPos);
+              const centerPoint =
+                mapRef.current.latLngToContainerPoint(currentPos);
               const newCenterPoint = centerPoint.add([tx, ty]);
-              const newLatLng = mapRef.current.containerPointToLatLng(newCenterPoint);
+              const newLatLng =
+                mapRef.current.containerPointToLatLng(newCenterPoint);
               onPositionChange(newLatLng);
             }
           }
@@ -510,19 +551,20 @@ export function MapView({
         document.addEventListener("mouseup", onMouseUp);
       };
 
-      ['nw', 'ne', 'sw', 'se', 'n', 's', 'e', 'w'].forEach(dir => {
+      ["nw", "ne", "sw", "se", "n", "s", "e", "w"].forEach((dir) => {
         setupHandle(`.handle-${dir}`, (e) => handleResize(e, dir));
       });
 
       // Rotation Logic
-      setupHandle('.rotate-handle', (e) => {
+      setupHandle(".rotate-handle", (e) => {
         const rect = wrapper.getBoundingClientRect();
         const cx = rect.left + rect.width / 2;
         const cy = rect.top + rect.height / 2;
         let lastRot: number | undefined;
 
         const onMouseMove = (me: MouseEvent) => {
-          const angle = Math.atan2(me.clientY - cy, me.clientX - cx) * (180 / Math.PI);
+          const angle =
+            Math.atan2(me.clientY - cy, me.clientX - cx) * (180 / Math.PI);
           const rot = ((Math.round(angle + 90) % 360) + 360) % 360;
           wrapper.style.transform = `rotate(${rot}deg)`;
           lastRot = rot;
@@ -539,11 +581,10 @@ export function MapView({
         document.addEventListener("mousemove", onMouseMove);
         document.addEventListener("mouseup", onMouseUp);
       });
-
     }, 50);
 
     // Draggable Marker Event
-    marker.on('dragend', (e) => {
+    marker.on("dragend", (e) => {
       const latlng = e.target.getLatLng();
       onPositionChange({ lat: latlng.lat, lng: latlng.lng });
     });
@@ -576,8 +617,16 @@ export function MapView({
       map.off("zoomanim", onZoomAnim);
       map.off("zoomend", onZoomEnd);
     };
-
-  }, [position, scale, rotation, isEditMode, svgContent, onPositionChange, onRotationChange, onScaleChange]);
+  }, [
+    position,
+    scale,
+    rotation,
+    isEditMode,
+    svgContent,
+    onPositionChange,
+    onRotationChange,
+    onScaleChange,
+  ]);
 
   // Apply shop assignment coloring and click handlers
   useEffect(() => {
@@ -593,14 +642,18 @@ export function MapView({
 
       // Build a set of svgIds that are already assigned to shops
       const assignedSvgIds = new Set<string>();
-      shopAssignments.forEach(a => {
+      shopAssignments.forEach((a) => {
         if (a.svgId) assignedSvgIds.add(a.svgId);
       });
-      
-      const selectedShopSvgId = shopAssignments.find(a => a.shopId === selectedShopForAssignment)?.svgId;
+
+      const selectedShopSvgId = shopAssignments.find(
+        (a) => a.shopId === selectedShopForAssignment
+      )?.svgId;
 
       // Find all interactive elements
-      const allElements = wrapper.querySelectorAll("path, rect, polygon, polyline, circle, ellipse, g");
+      const allElements = wrapper.querySelectorAll(
+        "path, rect, polygon, polyline, circle, ellipse, g"
+      );
 
       allElements.forEach((el) => {
         const id = el.getAttribute("id");
@@ -611,7 +664,11 @@ export function MapView({
 
         if (shopAssignmentMode) {
           // Remove old classes first
-          el.classList.remove("wm-map-assigned", "wm-map-unassigned", "wm-map-active");
+          el.classList.remove(
+            "wm-map-assigned",
+            "wm-map-unassigned",
+            "wm-map-active"
+          );
 
           if (id === selectedShopSvgId) {
             el.classList.add("wm-map-active");
@@ -631,7 +688,11 @@ export function MapView({
           };
         } else {
           // Reset when not in assignment mode
-          el.classList.remove("wm-map-assigned", "wm-map-unassigned", "wm-map-active");
+          el.classList.remove(
+            "wm-map-assigned",
+            "wm-map-unassigned",
+            "wm-map-active"
+          );
           (el as HTMLElement).style.cursor = "";
           (el as HTMLElement).onclick = null;
         }
@@ -639,8 +700,17 @@ export function MapView({
     });
 
     return () => cancelAnimationFrame(handle);
-  }, [shopAssignmentMode, shopAssignments, selectedShopForAssignment, onPathClick, position, rotation, scale, svgContent, markerVersion]);
-
+  }, [
+    shopAssignmentMode,
+    shopAssignments,
+    selectedShopForAssignment,
+    onPathClick,
+    position,
+    rotation,
+    scale,
+    svgContent,
+    markerVersion,
+  ]);
 
   // Restored: Render other floor overlays
   useEffect(() => {
@@ -649,7 +719,7 @@ export function MapView({
     const map = mapRef.current;
 
     // Clear existing
-    otherMarkersRef.current.forEach(marker => marker.remove());
+    otherMarkersRef.current.forEach((marker) => marker.remove());
     otherMarkersRef.current = [];
 
     if (!showOtherFloors || !selectedBuilding) return;
@@ -704,7 +774,9 @@ export function MapView({
       const onZoomAnim = (e: L.ZoomAnimEvent) => {
         const el = marker.getElement();
         if (!el) return;
-        const inner = el.querySelector(".svg-inner-scaler-other") as HTMLElement;
+        const inner = el.querySelector(
+          ".svg-inner-scaler-other"
+        ) as HTMLElement;
         if (!inner) return;
 
         const zoomScale = Math.pow(2, e.zoom - currentBaseZoom);
@@ -714,7 +786,9 @@ export function MapView({
       const onZoomEnd = () => {
         const el = marker.getElement();
         if (!el) return;
-        const inner = el.querySelector(".svg-inner-scaler-other") as HTMLElement;
+        const inner = el.querySelector(
+          ".svg-inner-scaler-other"
+        ) as HTMLElement;
         if (!inner) return;
 
         const zoomScale = Math.pow(2, map.getZoom() - currentBaseZoom);
@@ -726,95 +800,121 @@ export function MapView({
     });
 
     return () => {
-      otherMarkersRef.current.forEach(marker => marker.remove());
+      otherMarkersRef.current.forEach((marker) => marker.remove());
       otherMarkersRef.current = [];
     };
-  }, [showOtherFloors, selectedBuilding, position, rotation, scale, getOtherFloorSvgs, fetchSvgContent, processSvgContent]);
+  }, [
+    showOtherFloors,
+    selectedBuilding,
+    position,
+    rotation,
+    scale,
+    getOtherFloorSvgs,
+    fetchSvgContent,
+    processSvgContent,
+  ]);
 
   return (
-    <div className="relative w-full h-full">
+    <div className="relative h-full w-full">
       <style jsx global>{`
-        .leaflet-zoom-anim .leaflet-zoom-animated { 
-            transition: transform 0.25s cubic-bezier(0,0,0.25,1); 
+        .leaflet-zoom-anim .leaflet-zoom-animated {
+          transition: transform 0.25s cubic-bezier(0, 0, 0.25, 1);
         }
         .svg-marker-wrapper {
-            background: transparent;
-            border: none;
+          background: transparent;
+          border: none;
         }
         .resize-handle {
-            width: 12px; height: 12px;
-            background: #3b82f6;
-            border: 2px solid white;
-            border-radius: 50%;
-            position: absolute;
-            z-index: 100;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+          width: 12px;
+          height: 12px;
+          background: #3b82f6;
+          border: 2px solid white;
+          border-radius: 50%;
+          position: absolute;
+          z-index: 100;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
         .rotate-handle {
-            width: 14px; height: 14px;
-            background: #22c55e;
-            border: 2px solid white;
-            border-radius: 50%;
-            position: absolute;
-            cursor: pointer;
-            z-index: 100;
-            box-shadow: 0 1px 3px rgba(0,0,0,0.3);
+          width: 14px;
+          height: 14px;
+          background: #22c55e;
+          border: 2px solid white;
+          border-radius: 50%;
+          position: absolute;
+          cursor: pointer;
+          z-index: 100;
+          box-shadow: 0 1px 3px rgba(0, 0, 0, 0.3);
         }
         .rotate-handle::after {
-            content: ''; position: absolute;
-            top: 14px; left: 50%; width: 2px; height: 20px;
-            background: #22c55e; transform: translateX(-50%);
-            z-index: -1;
+          content: "";
+          position: absolute;
+          top: 14px;
+          left: 50%;
+          width: 2px;
+          height: 20px;
+          background: #22c55e;
+          transform: translateX(-50%);
+          z-index: -1;
         }
         .svg-clickable-path {
-            transition: opacity 0.15s ease;
+          transition: opacity 0.15s ease;
         }
         .svg-clickable-path:hover {
-            opacity: 0.8;
-            filter: brightness(1.1);
+          opacity: 0.8;
+          filter: brightness(1.1);
         }
-        
+
         /* Shop assignment coloring */
         .wm-map-unassigned {
-            fill: rgba(34, 197, 94, 0.3) !important;
-            stroke: #22c55e !important;
-            stroke-width: 1 !important;
+          fill: rgba(34, 197, 94, 0.3) !important;
+          stroke: #22c55e !important;
+          stroke-width: 1 !important;
         }
         .wm-map-assigned {
-            fill: rgba(239, 68, 68, 0.3) !important;
-            stroke: #ef4444 !important;
-            stroke-width: 1 !important;
+          fill: rgba(239, 68, 68, 0.3) !important;
+          stroke: #ef4444 !important;
+          stroke-width: 1 !important;
         }
         .wm-map-active {
-            fill: rgba(59, 130, 246, 0.4) !important;
-            stroke: #3b82f6 !important;
-            stroke-width: 2 !important;
+          fill: rgba(59, 130, 246, 0.4) !important;
+          stroke: #3b82f6 !important;
+          stroke-width: 2 !important;
         }
         .wm-map-unassigned:hover,
         .wm-map-assigned:hover,
         .wm-map-active:hover {
-            opacity: 0.8;
-            filter: brightness(1.1);
+          opacity: 0.8;
+          filter: brightness(1.1);
         }
       `}</style>
 
-      <div ref={containerRef} className="w-full h-full" style={{ minHeight: "400px" }} />
+      <div
+        ref={containerRef}
+        className="h-full w-full"
+        style={{ minHeight: "400px" }}
+      />
 
       {/* Restored UI Indicators */}
       {selectedBuilding && selectedBuilding.floors.length > 0 && (
-        <div className="absolute top-3 left-3 z-[1000] bg-white rounded-lg shadow-lg p-2">
+        <div
+          className={`absolute top-3 left-16 z-[1000] rounded-lg bg-white p-2 shadow-lg transition-opacity ${dialogOpen ? "pointer-events-none opacity-50" : ""}`}
+        >
           <select
             value={selectedFloor?.id ?? ""}
             onChange={(e) => {
-              const floor = selectedBuilding.floors.find(f => f.id === e.target.value);
+              const floor = selectedBuilding.floors.find(
+                (f) => f.id === e.target.value
+              );
               onFloorChange(floor || null);
             }}
-            className="block w-full px-3 py-1.5 text-sm border border-gray-300 rounded-md"
+            className="block w-full rounded-md border border-gray-300 px-3 py-1.5 text-sm"
           >
             <option value="">{t("selectFloor")}</option>
             {selectedBuilding.floors.map((floor) => (
               <option key={floor.id} value={floor.id}>
-                {floor.code}{floor.label ? ` (${floor.label})` : ""}{floor.floorMap ? " ✓" : ""}
+                {floor.code}
+                {floor.label ? ` (${floor.label})` : ""}
+                {floor.floorMap ? " ✓" : ""}
               </option>
             ))}
           </select>
@@ -822,25 +922,25 @@ export function MapView({
       )}
 
       {isEditMode && (selectedBuilding || selectedVenue) && (
-        <div className="absolute top-3 right-3 z-[1000] bg-blue-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+        <div className="absolute top-3 right-3 z-[1000] rounded-full bg-blue-500 px-3 py-1 text-sm font-medium text-white shadow-lg">
           {t("editMode")}
         </div>
       )}
 
       {!isEditMode && (selectedBuilding || selectedVenue) && svgContent && (
-        <div className="absolute top-3 right-3 z-[1000] bg-green-500 text-white px-3 py-1 rounded-full text-sm font-medium shadow-lg">
+        <div className="absolute top-3 right-3 z-[1000] rounded-full bg-green-500 px-3 py-1 text-sm font-medium text-white shadow-lg">
           {t("previewMode")}
         </div>
       )}
 
       {!svgContent && isEditMode && (selectedBuilding || selectedVenue) && (
-        <div className="absolute bottom-3 right-3 z-[1000] bg-amber-500 text-white px-3 py-2 rounded-lg text-sm shadow-lg">
+        <div className="absolute right-3 bottom-3 z-[1000] rounded-lg bg-amber-500 px-3 py-2 text-sm text-white shadow-lg">
           {selectedBuilding ? t("selectFloorOrUpload") : t("uploadSvg")}
         </div>
       )}
 
       {isEditMode && svgContent && (
-        <div className="absolute bottom-3 left-3 z-[1000] bg-white/90 backdrop-blur rounded-lg shadow-lg p-2 text-xs text-gray-600 space-y-0.5">
+        <div className="absolute bottom-3 left-3 z-[1000] space-y-0.5 rounded-lg bg-white/90 p-2 text-xs text-gray-600 shadow-lg backdrop-blur">
           <p>{t("helpMove")}</p>
           <p>{t("helpResize")}</p>
           <p>{t("helpRotate")}</p>
