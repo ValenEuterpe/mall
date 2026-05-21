@@ -52,7 +52,10 @@ import { cn } from "@/lib/utils";
 import { toast } from "@/lib/utils/toast";
 import { apiClient } from "@/lib/api-client";
 import { useSellerProductMutations } from "@/hooks/use-seller-product-mutations";
-import type { SellerProductCardData, ProductDiscountData } from "@/types/product";
+import type {
+  SellerProductCardData,
+  ProductDiscountData,
+} from "@/types/product";
 import { formatPrice, getStockStatus } from "@/types/product";
 
 export interface SellerProductCardProps {
@@ -182,7 +185,6 @@ function EditableField({
   );
 }
 
-
 interface ImageUploadButtonProps {
   onUpload: (files: File[]) => Promise<void>;
   disabled?: boolean;
@@ -279,7 +281,9 @@ export const SellerProductCard = memo(function SellerProductCard({
   const [localQuantity, setLocalQuantity] = useState(product.stockQuantity);
   const [localIsActive, setLocalIsActive] = useState(product.isActive);
   const [localStatus, setLocalStatus] = useState(product.status);
-  const [localDiscounts, setLocalDiscounts] = useState<ProductDiscountData[]>(product.discounts || []);
+  const [localDiscounts, setLocalDiscounts] = useState<ProductDiscountData[]>(
+    product.discounts || []
+  );
   const [salePopoverOpen, setSalePopoverOpen] = useState(false);
   const [saleForm, setSaleForm] = useState({
     name_en: "",
@@ -382,7 +386,8 @@ export const SellerProductCard = memo(function SellerProductCard({
 
     setIsSavingSale(true);
     try {
-      const name = saleForm.name_en || saleForm.name_ru || saleForm.name_am || "";
+      const name =
+        saleForm.name_en || saleForm.name_ru || saleForm.name_am || "";
       const created = await mutations.createDiscount({
         name,
         name_en: saleForm.name_en || undefined,
@@ -397,9 +402,14 @@ export const SellerProductCard = memo(function SellerProductCard({
       });
       setLocalDiscounts((prev) => [...prev, created]);
       setSaleForm({
-        name_en: "", name_ru: "", name_am: "",
-        discountType: "percentage", discountValue: "",
-        startDate: null, endDate: null, autoTranslate: false,
+        name_en: "",
+        name_ru: "",
+        name_am: "",
+        discountType: "percentage",
+        discountValue: "",
+        startDate: null,
+        endDate: null,
+        autoTranslate: false,
       });
       setSalePopoverOpen(false);
     } catch {
@@ -478,6 +488,7 @@ export const SellerProductCard = memo(function SellerProductCard({
                 src={img}
                 alt={`${product.name} ${idx + 1}`}
                 fill
+                sizes="64px"
                 className="object-cover"
               />
             ) : (
@@ -543,7 +554,11 @@ export const SellerProductCard = memo(function SellerProductCard({
                         t("enterQuantity"),
                         String(localQuantity)
                       );
-                      if (newQty !== null && !isNaN(parseInt(newQty)) && parseInt(newQty) >= 0) {
+                      if (
+                        newQty !== null &&
+                        !isNaN(parseInt(newQty)) &&
+                        parseInt(newQty) >= 0
+                      ) {
                         void handleDefaultQuantityChange(parseInt(newQty));
                       }
                     }}
@@ -587,13 +602,24 @@ export const SellerProductCard = memo(function SellerProductCard({
         {activeDiscounts.length > 0 && (
           <div className="flex flex-wrap gap-1.5">
             {activeDiscounts.map((d) => {
-              const localeName = locale === "ru" ? d.name_ru : locale === "am" ? d.name_am : d.name_en;
+              const localeName =
+                locale === "ru"
+                  ? d.name_ru
+                  : locale === "am"
+                    ? d.name_am
+                    : d.name_en;
               const displayName = localeName || d.name;
               return (
-                <Badge key={d.id} variant="secondary" className="gap-1 bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400">
+                <Badge
+                  key={d.id}
+                  variant="secondary"
+                  className="gap-1 bg-red-100 text-red-700 dark:bg-red-900/20 dark:text-red-400"
+                >
                   <Percent className="h-3 w-3" />
                   {displayName ? `${displayName}: ` : ""}
-                  {d.discountType === "percentage" ? `-${d.discountValue}%` : `-${formatPrice(d.discountValue, locale)}`}
+                  {d.discountType === "percentage"
+                    ? `-${d.discountValue}%`
+                    : `-${formatPrice(d.discountValue, locale)}`}
                   <button
                     className="ml-0.5 hover:text-red-900"
                     onClick={() => void handleDeleteDiscount(d.id)}
@@ -619,16 +645,32 @@ export const SellerProductCard = memo(function SellerProductCard({
                 {/* Language tabs for sale name */}
                 <div className="space-y-1.5">
                   <Label className="text-xs font-medium">{t("saleName")}</Label>
-                  <Tabs value={saleLangTab} onValueChange={(v) => setSaleLangTab(v as "en" | "ru" | "am")}>
-                    <TabsList className="grid w-full grid-cols-3 h-7">
-                      <TabsTrigger value="en" className="text-xs py-0.5">EN</TabsTrigger>
-                      <TabsTrigger value="ru" className="text-xs py-0.5">RU</TabsTrigger>
-                      <TabsTrigger value="am" className="text-xs py-0.5">AM</TabsTrigger>
+                  <Tabs
+                    value={saleLangTab}
+                    onValueChange={(v) =>
+                      setSaleLangTab(v as "en" | "ru" | "am")
+                    }
+                  >
+                    <TabsList className="grid h-7 w-full grid-cols-3">
+                      <TabsTrigger value="en" className="py-0.5 text-xs">
+                        EN
+                      </TabsTrigger>
+                      <TabsTrigger value="ru" className="py-0.5 text-xs">
+                        RU
+                      </TabsTrigger>
+                      <TabsTrigger value="am" className="py-0.5 text-xs">
+                        AM
+                      </TabsTrigger>
                     </TabsList>
                     <TabsContent value="en" className="mt-1.5">
                       <Input
                         value={saleForm.name_en}
-                        onChange={(e) => setSaleForm((prev) => ({ ...prev, name_en: e.target.value }))}
+                        onChange={(e) =>
+                          setSaleForm((prev) => ({
+                            ...prev,
+                            name_en: e.target.value,
+                          }))
+                        }
                         placeholder={t("saleNamePlaceholder")}
                         className="h-8 text-sm"
                       />
@@ -636,7 +678,12 @@ export const SellerProductCard = memo(function SellerProductCard({
                     <TabsContent value="ru" className="mt-1.5">
                       <Input
                         value={saleForm.name_ru}
-                        onChange={(e) => setSaleForm((prev) => ({ ...prev, name_ru: e.target.value }))}
+                        onChange={(e) =>
+                          setSaleForm((prev) => ({
+                            ...prev,
+                            name_ru: e.target.value,
+                          }))
+                        }
                         placeholder={t("saleNamePlaceholder")}
                         className="h-8 text-sm"
                       />
@@ -644,7 +691,12 @@ export const SellerProductCard = memo(function SellerProductCard({
                     <TabsContent value="am" className="mt-1.5">
                       <Input
                         value={saleForm.name_am}
-                        onChange={(e) => setSaleForm((prev) => ({ ...prev, name_am: e.target.value }))}
+                        onChange={(e) =>
+                          setSaleForm((prev) => ({
+                            ...prev,
+                            name_am: e.target.value,
+                          }))
+                        }
                         placeholder={t("saleNamePlaceholder")}
                         className="h-8 text-sm"
                       />
@@ -654,9 +706,14 @@ export const SellerProductCard = memo(function SellerProductCard({
                     <Checkbox
                       id="sale-auto-translate"
                       checked={saleForm.autoTranslate}
-                      onCheckedChange={(v) => setSaleForm((prev) => ({ ...prev, autoTranslate: !!v }))}
+                      onCheckedChange={(v) =>
+                        setSaleForm((prev) => ({ ...prev, autoTranslate: !!v }))
+                      }
                     />
-                    <label htmlFor="sale-auto-translate" className="text-xs text-muted-foreground flex items-center gap-1 cursor-pointer">
+                    <label
+                      htmlFor="sale-auto-translate"
+                      className="text-muted-foreground flex cursor-pointer items-center gap-1 text-xs"
+                    >
                       <Sparkles className="h-3 w-3" />
                       {t("autoTranslateSale")}
                     </label>
@@ -664,30 +721,54 @@ export const SellerProductCard = memo(function SellerProductCard({
                 </div>
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-medium">{t("discountType")}</Label>
+                    <Label className="text-xs font-medium">
+                      {t("discountType")}
+                    </Label>
                     <Select
                       value={saleForm.discountType}
-                      onValueChange={(v) => setSaleForm((prev) => ({ ...prev, discountType: v as "percentage" | "fixed" }))}
+                      onValueChange={(v) =>
+                        setSaleForm((prev) => ({
+                          ...prev,
+                          discountType: v as "percentage" | "fixed",
+                        }))
+                      }
                     >
                       <SelectTrigger className="h-8 text-sm">
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="percentage">{t("percentage")}</SelectItem>
-                        <SelectItem value="fixed">{t("fixedAmount")}</SelectItem>
+                        <SelectItem value="percentage">
+                          {t("percentage")}
+                        </SelectItem>
+                        <SelectItem value="fixed">
+                          {t("fixedAmount")}
+                        </SelectItem>
                       </SelectContent>
                     </Select>
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-medium">{t("discountValue")}</Label>
+                    <Label className="text-xs font-medium">
+                      {t("discountValue")}
+                    </Label>
                     <Input
                       type="number"
                       min="0"
-                      max={saleForm.discountType === "percentage" ? "100" : undefined}
+                      max={
+                        saleForm.discountType === "percentage"
+                          ? "100"
+                          : undefined
+                      }
                       step="0.01"
                       value={saleForm.discountValue}
-                      onChange={(e) => setSaleForm((prev) => ({ ...prev, discountValue: e.target.value }))}
-                      placeholder={saleForm.discountType === "percentage" ? "10" : "500"}
+                      onChange={(e) =>
+                        setSaleForm((prev) => ({
+                          ...prev,
+                          discountValue: e.target.value,
+                        }))
+                      }
+                      placeholder={
+                        saleForm.discountType === "percentage" ? "10" : "500"
+                      }
                       className="h-8 text-sm"
                     />
                   </div>
@@ -695,12 +776,27 @@ export const SellerProductCard = memo(function SellerProductCard({
                 {/* Date pickers */}
                 <div className="grid grid-cols-2 gap-2">
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-medium">{t("startDate")}</Label>
-                    <Popover open={startDateOpen} onOpenChange={setStartDateOpen}>
+                    <Label className="text-xs font-medium">
+                      {t("startDate")}
+                    </Label>
+                    <Popover
+                      open={startDateOpen}
+                      onOpenChange={setStartDateOpen}
+                    >
                       <PopoverTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-full h-8 text-xs justify-start font-normal">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 w-full justify-start text-xs font-normal"
+                        >
                           <CalendarIcon className="mr-1.5 h-3 w-3" />
-                          {saleForm.startDate ? format(saleForm.startDate, "MMM d, yyyy") : <span className="text-muted-foreground">Optional</span>}
+                          {saleForm.startDate ? (
+                            format(saleForm.startDate, "MMM d, yyyy")
+                          ) : (
+                            <span className="text-muted-foreground">
+                              Optional
+                            </span>
+                          )}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
@@ -708,7 +804,10 @@ export const SellerProductCard = memo(function SellerProductCard({
                           mode="single"
                           selected={saleForm.startDate ?? undefined}
                           onSelect={(date) => {
-                            setSaleForm((prev) => ({ ...prev, startDate: date ?? null }));
+                            setSaleForm((prev) => ({
+                              ...prev,
+                              startDate: date ?? null,
+                            }));
                             setStartDateOpen(false);
                           }}
                         />
@@ -716,12 +815,24 @@ export const SellerProductCard = memo(function SellerProductCard({
                     </Popover>
                   </div>
                   <div className="space-y-1.5">
-                    <Label className="text-xs font-medium">{t("endDate")}</Label>
+                    <Label className="text-xs font-medium">
+                      {t("endDate")}
+                    </Label>
                     <Popover open={endDateOpen} onOpenChange={setEndDateOpen}>
                       <PopoverTrigger asChild>
-                        <Button variant="outline" size="sm" className="w-full h-8 text-xs justify-start font-normal">
+                        <Button
+                          variant="outline"
+                          size="sm"
+                          className="h-8 w-full justify-start text-xs font-normal"
+                        >
                           <CalendarIcon className="mr-1.5 h-3 w-3" />
-                          {saleForm.endDate ? format(saleForm.endDate, "MMM d, yyyy") : <span className="text-muted-foreground">Optional</span>}
+                          {saleForm.endDate ? (
+                            format(saleForm.endDate, "MMM d, yyyy")
+                          ) : (
+                            <span className="text-muted-foreground">
+                              Optional
+                            </span>
+                          )}
                         </Button>
                       </PopoverTrigger>
                       <PopoverContent className="w-auto p-0" align="start">
@@ -729,7 +840,10 @@ export const SellerProductCard = memo(function SellerProductCard({
                           mode="single"
                           selected={saleForm.endDate ?? undefined}
                           onSelect={(date) => {
-                            setSaleForm((prev) => ({ ...prev, endDate: date ?? null }));
+                            setSaleForm((prev) => ({
+                              ...prev,
+                              endDate: date ?? null,
+                            }));
                             setEndDateOpen(false);
                           }}
                         />
@@ -744,7 +858,11 @@ export const SellerProductCard = memo(function SellerProductCard({
                     disabled={isSavingSale || !saleForm.discountValue}
                     onClick={() => void handleCreateDiscount()}
                   >
-                    {isSavingSale ? <Loader2 className="h-3.5 w-3.5 animate-spin" /> : t("saveSale")}
+                    {isSavingSale ? (
+                      <Loader2 className="h-3.5 w-3.5 animate-spin" />
+                    ) : (
+                      t("saveSale")
+                    )}
                   </Button>
                   <Button
                     size="sm"
@@ -759,14 +877,20 @@ export const SellerProductCard = memo(function SellerProductCard({
           </div>
           <div className="flex flex-col gap-2">
             <div className="flex items-center gap-2">
-              <span className="text-muted-foreground text-xs">{localStatus === "PUBLISHED" ? t("status.published") : t("status.draft")}</span>
+              <span className="text-muted-foreground text-xs">
+                {localStatus === "PUBLISHED"
+                  ? t("status.published")
+                  : t("status.draft")}
+              </span>
               <Switch
                 checked={localStatus === "PUBLISHED"}
                 onCheckedChange={(v) => void handleStatusToggle(v)}
               />
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-muted-foreground text-xs">{t("active")}</span>
+              <span className="text-muted-foreground text-xs">
+                {t("active")}
+              </span>
               <Switch
                 checked={localIsActive}
                 onCheckedChange={(v) => void handleDefaultActiveToggle(v)}

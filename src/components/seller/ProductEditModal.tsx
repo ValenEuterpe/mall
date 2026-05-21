@@ -15,7 +15,10 @@ import { Skeleton } from "@/components/ui/skeleton";
 import { Link } from "@/i18n/routing";
 import { apiClient } from "@/lib/api-client";
 import { toast } from "@/lib/utils/toast";
-import { ProductForm, type ProductFormData } from "@/components/seller/ProductForm";
+import {
+  ProductForm,
+  type ProductFormData,
+} from "@/components/seller/ProductForm";
 
 interface SellerProductDetail {
   id: string;
@@ -125,7 +128,10 @@ export const ProductEditModal = memo(function ProductEditModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(v) => !v && onClose()}>
-      <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-4xl">
+      <DialogContent
+        className="max-h-[90vh] overflow-y-auto sm:max-w-4xl"
+        aria-describedby={undefined}
+      >
         <DialogHeader className="flex-row items-center justify-between space-y-0">
           <DialogTitle>{t("editModalTitle") || "Edit Product"}</DialogTitle>
           {editPageUrl && (
