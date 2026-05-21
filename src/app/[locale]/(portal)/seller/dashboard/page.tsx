@@ -30,6 +30,7 @@ import {
 } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { Skeleton } from "@/components/ui/skeleton";
+import { cn } from "@/lib/utils";
 
 // Types based on API response
 interface DashboardOverview {
@@ -64,9 +65,7 @@ interface DashboardData {
   recentProducts: RecentProduct[];
 }
 
-function isSuccess<T>(
-  res: ApiResponse<T>
-): res is { success: true; data: T } {
+function isSuccess<T>(res: ApiResponse<T>): res is { success: true; data: T } {
   return (res as { success?: boolean })?.success === true;
 }
 
@@ -94,7 +93,7 @@ function StatCard({
           <Skeleton className="h-4 w-4" />
         </CardHeader>
         <CardContent>
-          <Skeleton className="h-8 w-20 mb-1" />
+          <Skeleton className="mb-1 h-8 w-20" />
           <Skeleton className="h-3 w-32" />
         </CardContent>
       </Card>
@@ -105,15 +104,15 @@ function StatCard({
     <Card>
       <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
         <CardTitle className="text-sm font-medium">{title}</CardTitle>
-        <Icon className="h-4 w-4 text-muted-foreground" />
+        <Icon className="text-muted-foreground h-4 w-4" />
       </CardHeader>
       <CardContent>
         <div className="text-2xl font-bold">{value}</div>
         {description && (
-          <p className="text-xs text-muted-foreground">{description}</p>
+          <p className="text-muted-foreground text-xs">{description}</p>
         )}
         {trend && (
-          <div className="flex items-center gap-1 mt-1">
+          <div className="mt-1 flex items-center gap-1">
             <TrendingUp className="h-3 w-3 text-green-500" />
             <span className="text-xs text-green-500">
               +{trend.value} {trend.label}
@@ -126,7 +125,13 @@ function StatCard({
 }
 
 // Product Status Badge
-function ProductStatusBadge({ status }: { status: string }) {
+function ProductStatusBadge({
+  status,
+  className,
+}: {
+  status: string;
+  className?: string;
+}) {
   const variant =
     status === "PUBLISHED"
       ? "default"
@@ -135,7 +140,7 @@ function ProductStatusBadge({ status }: { status: string }) {
         : "outline";
 
   return (
-    <Badge variant={variant} className="text-xs">
+    <Badge variant={variant} className={cn("text-xs", className)}>
       {status.toLowerCase()}
     </Badge>
   );
@@ -166,7 +171,8 @@ export default function SellerDashboardPage(): React.ReactElement {
         setError("Failed to load dashboard data");
       }
     } catch (e: unknown) {
-      const message = e instanceof Error ? e.message : "Failed to load dashboard";
+      const message =
+        e instanceof Error ? e.message : "Failed to load dashboard";
       setError(message);
       toast.error(message);
     } finally {
@@ -182,7 +188,7 @@ export default function SellerDashboardPage(): React.ReactElement {
   if (isAuthLoading) {
     return (
       <div className="container mx-auto max-w-6xl py-6">
-        <div className="flex items-center justify-center h-64">
+        <div className="flex h-64 items-center justify-center">
           <div className="text-muted-foreground">{tCommon("loading")}</div>
         </div>
       </div>
@@ -227,7 +233,9 @@ export default function SellerDashboardPage(): React.ReactElement {
             onClick={fetchDashboard}
             disabled={isLoading}
           >
-            <RefreshCw className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`} />
+            <RefreshCw
+              className={`h-4 w-4 ${isLoading ? "animate-spin" : ""}`}
+            />
           </Button>
         </div>
       </div>
@@ -236,7 +244,7 @@ export default function SellerDashboardPage(): React.ReactElement {
       {error && !isLoading && (
         <Card className="border-destructive">
           <CardContent className="pt-6">
-            <p className="text-sm text-destructive">{error}</p>
+            <p className="text-destructive text-sm">{error}</p>
             <Button
               variant="outline"
               size="sm"
@@ -307,8 +315,8 @@ export default function SellerDashboardPage(): React.ReactElement {
               </div>
             ) : !data?.topProducts?.length ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
-                <Eye className="h-10 w-10 text-muted-foreground/50 mb-2" />
-                <p className="text-sm text-muted-foreground">
+                <Eye className="text-muted-foreground/50 mb-2 h-10 w-10" />
+                <p className="text-muted-foreground text-sm">
                   {t("topProducts.empty")}
                 </p>
               </div>
@@ -317,9 +325,9 @@ export default function SellerDashboardPage(): React.ReactElement {
                 {data.topProducts.map((product, index) => (
                   <div
                     key={product.id}
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                    className="hover:bg-muted/50 flex items-center gap-3 rounded-lg p-2 transition-colors"
                   >
-                    <div className="flex h-10 w-10 items-center justify-center rounded bg-muted text-sm font-medium">
+                    <div className="bg-muted flex h-10 w-10 items-center justify-center rounded text-sm font-medium">
                       {product.thumbnail ? (
                         <img
                           src={product.thumbnail}
@@ -332,16 +340,16 @@ export default function SellerDashboardPage(): React.ReactElement {
                         </span>
                       )}
                     </div>
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
+                    <div className="min-w-0 flex-1">
+                      <p className="line-clamp-2 text-sm font-medium">
                         {product.name}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-muted-foreground text-xs">
                         {product.sku || "—"}
                       </p>
                     </div>
-                    <div className="flex items-center gap-2">
-                      <div className="flex items-center gap-1 text-sm text-muted-foreground">
+                    <div className="hidden items-center gap-2 sm:flex">
+                      <div className="text-muted-foreground flex items-center gap-1 text-sm">
                         <Eye className="h-3 w-3" />
                         {product.viewCount}
                       </div>
@@ -352,7 +360,7 @@ export default function SellerDashboardPage(): React.ReactElement {
               </div>
             )}
             {data?.topProducts?.length ? (
-              <div className="mt-4 pt-4 border-t">
+              <div className="mt-4 border-t pt-4">
                 <Button asChild variant="ghost" size="sm" className="w-full">
                   <Link href="/seller/products">
                     {t("topProducts.viewAll")}
@@ -367,7 +375,9 @@ export default function SellerDashboardPage(): React.ReactElement {
         {/* Recent Products */}
         <Card>
           <CardHeader>
-            <CardTitle className="text-lg">{t("recentProducts.title")}</CardTitle>
+            <CardTitle className="text-lg">
+              {t("recentProducts.title")}
+            </CardTitle>
             <CardDescription>{t("recentProducts.description")}</CardDescription>
           </CardHeader>
           <CardContent>
@@ -385,8 +395,8 @@ export default function SellerDashboardPage(): React.ReactElement {
               </div>
             ) : !data?.recentProducts?.length ? (
               <div className="flex flex-col items-center justify-center py-8 text-center">
-                <Package className="h-10 w-10 text-muted-foreground/50 mb-2" />
-                <p className="text-sm text-muted-foreground">
+                <Package className="text-muted-foreground/50 mb-2 h-10 w-10" />
+                <p className="text-muted-foreground text-sm">
                   {t("recentProducts.empty")}
                 </p>
                 <Button asChild size="sm" className="mt-3">
@@ -401,24 +411,27 @@ export default function SellerDashboardPage(): React.ReactElement {
                 {data.recentProducts.map((product) => (
                   <div
                     key={product.id}
-                    className="flex items-center gap-3 p-2 rounded-lg hover:bg-muted/50 transition-colors"
+                    className="hover:bg-muted/50 flex items-center gap-3 rounded-lg p-2 transition-colors"
                   >
-                    <div className="flex-1 min-w-0">
-                      <p className="text-sm font-medium truncate">
+                    <div className="min-w-0 flex-1">
+                      <p className="line-clamp-2 text-sm font-medium">
                         {product.name}
                       </p>
-                      <p className="text-xs text-muted-foreground">
+                      <p className="text-muted-foreground text-xs">
                         {product.sku || "—"} •{" "}
                         {new Date(product.createdAt).toLocaleDateString()}
                       </p>
                     </div>
-                    <ProductStatusBadge status={product.status} />
+                    <ProductStatusBadge
+                      status={product.status}
+                      className="hidden sm:inline-flex"
+                    />
                   </div>
                 ))}
               </div>
             )}
             {data?.recentProducts?.length ? (
-              <div className="mt-4 pt-4 border-t">
+              <div className="mt-4 border-t pt-4">
                 <Button asChild variant="ghost" size="sm" className="w-full">
                   <Link href="/seller/products">
                     {t("recentProducts.viewAll")}
@@ -439,25 +452,41 @@ export default function SellerDashboardPage(): React.ReactElement {
         </CardHeader>
         <CardContent>
           <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-            <Button asChild variant="outline" className="h-auto py-4 flex-col gap-2">
+            <Button
+              asChild
+              variant="outline"
+              className="h-auto flex-col gap-2 py-4"
+            >
               <Link href="/seller/products/new">
                 <Plus className="h-5 w-5" />
                 <span>{t("quickActions.addProduct")}</span>
               </Link>
             </Button>
-            <Button asChild variant="outline" className="h-auto py-4 flex-col gap-2">
+            <Button
+              asChild
+              variant="outline"
+              className="h-auto flex-col gap-2 py-4"
+            >
               <Link href="/seller/products/import">
                 <Upload className="h-5 w-5" />
                 <span>{t("quickActions.bulkImport")}</span>
               </Link>
             </Button>
-            <Button asChild variant="outline" className="h-auto py-4 flex-col gap-2">
+            <Button
+              asChild
+              variant="outline"
+              className="h-auto flex-col gap-2 py-4"
+            >
               <Link href="/seller/products">
                 <Package className="h-5 w-5" />
                 <span>{t("quickActions.manageProducts")}</span>
               </Link>
             </Button>
-            <Button asChild variant="outline" className="h-auto py-4 flex-col gap-2">
+            <Button
+              asChild
+              variant="outline"
+              className="h-auto flex-col gap-2 py-4"
+            >
               <Link href="/seller/profile">
                 <FileText className="h-5 w-5" />
                 <span>{t("quickActions.editProfile")}</span>

@@ -1,6 +1,12 @@
 "use client";
 
-import React, { useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import { useTranslations } from "next-intl";
 import { Plus, Trash2, Loader2, Package } from "lucide-react";
 
@@ -10,7 +16,7 @@ import {
   type PaginationMeta,
 } from "@/lib/api-client";
 import { useRequireRole } from "@/hooks/use-auth";
-import { Link, useRouter } from "@/i18n/routing";
+import { Link } from "@/i18n/routing";
 import { toast } from "@/lib/utils/toast";
 
 import { Button } from "@/components/ui/button";
@@ -76,7 +82,6 @@ function isSuccess<T>(
 export default function SellerProductsPage(): React.ReactElement {
   const t = useTranslations("portal.sellerProducts");
   const tSeller = useTranslations("seller.products");
-  const router = useRouter();
   const { isAuthorized, isLoading: isAuthLoading } = useRequireRole(
     "SELLER",
     "/unauthorized"
@@ -89,7 +94,66 @@ export default function SellerProductsPage(): React.ReactElement {
   const [items, setItems] = useState<SellerProductListItem[]>([]);
   const [meta, setMeta] = useState<PaginationMeta | null>(null);
   const [isLoading, setIsLoading] = useState(false);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const sentinelRef = useRef<HTMLDivElement | null>(null);
+
+  const fetchProducts = useCallback(async () => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      const res = await apiClient.get<SellerProductListItem[]>(
+        "/sellers/products",
+        {
+          q: q || undefined,
+          page: 1,
+          limit,
+          sort: "lastUpdated:desc",
+        }
+      );
+
+      if (isSuccess(res)) {
+        setItems(res.data);
+        setMeta(res.meta ?? null);
+        setPage(1);
+      }
+    } catch (e: any) {
+      setError(e?.message ?? t("errors.loadFailed"));
+    } finally {
+      setIsLoading(false);
+    }
+  }, [limit, q, t]);
+
+  const loadMore = useCallback(async () => {
+    if (!meta?.hasMore || isLoadingMore) return;
+
+    const nextPage = page + 1;
+    setIsLoadingMore(true);
+
+    try {
+      const res = await apiClient.get<SellerProductListItem[]>(
+        "/sellers/products",
+        {
+          q: q || undefined,
+          page: nextPage,
+          limit,
+          sort: "lastUpdated:desc",
+        }
+      );
+
+      if (isSuccess(res)) {
+        setItems((prev) => [...prev, ...res.data]);
+        setMeta(res.meta ?? null);
+        setPage(nextPage);
+      }
+    } catch (e: any) {
+      toast.error(e?.message ?? t("errors.loadFailed"));
+    } finally {
+      setIsLoadingMore(false);
+    }
+  }, [limit, meta?.hasMore, isLoadingMore, page, q, t]);
 
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] =
@@ -102,32 +166,6 @@ export default function SellerProductsPage(): React.ReactElement {
   const [detailModalOpen, setDetailModalOpen] = useState(false);
   const [editModalOpen, setEditModalOpen] = useState(false);
   const [editingProductId, setEditingProductId] = useState<string | null>(null);
-
-  const fetchProducts = useCallback(async () => {
-    setIsLoading(true);
-    setError(null);
-
-    try {
-      const res = await apiClient.get<SellerProductListItem[]>(
-        "/sellers/products",
-        {
-          q: q || undefined,
-          page,
-          limit,
-          sort: "lastUpdated:desc",
-        }
-      );
-
-      if (isSuccess(res)) {
-        setItems(res.data);
-        setMeta(res.meta ?? null);
-      }
-    } catch (e: any) {
-      setError(e?.message ?? t("errors.loadFailed"));
-    } finally {
-      setIsLoading(false);
-    }
-  }, [limit, page, q, t]);
 
   const handleDeleteClick = (product: SellerProductListItem) => {
     setProductToDelete(product);
@@ -144,7 +182,8 @@ export default function SellerProductsPage(): React.ReactElement {
       );
       if (res.success) {
         toast.success(tSeller("deleteSuccess"));
-        void fetchProducts();
+        setItems((prev) => prev.filter((p) => p.id !== productToDelete.id));
+        setMeta((prev) => (prev ? { ...prev, total: prev.total - 1 } : null));
       } else {
         toast.error(tSeller("deleteFailed"));
       }
@@ -167,13 +206,10 @@ export default function SellerProductsPage(): React.ReactElement {
     setSelectedProductId(null);
   }, []);
 
-  const handleEditProduct = useCallback(
-    (productId: string) => {
-      setEditingProductId(productId);
-      setEditModalOpen(true);
-    },
-    []
-  );
+  const handleEditProduct = useCallback((productId: string) => {
+    setEditingProductId(productId);
+    setEditModalOpen(true);
+  }, []);
 
   const handleCloseEditModal = useCallback(() => {
     setEditModalOpen(false);
@@ -184,6 +220,23 @@ export default function SellerProductsPage(): React.ReactElement {
     if (!isAuthorized) return;
     void fetchProducts();
   }, [fetchProducts, isAuthorized]);
+
+  useEffect(() => {
+    if (!meta?.hasMore || isLoadingMore || isLoading) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting) {
+          void loadMore();
+        }
+      },
+      { rootMargin: "200px" }
+    );
+
+    const sentinel = sentinelRef.current;
+    if (sentinel) observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [meta?.hasMore, isLoadingMore, isLoading, loadMore]);
 
   const headerActions = useMemo(() => {
     return (
@@ -226,7 +279,6 @@ export default function SellerProductsPage(): React.ReactElement {
               value={q}
               onChange={(e) => {
                 setQ(e.target.value);
-                setPage(1);
               }}
               placeholder={t("filters.searchPlaceholder")}
               className="sm:w-[280px]"
@@ -262,60 +314,42 @@ export default function SellerProductsPage(): React.ReactElement {
               </Button>
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-              {items.map((p) => (
-                <SellerProductCard
-                  key={p.id}
-                  product={{
-                    id: p.id,
-                    name: p.name,
-                    description: p.description,
-                    basePrice: p.pricing.basePrice,
-                    stockQuantity: p.inventory.stockQuantity,
-                    images: p.images,
-                    isActive: p.isActive,
-                    status: p.status,
-                    sku: p.inventory.sku ?? undefined,
-                    discounts: p.discounts,
-                    category: p.category,
-                    subcategory: p.subcategory,
-                  }}
-                  onShowDetails={() => handleShowDetails(p.id)}
-                  onEdit={() => handleEditProduct(p.id)}
-                />
-              ))}
-            </div>
-          )}
-
-          {meta ? (
-            <div className="mt-4 flex items-center justify-between gap-3">
-              <p className="text-muted-foreground text-xs">
-                {t("pagination", {
-                  page: meta.page,
-                  totalPages: meta.totalPages,
-                  total: meta.total,
-                })}
-              </p>
-              <div className="flex items-center gap-2">
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage((p) => Math.max(1, p - 1))}
-                  disabled={isLoading || !meta.hasPrevious}
-                >
-                  {t("actions.prev")}
-                </Button>
-                <Button
-                  variant="outline"
-                  size="sm"
-                  onClick={() => setPage((p) => p + 1)}
-                  disabled={isLoading || !meta.hasMore}
-                >
-                  {t("actions.next")}
-                </Button>
+            <>
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+                {items.map((p) => (
+                  <SellerProductCard
+                    key={p.id}
+                    product={{
+                      id: p.id,
+                      name: p.name,
+                      description: p.description,
+                      basePrice: p.pricing.basePrice,
+                      stockQuantity: p.inventory.stockQuantity,
+                      images: p.images,
+                      isActive: p.isActive,
+                      status: p.status,
+                      sku: p.inventory.sku ?? undefined,
+                      discounts: p.discounts,
+                      category: p.category,
+                      subcategory: p.subcategory,
+                    }}
+                    onShowDetails={() => handleShowDetails(p.id)}
+                    onEdit={() => handleEditProduct(p.id)}
+                  />
+                ))}
               </div>
-            </div>
-          ) : null}
+              {meta?.hasMore && (
+                <div
+                  ref={sentinelRef}
+                  className="mt-4 flex justify-center py-4"
+                >
+                  {isLoadingMore && (
+                    <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
+                  )}
+                </div>
+              )}
+            </>
+          )}
         </CardContent>
       </Card>
 
