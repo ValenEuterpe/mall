@@ -27,6 +27,7 @@ import {
 import {
   SellerProductCard,
   SellerProductCardSkeleton,
+  ProductEditModal,
 } from "@/components/seller";
 import { ProductDetailModal } from "@/components/products/ProductDetailModal";
 
@@ -99,6 +100,8 @@ export default function SellerProductsPage(): React.ReactElement {
     null
   );
   const [detailModalOpen, setDetailModalOpen] = useState(false);
+  const [editModalOpen, setEditModalOpen] = useState(false);
+  const [editingProductId, setEditingProductId] = useState<string | null>(null);
 
   const fetchProducts = useCallback(async () => {
     setIsLoading(true);
@@ -166,10 +169,16 @@ export default function SellerProductsPage(): React.ReactElement {
 
   const handleEditProduct = useCallback(
     (productId: string) => {
-      router.push(`/seller/products/${productId}/edit`);
+      setEditingProductId(productId);
+      setEditModalOpen(true);
     },
-    [router]
+    []
   );
+
+  const handleCloseEditModal = useCallback(() => {
+    setEditModalOpen(false);
+    setEditingProductId(null);
+  }, []);
 
   useEffect(() => {
     if (!isAuthorized) return;
@@ -361,6 +370,17 @@ export default function SellerProductsPage(): React.ReactElement {
             handleEditProduct(selectedProductId);
             handleCloseDetailModal();
           }
+        }}
+      />
+
+      {/* Product Edit Modal */}
+      <ProductEditModal
+        productId={editingProductId}
+        isOpen={editModalOpen}
+        onClose={handleCloseEditModal}
+        onSaved={() => {
+          handleCloseEditModal();
+          void fetchProducts();
         }}
       />
     </div>

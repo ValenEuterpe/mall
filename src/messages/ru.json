@@ -535,7 +535,8 @@
       "form": {
         "loadError": "Не удалось загрузить товар",
         "notFound": "Товар не найден"
-      }
+      },
+      "editModalTitle": "Редактировать товар"
     },
     "productForm": {
       "tags": "Теги",

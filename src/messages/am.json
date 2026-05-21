@@ -535,7 +535,8 @@
       "form": {
         "loadError": "Չհաջողվեց բեռնել ապրանքը",
         "notFound": "Ապրանքը չի գտնվել"
-      }
+      },
+      "editModalTitle": "Խմբագրել ապրանքը"
     },
     "productForm": {
       "tags": "Թեգեր",

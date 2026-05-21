@@ -535,7 +535,8 @@
       "form": {
         "loadError": "Failed to load product",
         "notFound": "Product not found"
-      }
+      },
+      "editModalTitle": "Edit Product"
     },
     "productForm": {
       "tags": "Tags",
