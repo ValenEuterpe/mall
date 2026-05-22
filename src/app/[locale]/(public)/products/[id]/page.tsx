@@ -1,6 +1,13 @@
 "use client";
 
-import React, { use, useCallback, useMemo } from "react";
+import React, {
+  use,
+  useCallback,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+} from "react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -32,6 +39,17 @@ import {
 } from "@/hooks/use-products";
 import { StorefrontIcon } from "@/components/icons/Storefront";
 import { useOptionalFavorites } from "@/hooks/use-optional-favorites";
+import { useIsMobile } from "@/hooks/use-media-query";
+import { useMultiMapData } from "@/hooks/use-multi-map-data";
+import type { BuildingOverlay } from "@/components/home/LeafletMapView";
+import { useShopPopup } from "@/hooks/use-shop-popup";
+import { useMapPins } from "@/hooks/use-map-pins";
+import {
+  useSidebarToggle,
+  SIDEBAR_PANELS,
+} from "@/contexts/sidebar-toggle-context";
+import { MobilePanelSheet } from "@/components/layout/MobilePanelSheet";
+import { MapPanel } from "@/components/home/MapPanel";
 
 export default function ProductDetailPage({
   params,
@@ -41,14 +59,73 @@ export default function ProductDetailPage({
   const { id } = use(params);
   const t = useTranslations("products.detail");
   const tCard = useTranslations("products.card");
+  const tProducts = useTranslations("products");
+  const tHome = useTranslations("home");
   const locale = useLocale();
   const router = useRouter();
 
   const { product, isLoading, error } = useProduct(id);
   const { addItem, isInCart } = useCart();
   const { isFavorite, toggleFavorite } = useOptionalFavorites();
+  const isMobile = useIsMobile();
+
+  // ---- Map integration ----
+  const code = product?.shop.code ?? "";
+  const floorFromCode = useMemo(() => {
+    const m = code.match(/F(\d+)/i);
+    return m ? m[1] : "1";
+  }, [code]);
+
+  const buildingFromCode = useMemo(() => {
+    const m = code.match(/B(\d+)/i);
+    return m ? `B${m[1]}` : undefined;
+  }, [code]);
+
+  const {
+    buildings: mapBuildings,
+    globalCenter,
+    globalLoading,
+    globalError,
+    setFloorForBuilding,
+    allShopsBySvgId,
+    allShopSvgIds,
+  } = useMultiMapData();
+
+  const buildingOverlays: BuildingOverlay[] = useMemo(
+    () =>
+      mapBuildings.map((b) => ({
+        buildingCode: b.buildingCode,
+        svgContent: b.svgMarkup,
+        center: b.center,
+        rotation: b.rotation,
+        scale: b.scale,
+        floors: b.floors,
+        currentFloor: b.currentFloor,
+        onFloorChange: (floor: string) =>
+          setFloorForBuilding(b.buildingCode, floor),
+      })),
+    [mapBuildings, setFloorForBuilding]
+  );
+
+  const {
+    activeShopSvgId,
+    activeShop,
+    handleShopClick,
+    handleCloseShopPopup,
+  } = useShopPopup(allShopsBySvgId);
+
+  const {
+    productPins,
+    selectedCount,
+    handleAddToMap: mapPinsAddToMap,
+    handleRemoveFromMap,
+    isSelected,
+  } = useMapPins();
+
+  const { mapOpen, setMapOpen, toggleMap } = useSidebarToggle();
 
   const inCart = product ? isInCart(product.id) : false;
+  const isOnMap = product ? isSelected(product.id) : false;
   const inStock = product ? product.inventory.inStock : false;
 
   const formattedPrice = useMemo(() => {
@@ -125,6 +202,25 @@ export default function ProductDetailPage({
 
     addItem(cartProduct);
 
+    // Also add to map (mirror UnifiedPageClient:125-138)
+    const svgId = product.shop.location.svgId;
+    if (svgId) {
+      const shopCode = product.shop.code ?? "";
+      const floorMatch = shopCode.match(/F(\d+)/i);
+      const buildingMatch = shopCode.match(/B(\d+)/i);
+      if (floorMatch && buildingMatch) {
+        const shopFloor = floorMatch[1];
+        const buildingCode = `B${buildingMatch[1]}`;
+        const building = mapBuildings.find(
+          (b) => b.buildingCode === buildingCode
+        );
+        if (building && building.currentFloor !== shopFloor) {
+          setFloorForBuilding(buildingCode, shopFloor);
+        }
+      }
+      mapPinsAddToMap({ id: product.id, shop: { svgId } });
+    }
+
     toast.success(t("addedToRoute"), {
       action: {
         label: t("viewRoute"),
@@ -133,12 +229,70 @@ export default function ProductDetailPage({
         },
       },
     });
-  }, [addItem, inCart, inStock, product, t, router]);
+  }, [addItem, inCart, inStock, product, t, router, mapBuildings, setFloorForBuilding, mapPinsAddToMap]);
 
   const handleWishlist = useCallback(() => {
     if (!product) return;
     toggleFavorite(product.id);
   }, [product, toggleFavorite]);
+
+  const handleToggleMap = useCallback(() => {
+    if (!product) return;
+    if (isOnMap) {
+      handleRemoveFromMap(product.id);
+      return;
+    }
+    handleAddToRoute();
+  }, [product, isOnMap, handleRemoveFromMap, handleAddToRoute]);
+
+  // ---- Auto-focus on product's shop when map loads ----
+  const initialMapSyncDone = useRef(false);
+  useEffect(() => {
+    if (initialMapSyncDone.current) return;
+    const svgId = product?.shop.location.svgId;
+    if (!svgId || globalLoading || mapBuildings.length === 0) return;
+
+    initialMapSyncDone.current = true;
+
+    if (buildingFromCode) {
+      const building = mapBuildings.find(
+        (b) => b.buildingCode === buildingFromCode
+      );
+      if (building && building.currentFloor !== floorFromCode) {
+        setFloorForBuilding(buildingFromCode, floorFromCode);
+      }
+    }
+
+    const timer = setTimeout(() => handleShopClick(svgId), 400);
+    return () => clearTimeout(timer);
+  }, [product?.shop.location.svgId, globalLoading, mapBuildings.length]);
+
+  const handleShowOnMap = useCallback(() => {
+    const svgId = product?.shop.location.svgId;
+    if (!svgId) return;
+    if (buildingFromCode) {
+      const b = mapBuildings.find((x) => x.buildingCode === buildingFromCode);
+      if (b && b.currentFloor !== floorFromCode) {
+        setFloorForBuilding(buildingFromCode, floorFromCode);
+      }
+    }
+    if (!mapOpen) {
+      if (isMobile) toggleMap();
+      else setMapOpen(true);
+    }
+    handleShopClick(svgId);
+  }, [
+    product?.shop.location.svgId,
+    buildingFromCode,
+    floorFromCode,
+    mapBuildings,
+    setFloorForBuilding,
+    mapOpen,
+    isMobile,
+    toggleMap,
+    setMapOpen,
+    handleShopClick,
+  ]);
 
   const { products: relatedList, isLoading: relatedLoading } = useProducts({
     categoryId: product?.category?.id ?? undefined,
@@ -175,6 +329,24 @@ export default function ProductDetailPage({
       .map(toCardProduct);
   }, [product?.id, relatedList]);
 
+  // ---- Map panel props ----
+  const mapPanelProps = {
+    mapCenter: globalCenter,
+    mapLoading: globalLoading,
+    mapError: globalError,
+    selectedCount,
+    shopSvgIds: allShopSvgIds,
+    activeShopSvgId: activeShopSvgId ?? null,
+    onShopClick: handleShopClick,
+    productPins,
+    shopsBySvgId: allShopsBySvgId,
+    onRemoveProduct: handleRemoveFromMap,
+    onViewProduct: () => {},
+    activeShop,
+    onCloseShopPopup: handleCloseShopPopup,
+    buildings: buildingOverlays,
+  };
+
   if (isLoading) {
     return (
       <div className="container py-8">
@@ -207,7 +379,8 @@ export default function ProductDetailPage({
     );
   }
 
-  return (
+  // ---- Product content (shared between mobile and desktop) ----
+  const productContent = (
     <div className="container py-6 lg:py-8">
       <div className="mb-6">
         <nav className="text-muted-foreground text-sm">
@@ -362,13 +535,13 @@ export default function ProductDetailPage({
             <Button
               size="lg"
               className="flex-1"
-              onClick={handleAddToRoute}
-              disabled={!inStock || inCart}
+              onClick={handleToggleMap}
+              disabled={!inStock && !isOnMap}
             >
-              {inCart ? (
+              {isOnMap ? (
                 <>
                   <Check className="mr-2 h-5 w-5" />
-                  {t("inRoute")}
+                  {tProducts("removeFromMap")}
                 </>
               ) : (
                 <>
@@ -378,12 +551,15 @@ export default function ProductDetailPage({
               )}
             </Button>
 
-            {inCart && (
-              <Button size="lg" variant="outline" className="flex-1" asChild>
-                <Link href="/map">
-                  {t("viewOnMap")}
-                  <ExternalLink className="ml-2 h-4 w-4" />
-                </Link>
+            {product.shop.location.svgId && (
+              <Button
+                size="lg"
+                variant="outline"
+                className="flex-1"
+                onClick={handleShowOnMap}
+              >
+                {t("viewOnMap")}
+                <ExternalLink className="ml-2 h-4 w-4" />
               </Button>
             )}
           </div>
@@ -394,13 +570,13 @@ export default function ProductDetailPage({
         <section className="mt-16">
           <h2 className="mb-6 text-2xl font-bold">{t("relatedProducts")}</h2>
           {relatedLoading ? (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-[repeat(auto-fill,minmax(170px,1fr))]">
               {Array.from({ length: 4 }).map((_, i) => (
                 <Skeleton key={i} className="aspect-[3/4]" />
               ))}
             </div>
           ) : (
-            <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-4">
+            <div className="grid grid-cols-2 gap-3 md:grid-cols-[repeat(auto-fill,minmax(170px,1fr))]">
               {relatedProducts.map((p) => (
                 <UserProductCard
                   key={p.id}
@@ -412,6 +588,38 @@ export default function ProductDetailPage({
             </div>
           )}
         </section>
+      )}
+    </div>
+  );
+
+  // ---- Layout ----
+  // Mobile and desktop are separate returns so MapPanel mounts in exactly one place.
+  if (isMobile) {
+    return (
+      <div className="relative w-full overflow-x-hidden">
+        {productContent}
+
+        <MobilePanelSheet name={SIDEBAR_PANELS.map} title={tHome("map.title")}>
+          <div className="h-full p-3">
+            <div className="border-accent h-full rounded-lg border-4 shadow-lg">
+              <MapPanel {...mapPanelProps} />
+            </div>
+          </div>
+        </MobilePanelSheet>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex w-full">
+      <div className="min-w-0 flex-1">{productContent}</div>
+
+      {mapOpen && (
+        <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-1/3 shrink-0 self-start p-3 md:block">
+          <div className="border-accent h-full rounded-lg border-4 shadow-lg">
+            <MapPanel {...mapPanelProps} />
+          </div>
+        </aside>
       )}
     </div>
   );

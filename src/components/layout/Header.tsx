@@ -525,6 +525,7 @@ export function Header({
   const { filterOpen, mapOpen, toggleFilter, toggleMap } = useSidebarToggle();
   const isHomePage = pathname === "/";
   const isShopPage = pathname.startsWith("/shops");
+  const isProductPage = pathname.startsWith("/products");
 
   const searchParams = useSearchParams();
   const isSearchActive = Boolean(searchParams.get("q"));
@@ -606,8 +607,8 @@ export function Header({
         <div className="flex flex-1 items-center justify-end gap-2">
           <LanguageSwitcher />
 
-          {/* Map toggle — visible on homepage and shop pages */}
-          {(isHomePage || isShopPage) && (
+          {/* Map toggle — visible on homepage, shop pages, and product pages */}
+          {(isHomePage || isShopPage || isProductPage) && (
             <Button
               variant="ghost"
               size="icon"
