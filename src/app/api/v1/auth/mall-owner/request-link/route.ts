@@ -10,7 +10,7 @@ import { validateBody } from "@/lib/validation/request";
 
 import { emailObjectSchema } from "@/lib/validation/schemas/common";
 import { createMagicLinkToken } from "@/lib/auth/email";
-import { sendMagicLinkEmail, dispatch } from "@/lib/email/send";
+import { sendMagicLinkEmail } from "@/lib/email/send";
 import {
   findMallOwnerByEmail,
   updateMagicLinkRequestMetadata,
@@ -22,6 +22,9 @@ import {
   createGenericMagicLinkSuccessResponse,
   getMagicLinkMessage,
 } from "./response-builder";
+
+export const runtime = "nodejs";
+export const maxDuration = 30;
 
 /**
  * POST /api/v1/auth/mall-owner/request-link
@@ -95,16 +98,26 @@ export async function POST(request: NextRequest) {
       return genericSuccess;
     }
 
-    // Send email (fire-and-forget failure handling: we still return generic success)
+    // Send email
     const baseUrl = env.NEXT_PUBLIC_APP_URL.replace(/\/$/, "");
     const loginUrl = `${baseUrl}/${locale}${AUTH_CONFIG.mallOwner.verify.redirectUrl}?token=${encodeURIComponent(tokenResult.token)}`;
-    console.log("[EMAIL-DEBUG] request-link: dispatching email", {
+    console.log("[EMAIL-DEBUG] request-link: sending email", {
       email,
       loginUrl,
       deliveryMode: process.env.EMAIL_DELIVERY_MODE,
     });
-    dispatch(() => sendMagicLinkEmail(email, loginUrl));
-    logMagicLinkEvent("magic_link_sent", email, ip, userAgent);
+    try {
+      await sendMagicLinkEmail(email, loginUrl);
+      logMagicLinkEvent("magic_link_sent", email, ip, userAgent);
+    } catch (err) {
+      console.log("[EMAIL-DEBUG] request-link: sendMagicLinkEmail FAILED", {
+        email,
+        error: err instanceof Error ? err.message : String(err),
+      });
+      logMagicLinkEvent("magic_link_failed", email, ip, userAgent, {
+        error: err instanceof Error ? err.message : String(err),
+      });
+    }
     return genericSuccess;
   } catch (error) {
     // On validation or unexpected errors, still avoid revealing details.

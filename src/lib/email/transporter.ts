@@ -1,7 +1,6 @@
 // src/lib/email/transporter.ts
 
 import nodemailer from "nodemailer";
-import type SMTPPool from "nodemailer/lib/smtp-pool";
 import { EMAIL_CONFIG } from "@/lib/config/email.config";
 import { logger } from "@/lib/utils/logger";
 import type { EmailConnectionResult } from "@/types/email";
@@ -10,7 +9,18 @@ import type { EmailConnectionResult } from "@/types/email";
 // TRANSPORTER STATE
 // ============================================================================
 
-let transporter: nodemailer.Transporter<SMTPPool.SentMessageInfo> | null = null;
+const globalForTransporter = globalThis as unknown as {
+  emailTransporter: nodemailer.Transporter | null;
+};
+
+function getCachedTransporter(): nodemailer.Transporter | null {
+  return globalForTransporter.emailTransporter ?? null;
+}
+
+function setCachedTransporter(t: nodemailer.Transporter | null): void {
+  globalForTransporter.emailTransporter = t;
+}
+
 let isVerified = false;
 let lastVerifiedAt: Date | null = null;
 
@@ -21,7 +31,8 @@ let lastVerifiedAt: Date | null = null;
 /**
  * Create or get the email transporter
  */
-export function getTransporter(): nodemailer.Transporter<SMTPPool.SentMessageInfo> {
+export function getTransporter(): nodemailer.Transporter {
+  let transporter = getCachedTransporter();
   if (!transporter) {
     console.log("[EMAIL-DEBUG] Creating SMTP transporter", {
       host: EMAIL_CONFIG.smtp.host,
@@ -31,7 +42,6 @@ export function getTransporter(): nodemailer.Transporter<SMTPPool.SentMessageInf
       deliveryMode: EMAIL_CONFIG.deliveryMode,
     });
     transporter = nodemailer.createTransport({
-      pool: true,
       host: EMAIL_CONFIG.smtp.host,
       port: EMAIL_CONFIG.smtp.port,
       secure: EMAIL_CONFIG.smtp.secure,
@@ -39,9 +49,10 @@ export function getTransporter(): nodemailer.Transporter<SMTPPool.SentMessageInf
         user: EMAIL_CONFIG.smtp.user,
         pass: EMAIL_CONFIG.smtp.password,
       },
-      maxConnections: EMAIL_CONFIG.pool.maxConnections,
-      maxMessages: EMAIL_CONFIG.pool.maxMessages,
+      connectionTimeout: EMAIL_CONFIG.timeouts.connection,
+      socketTimeout: EMAIL_CONFIG.timeouts.socket,
     });
+    setCachedTransporter(transporter);
   }
 
   return transporter;
@@ -70,9 +81,10 @@ export async function verifyEmailConnection(): Promise<EmailConnectionResult> {
  * Close the email transporter connection
  */
 export async function closeEmailConnection(): Promise<void> {
+  const transporter = getCachedTransporter();
   if (transporter) {
     transporter.close();
-    transporter = null;
+    setCachedTransporter(null);
     isVerified = false;
     lastVerifiedAt = null;
     logger.info("Email service connection closed");
@@ -87,6 +99,7 @@ export function getTransporterStatus(): {
   verified: boolean;
   lastVerifiedAt: Date | null;
 } {
+  const transporter = getCachedTransporter();
   return {
     created: transporter !== null,
     verified: isVerified,
