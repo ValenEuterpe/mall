@@ -17,20 +17,12 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
-import {
-  Sheet,
-  SheetContent,
-  SheetHeader,
-  SheetTitle,
-} from "@/components/ui/sheet";
 import { Input } from "@/components/ui/input";
-import { Separator } from "@/components/ui/separator";
 import { cn } from "@/lib/utils";
 import { useAuth, type UserRole } from "@/hooks/use-auth";
 import { useIsMobile } from "@/hooks/use-media-query";
 import {
   ArrowLeft,
-  Bell,
   Building2,
   ChevronDown,
   Globe,
@@ -48,7 +40,10 @@ import {
 } from "lucide-react";
 import { useSidebarToggle } from "@/contexts/sidebar-toggle-context";
 import { useCart } from "@/hooks/use-cart";
-import { SearchSuggestionsDropdown, type SearchSuggestionsDropdownHandle } from "@/components/shared/SearchSuggestionsDropdown";
+import {
+  SearchSuggestionsDropdown,
+  type SearchSuggestionsDropdownHandle,
+} from "@/components/shared/SearchSuggestionsDropdown";
 
 interface NavItem {
   label: string;
@@ -113,7 +108,8 @@ function SearchBar() {
   const mobileInputRef = React.useRef<HTMLInputElement>(null);
   const desktopInputRef = React.useRef<HTMLInputElement>(null);
   const blurTimerRef = React.useRef<ReturnType<typeof setTimeout> | null>(null);
-  const desktopDropdownRef = React.useRef<SearchSuggestionsDropdownHandle>(null);
+  const desktopDropdownRef =
+    React.useRef<SearchSuggestionsDropdownHandle>(null);
   const mobileDropdownRef = React.useRef<SearchSuggestionsDropdownHandle>(null);
 
   const handleSuggestionSelect = (
@@ -399,16 +395,7 @@ function UserMenu() {
   const { user, isAuthenticated, logout, hasRole } = useAuth();
 
   if (!isAuthenticated || !user) {
-    return (
-      <div className="flex items-center gap-2">
-        <Button variant="ghost" size="sm" asChild>
-          <Link href="/login">{t("login")}</Link>
-        </Button>
-        <Button size="sm" asChild>
-          <Link href="/signup">{t("signup")}</Link>
-        </Button>
-      </div>
-    );
+    return null;
   }
 
   const initials =
@@ -498,124 +485,24 @@ function UserMenu() {
   );
 }
 
-function MobileNav({
-  navItems,
-  isOpen,
-  onClose,
-}: {
-  navItems: NavItem[];
-  isOpen: boolean;
-  onClose: (open: boolean) => void;
-}) {
+function MobileUnauthMenu() {
   const t = useTranslations("header");
-  const pathname = usePathname();
-  const { isAuthenticated, user, logout } = useAuth();
-
   return (
-    <Sheet open={isOpen} onOpenChange={onClose}>
-      <SheetContent
-        side="right"
-        className="w-80 max-w-full p-4 pl-14 sm:p-6 sm:pl-16 [&>button]:hidden"
-      >
-        <div className="absolute top-2 left-2 z-10">
-          <Button
-            type="button"
-            variant="ghost"
-            size="icon"
-            onClick={() => onClose(false)}
-            aria-label={t("menu")}
-            className="h-9 w-9"
-          >
-            <X className="h-5 w-5" />
-          </Button>
-        </div>
-
-        <SheetHeader>
-          <SheetTitle className="flex items-center gap-2">
-            <Logo className="h-8 w-8" />
-            <span>Wholesale Market</span>
-          </SheetTitle>
-        </SheetHeader>
-
-        <div className="mt-8 flex flex-col gap-4">
-          <nav className="flex flex-col gap-1">
-            {navItems.map((item) => {
-              const isActive = pathname === item.href;
-              return (
-                <Link
-                  key={item.href}
-                  href={item.href}
-                  onClick={() => onClose(false)}
-                  className={cn(
-                    "flex items-center gap-3 rounded-lg px-3 py-2 text-sm transition-colors",
-                    isActive
-                      ? "bg-accent text-accent-foreground"
-                      : "text-muted-foreground hover:bg-accent hover:text-accent-foreground"
-                  )}
-                >
-                  {item.icon}
-                  {t(item.label)}
-                  {item.badge != null && (
-                    <Badge variant="secondary" className="ml-auto">
-                      {item.badge}
-                    </Badge>
-                  )}
-                </Link>
-              );
-            })}
-          </nav>
-
-          <Separator />
-
-          <div className="px-3">
-            {isAuthenticated && user ? (
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <Avatar className="h-10 w-10">
-                    <AvatarImage src={user.avatarUrl} />
-                    <AvatarFallback>
-                      {user.email[0]?.toUpperCase() ?? "U"}
-                    </AvatarFallback>
-                  </Avatar>
-                  <div>
-                    <p className="text-sm font-medium">
-                      {user.firstName} {user.lastName}
-                    </p>
-                    <p className="text-muted-foreground text-xs">
-                      {user.email}
-                    </p>
-                  </div>
-                </div>
-                <Button
-                  variant="outline"
-                  className="w-full"
-                  onClick={() => {
-                    void logout();
-                    onClose(false);
-                  }}
-                >
-                  <LogOut className="mr-2 h-4 w-4" />
-                  {t("logout")}
-                </Button>
-              </div>
-            ) : (
-              <div className="flex flex-col gap-2">
-                <Button asChild onClick={() => onClose(false)}>
-                  <Link href="/login">{t("login")}</Link>
-                </Button>
-                <Button
-                  variant="outline"
-                  asChild
-                  onClick={() => onClose(false)}
-                >
-                  <Link href="/signup">{t("signup")}</Link>
-                </Button>
-              </div>
-            )}
-          </div>
-        </div>
-      </SheetContent>
-    </Sheet>
+    <DropdownMenu>
+      <DropdownMenuTrigger asChild>
+        <Button variant="ghost" size="icon" aria-label={t("menu")}>
+          <Menu className="h-5 w-5" />
+        </Button>
+      </DropdownMenuTrigger>
+      <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuItem asChild>
+          <Link href="/login">{t("login")}</Link>
+        </DropdownMenuItem>
+        <DropdownMenuItem asChild>
+          <Link href="/signup">{t("signup")}</Link>
+        </DropdownMenuItem>
+      </DropdownMenuContent>
+    </DropdownMenu>
   );
 }
 
@@ -630,7 +517,6 @@ export function Header({
   const t = useTranslations("header");
   const pathname = usePathname();
   const isMobile = useIsMobile();
-  const [mobileNavOpen, setMobileNavOpen] = React.useState(false);
   const [scrolled, setScrolled] = React.useState(false);
   const { isAuthenticated } = useAuth();
   const { itemCount: cartCount } = useCart();
@@ -651,131 +537,121 @@ export function Header({
   }, [transparent]);
 
   return (
-    <>
-      <header
-        className={cn(
-          "z-50 w-full border-b transition-all duration-200",
-          sticky && "sticky top-0",
-          transparent && !scrolled
-            ? "border-transparent bg-transparent"
-            : "bg-background/95 supports-[backdrop-filter]:bg-background/60 backdrop-blur"
-        )}
-      >
-        <div className="container flex h-12 items-center justify-between gap-2 sm:h-14 md:h-16 lg:gap-4">
-          <div className="flex flex-1 items-center gap-4">
-            <Link href="/" className="flex items-center gap-2">
-              {logo || <Logo className="h-7 w-7 sm:h-8 sm:w-8" />}
-              <span className="hidden text-sm font-bold sm:text-base md:inline-block">
-                Wholesale Market
-              </span>
-            </Link>
+    <header
+      className={cn(
+        "z-50 w-full border-b transition-all duration-200",
+        sticky && "sticky top-0",
+        transparent && !scrolled
+          ? "border-transparent bg-transparent"
+          : "bg-background/95 supports-[backdrop-filter]:bg-background/60 backdrop-blur"
+      )}
+    >
+      <div className="container flex h-12 items-center justify-between gap-2 sm:h-14 md:h-16 lg:gap-4">
+        <div className="flex flex-1 items-center gap-4">
+          <Link href="/" className="flex items-center gap-2">
+            {logo || <Logo className="h-7 w-7 sm:h-8 sm:w-8" />}
+            <span className="hidden text-sm font-bold sm:text-base md:inline-block">
+              Wholesale Market
+            </span>
+          </Link>
 
-            {!isMobile && (
-              <nav className="ml-6 hidden items-center gap-1 md:flex">
-                {navItems.map((item) => {
-                  const isActive = pathname === item.href;
-                  return (
-                    <Link
-                      key={item.href}
-                      href={item.href}
-                      className={cn(
-                        "flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
-                        isActive
-                          ? "bg-accent text-accent-foreground"
-                          : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
-                      )}
-                    >
-                      {item.icon}
-                      {t(item.label)}
-                      {item.badge != null && (
-                        <Badge variant="secondary" className="ml-1">
-                          {item.badge}
-                        </Badge>
-                      )}
-                    </Link>
-                  );
-                })}
-              </nav>
-            )}
-          </div>
+          {!isMobile && (
+            <nav className="ml-6 hidden items-center gap-1 md:flex">
+              {navItems.map((item) => {
+                const isActive = pathname === item.href;
+                return (
+                  <Link
+                    key={item.href}
+                    href={item.href}
+                    className={cn(
+                      "flex items-center gap-1.5 rounded-md px-3 py-2 text-sm font-medium transition-colors",
+                      isActive
+                        ? "bg-accent text-accent-foreground"
+                        : "text-muted-foreground hover:bg-accent/50 hover:text-foreground"
+                    )}
+                  >
+                    {item.icon}
+                    {t(item.label)}
+                    {item.badge != null && (
+                      <Badge variant="secondary" className="ml-1">
+                        {item.badge}
+                      </Badge>
+                    )}
+                  </Link>
+                );
+              })}
+            </nav>
+          )}
+        </div>
 
-          <div className="flex items-center justify-center gap-2">
-            {/* Filter toggle — visible on shop/search pages on all viewports.
+        <div className="flex items-center justify-center gap-2">
+          {/* Filter toggle — visible on shop/search pages on all viewports.
                 On desktop it flips a persistent sidebar; on mobile it opens the
                 shared MobilePanel. */}
-            {(isShopPage || isSearchActive) && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleFilter}
-                className={cn(
-                  filterOpen && "bg-primary text-primary-foreground"
-                )}
-                aria-label={t("toggleFilters")}
-              >
-                <SlidersHorizontal className="h-5 w-5" />
-              </Button>
-            )}
+          {(isShopPage || isSearchActive) && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleFilter}
+              className={cn(filterOpen && "bg-primary text-primary-foreground")}
+              aria-label={t("toggleFilters")}
+            >
+              <SlidersHorizontal className="h-5 w-5" />
+            </Button>
+          )}
 
-            {showSearch && <SearchBar />}
-          </div>
-
-          <div className="flex flex-1 items-center justify-end gap-2">
-            <LanguageSwitcher />
-
-            {/* Map toggle — visible on homepage and shop pages */}
-            {(isHomePage || isShopPage) && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={toggleMap}
-                className={cn(mapOpen && "bg-primary text-primary-foreground")}
-                aria-label={t("toggleMap")}
-              >
-                <Map className="h-5 w-5" />
-              </Button>
-            )}
-
-            {showCart && (
-              <Button variant="ghost" size="icon" className="relative" asChild>
-                <Link href="/cart" aria-label={t("cart")}>
-                  <ShoppingCart className="h-5 w-5" />
-                  {cartCount > 0 && (
-                    <Badge
-                      variant="destructive"
-                      className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full p-0 text-xs"
-                    >
-                      {cartCount > 99 ? "99+" : cartCount}
-                    </Badge>
-                  )}
-                </Link>
-              </Button>
-            )}
-
-            {/* Account UI: avatar dropdown on desktop only. On mobile,
-                login/signup/logout live in the hamburger drawer. */}
-            {!isMobile && <UserMenu />}
-
-            {isMobile && (
-              <Button
-                variant="ghost"
-                size="icon"
-                onClick={() => setMobileNavOpen(true)}
-                aria-label={t("menu")}
-              >
-                <Menu className="h-5 w-5" />
-              </Button>
-            )}
-          </div>
+          {showSearch && <SearchBar />}
         </div>
-      </header>
 
-      <MobileNav
-        navItems={navItems}
-        isOpen={mobileNavOpen}
-        onClose={setMobileNavOpen}
-      />
-    </>
+        <div className="flex flex-1 items-center justify-end gap-2">
+          <LanguageSwitcher />
+
+          {/* Map toggle — visible on homepage and shop pages */}
+          {(isHomePage || isShopPage) && (
+            <Button
+              variant="ghost"
+              size="icon"
+              onClick={toggleMap}
+              className={cn(mapOpen && "bg-primary text-primary-foreground")}
+              aria-label={t("toggleMap")}
+            >
+              <Map className="h-5 w-5" />
+            </Button>
+          )}
+
+          {showCart && (
+            <Button variant="ghost" size="icon" className="relative" asChild>
+              <Link href="/cart" aria-label={t("cart")}>
+                <ShoppingCart className="h-5 w-5" />
+                {cartCount > 0 && (
+                  <Badge
+                    variant="destructive"
+                    className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full p-0 text-xs"
+                  >
+                    {cartCount > 99 ? "99+" : cartCount}
+                  </Badge>
+                )}
+              </Link>
+            </Button>
+          )}
+
+          {isAuthenticated ? (
+            <UserMenu />
+          ) : isMobile ? (
+            <MobileUnauthMenu />
+          ) : (
+            <div className="flex items-center gap-2">
+              <Button variant="ghost" size="sm" asChild>
+                <Link href="/login">{t("login")}</Link>
+              </Button>
+              <Button size="sm" asChild>
+                <Link href="/signup">{t("signup")}</Link>
+              </Button>
+            </div>
+          )}
+        </div>
+      </div>
+    </header>
   );
 }
 
