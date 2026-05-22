@@ -143,10 +143,10 @@ function SearchBar() {
 
     if (e.key === "ArrowDown") {
       e.preventDefault();
-      dropdownRef.current?.moveUp();
+      dropdownRef.current?.moveDown();
     } else if (e.key === "ArrowUp") {
       e.preventDefault();
-      dropdownRef.current?.moveDown();
+      dropdownRef.current?.moveUp();
     } else if (e.key === "Enter") {
       const handled = dropdownRef.current?.selectActive() ?? false;
       if (handled) {

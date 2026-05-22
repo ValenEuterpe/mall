@@ -175,7 +175,7 @@ const SearchSuggestionsDropdownContent = React.forwardRef<
     const selectedValue =
       activeIndex !== null && activeIndex < flatProducts.length
         ? `product-${flatProducts[activeIndex].id}`
-        : "";
+        : "__none__";
 
     if (!open) return null;
 
@@ -204,6 +204,7 @@ const SearchSuggestionsDropdownContent = React.forwardRef<
                     <CommandItem
                       key={p.id}
                       value={`product-${p.id}`}
+                      onMouseDown={(e) => e.preventDefault()}
                       onSelect={() => onSelect("product", p.id, p.name)}
                     >
                       {p.image ? (
