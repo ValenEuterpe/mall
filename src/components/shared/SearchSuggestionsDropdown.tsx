@@ -158,10 +158,11 @@ const SearchSuggestionsDropdownContent = React.forwardRef<
       },
     }), [activeIndex, flatProducts, onSelect]);
 
-    // Group products by category
+    // Group products by category, filtering out products without a categoryId
     const groupedProducts = React.useMemo(() => {
       const groups: Record<string, SuggestionProduct[]> = {};
       data.products.forEach((p) => {
+        if (!p.categoryId) return;
         if (!groups[p.categoryId]) {
           groups[p.categoryId] = [];
         }
