@@ -1287,7 +1287,8 @@
       "wishlistRemoved": "Հեռացվեց նախընտրածներից",
       "wishlistAddLabel": "Ավելացնել նախընտրածներում",
       "wishlistRemoveLabel": "Հեռացնել նախընտրածներից",
-      "noDescription": "Նկարագրություն հասանելի չէ:"
+      "noDescription": "Նկարագրություն հասանելի չէ:",
+      "addToMap": "Ավելացնել քարտեզին"
     }
   },
   "map": {

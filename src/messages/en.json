@@ -1287,7 +1287,8 @@
       "wishlistRemoved": "Removed from wishlist",
       "wishlistAddLabel": "Add to wishlist",
       "wishlistRemoveLabel": "Remove from wishlist",
-      "noDescription": "No description available."
+      "noDescription": "No description available.",
+      "addToMap": "Add to Map"
     }
   },
   "map": {
