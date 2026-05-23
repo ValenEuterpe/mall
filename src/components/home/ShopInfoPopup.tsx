@@ -43,7 +43,9 @@ interface ShopInfoPopupProps {
 
 const DAY_KEYS = ["sun", "mon", "tue", "wed", "thu", "fri", "sat"] as const;
 
-function isOpenNow(openingHours: Record<string, string> | null): boolean | null {
+function isOpenNow(
+  openingHours: Record<string, string> | null
+): boolean | null {
   if (!openingHours) return null;
 
   const now = new Date();
@@ -51,7 +53,9 @@ function isOpenNow(openingHours: Record<string, string> | null): boolean | null 
   const todayHours = openingHours[dayKey];
   if (!todayHours) return null;
 
-  const match = todayHours.match(/^(\d{1,2}):?(\d{2})?\s*-\s*(\d{1,2}):?(\d{2})?$/);
+  const match = todayHours.match(
+    /^(\d{1,2}):?(\d{2})?\s*-\s*(\d{1,2}):?(\d{2})?$/
+  );
   if (!match) return null;
 
   const openH = parseInt(match[1]);
@@ -104,8 +108,9 @@ export const ShopInfoPopup = memo(function ShopInfoPopup({
   const displayName = shop.shopName || shop.seller?.businessName || t("noName");
   const imageUrl = shop.imageUrl || shop.seller?.logoUrl;
   const shopTypeName = shop.shopType
-    ? (shop.shopType[`name_${locale}` as keyof typeof shop.shopType] as string) ||
-      shop.shopType.name_en
+    ? (shop.shopType[
+        `name_${locale}` as keyof typeof shop.shopType
+      ] as string) || shop.shopType.name_en
     : null;
 
   return (
@@ -146,7 +151,7 @@ export const ShopInfoPopup = memo(function ShopInfoPopup({
         <CardContent className="p-3">
           {/* Name + status */}
           <div className="flex items-start justify-between gap-2">
-            <h3 className="line-clamp-2 text-sm font-semibold leading-tight">
+            <h3 className="line-clamp-2 text-sm leading-tight font-semibold">
               {displayName}
             </h3>
             {openStatus !== null && (
@@ -162,18 +167,24 @@ export const ShopInfoPopup = memo(function ShopInfoPopup({
           {/* Shop type */}
           {shopTypeName && (
             <div className="mt-1 flex items-center gap-1.5">
-              {shop.shopType?.icon && (
-                <Image
-                  src={shop.shopType.icon}
-                  alt=""
-                  width={14}
-                  height={14}
-                  className="rounded-sm"
-                />
-              )}
+              {shop.shopType?.icon &&
+                typeof shop.shopType.icon === "string" &&
+                shop.shopType.icon.startsWith("http") && (
+                  <Image
+                    src={shop.shopType.icon}
+                    alt=""
+                    width={14}
+                    height={14}
+                    className="rounded-sm"
+                  />
+                )}
               <span
                 className="text-xs font-medium"
-                style={shop.shopType?.color ? { color: shop.shopType.color } : undefined}
+                style={
+                  shop.shopType?.color
+                    ? { color: shop.shopType.color }
+                    : undefined
+                }
               >
                 {shopTypeName}
               </span>
