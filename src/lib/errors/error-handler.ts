@@ -2,9 +2,9 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
-import { Prisma } from "@/prisma/generated/client";
 import { AppError, RateLimitError, isAppError } from "./custom-errors";
 import { logger } from "@/lib/utils/logger";
+import type { Prisma } from "@/prisma/generated/client";
 
 // ============================================================================
 // TYPES
@@ -82,21 +82,24 @@ export function handleError(
     }
 
     // Handle Prisma errors
-    if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        return handlePrismaError(error);
-    }
-
-    if (error instanceof Prisma.PrismaClientInitializationError) {
-        return NextResponse.json(
-            {
-                success: false,
-                error: {
-                    code: "DATABASE_CONNECTION_ERROR",
-                    message: "Unable to connect to database",
+    if (error && typeof error === "object") {
+        const errorObj = error as any;
+        if (errorObj.code && errorObj.meta !== undefined) {
+            // This is likely a PrismaClientKnownRequestError
+            return handlePrismaError(errorObj);
+        }
+        if (errorObj.constructor?.name === "PrismaClientInitializationError") {
+            return NextResponse.json(
+                {
+                    success: false,
+                    error: {
+                        code: "DATABASE_CONNECTION_ERROR",
+                        message: "Unable to connect to database",
+                    },
                 },
-            },
-            { status: 503 }
-        );
+                { status: 503 }
+            );
+        }
     }
 
     // Handle unknown errors
@@ -123,7 +126,7 @@ export function handleError(
  * Handle Prisma-specific errors
  */
 function handlePrismaError(
-    error: Prisma.PrismaClientKnownRequestError
+    error: any
 ): NextResponse<ErrorResponse> {
     const prismaErrors: Record<
         string,

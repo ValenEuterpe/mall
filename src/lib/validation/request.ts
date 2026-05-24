@@ -194,6 +194,41 @@ export function parsePagination(request: NextRequest): PaginationParams {
 }
 
 /**
+ * Validate any data against a Zod schema (synchronous)
+ * Returns a result object instead of throwing
+ *
+ * @example
+ * ```ts
+ * const result = validateRequestBody(schema, { page: 1, limit: 20 });
+ * if (result.success) {
+ *   // use result.data
+ * }
+ * ```
+ */
+export function validateRequestBody<T>(
+    schema: ZodSchema<T>,
+    data: unknown
+): ValidationResult<T> {
+    try {
+        const parsed = schema.parse(data);
+        return { success: true, data: parsed };
+    } catch (error) {
+        if (error instanceof ZodError) {
+            const formattedErrors = error.issues.map((err) => ({
+                field: err.path.join("."),
+                message: err.message,
+                code: err.code,
+            }));
+            return {
+                success: false,
+                error: new ValidationError("Validation failed", formattedErrors),
+            };
+        }
+        throw error;
+    }
+}
+
+/**
  * Validate file upload
  */
 export function validateFile(
