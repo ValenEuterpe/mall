@@ -216,22 +216,12 @@ export default function ProductDetailPage({
       }
       mapPinsAddToMap({ id: product.id, shop: { svgId } });
     }
-
-    toast.success(t("addedToRoute"), {
-      action: {
-        label: t("viewRoute"),
-        onClick: () => {
-          router.push("/");
-        },
-      },
-    });
   }, [
     addItem,
     inCart,
     inStock,
     product,
     t,
-    router,
     mapBuildings,
     setFloorForBuilding,
     mapPinsAddToMap,

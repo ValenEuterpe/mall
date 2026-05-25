@@ -111,7 +111,10 @@ interface ShopInfoProps {
 
 const ShopInfo = memo(function ShopInfo({ shop }: ShopInfoProps) {
   const tCommon = useTranslations("common");
-  const displayName = shop.shopName || shop.businessName || formatShopLocation(shop.fullCode, tCommon);
+  const displayName =
+    shop.shopName ||
+    shop.businessName ||
+    formatShopLocation(shop.fullCode, tCommon);
   const locationParts = [shop.building, shop.floor].filter(Boolean);
   const locationString =
     locationParts.length > 0 ? locationParts.join(", ") : null;
@@ -340,12 +343,12 @@ export const UserProductCard = memo(function UserProductCard({
         return;
       }
 
-      addProduct(product.id);
-      onAddToMap?.();
-
-      toast.success(t("addedToRoute"), {
-        description: t("addedToRouteDescription"),
-      });
+      if (onAddToMap) {
+        onAddToMap();
+      } else {
+        addProduct(product.id);
+        toast.success(tProducts("addedToMap"));
+      }
     },
     [
       addProduct,
