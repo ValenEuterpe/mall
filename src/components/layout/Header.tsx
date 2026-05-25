@@ -40,6 +40,7 @@ import {
 } from "lucide-react";
 import { useSidebarToggle } from "@/contexts/sidebar-toggle-context";
 import { useCart } from "@/hooks/use-cart";
+import { useMapSelection } from "@/hooks/use-map-selection";
 import {
   SearchSuggestionsDropdown,
   type SearchSuggestionsDropdownHandle,
@@ -525,6 +526,9 @@ export function Header({
   }, []);
   const { isAuthenticated } = useAuth();
   const { itemCount: cartCount } = useCart();
+  const { productIds: mapSelectionIds, isHydrated: mapSelectionHydrated } =
+    useMapSelection();
+  const mapCount = mapSelectionHydrated ? mapSelectionIds.length : 0;
 
   // Sidebar toggles (safe defaults when outside SidebarToggleProvider)
   const { filterOpen, mapOpen, toggleFilter, toggleMap } = useSidebarToggle();
@@ -622,11 +626,20 @@ export function Header({
               size="icon"
               onClick={toggleMap}
               className={cn(
+                "relative",
                 mounted && mapOpen && "bg-primary text-primary-foreground"
               )}
               aria-label={t("toggleMap")}
             >
               <Map className="h-5 w-5" />
+              {mapCount > 0 && (
+                <Badge
+                  variant="destructive"
+                  className="absolute -top-1 -right-1 flex h-5 min-w-5 items-center justify-center rounded-full p-0 text-xs"
+                >
+                  {mapCount > 99 ? "99+" : mapCount}
+                </Badge>
+              )}
             </Button>
           )}
 

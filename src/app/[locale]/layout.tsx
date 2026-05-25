@@ -10,6 +10,7 @@ import { ToastProvider } from "@/components/providers/ToastProvider";
 import { ThemeProvider } from "@/components/providers/ThemeProvider";
 import { AuthProvider } from "@/hooks/use-auth";
 import { AuthAwareCartProvider } from "@/hooks/use-cart";
+import { AuthAwareMapSelectionProvider } from "@/hooks/use-map-selection";
 
 export async function generateMetadata({
   params,
@@ -73,18 +74,20 @@ export default async function LocaleLayout({
         <NextIntlClientProvider messages={messages} locale={locale}>
           <AuthProvider>
             <AuthAwareCartProvider>
-              <a
-                href="#main-content"
-                className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
-              >
-                Skip to content
-              </a>
+              <AuthAwareMapSelectionProvider>
+                <a
+                  href="#main-content"
+                  className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+                >
+                  Skip to content
+                </a>
 
-              <div id="main-content" className="relative flex min-h-screen flex-col">
-                {children}
-              </div>
+                <div id="main-content" className="relative flex min-h-screen flex-col">
+                  {children}
+                </div>
 
-              <ToastProvider />
+                <ToastProvider />
+              </AuthAwareMapSelectionProvider>
             </AuthAwareCartProvider>
           </AuthProvider>
         </NextIntlClientProvider>

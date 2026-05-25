@@ -1,6 +1,15 @@
 "use client";
 
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import React, {
+  createContext,
+  useCallback,
+  useContext,
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  type ReactNode,
+} from "react";
 
 import { apiClient } from "@/lib/api-client";
 import { useAuth } from "@/hooks/use-auth";
@@ -28,6 +37,7 @@ function writeSessionProductIds(productIds: string[]) {
 
 export type UseMapSelectionState = {
   productIds: string[];
+  isHydrated: boolean;
   addProduct: (productId: string) => void;
   removeProduct: (productId: string) => void;
   toggleProduct: (productId: string) => void;
@@ -39,15 +49,29 @@ export type UseMapSelectionState = {
   syncError: string | null;
 };
 
+const MapSelectionContext = createContext<UseMapSelectionState | undefined>(undefined);
+MapSelectionContext.displayName = "MapSelectionContext";
+
+export interface MapSelectionProviderProps {
+  children: ReactNode;
+}
+
 /**
- * Map selection store.
+ * Map selection store (single shared instance).
  * - Anonymous: sessionStorage only
  * - Signed-in USER: auto-syncs to DB via /api/v1/map-selection
+ *
+ * Mount once at the app root (see AuthAwareMapSelectionProvider).
  */
-export function useMapSelection(): UseMapSelectionState {
+export function MapSelectionProvider({
+  children,
+}: MapSelectionProviderProps): React.ReactElement {
   const { user, isAuthenticated } = useAuth();
 
-  const [productIds, setProductIds] = useState<string[]>(() => readSessionProductIds());
+  // Start empty on both server and client to avoid hydration mismatch;
+  // a useEffect below hydrates from sessionStorage on mount.
+  const [productIds, setProductIds] = useState<string[]>([]);
+  const [isHydrated, setIsHydrated] = useState(false);
   const [isSyncing, setIsSyncing] = useState(false);
   const [syncError, setSyncError] = useState<string | null>(null);
 
@@ -55,6 +79,13 @@ export function useMapSelection(): UseMapSelectionState {
 
   // Avoid firing PUT on initial DB load
   const didHydrateFromDb = useRef(false);
+
+  // Hydrate from sessionStorage on mount (client-only). Components that need
+  // to gate rendering on this can read `isHydrated`.
+  useEffect(() => {
+    setProductIds(readSessionProductIds());
+    setIsHydrated(true);
+  }, []);
 
   // Initial DB hydrate (merge rule = UNION)
   useEffect(() => {
@@ -88,7 +119,7 @@ export function useMapSelection(): UseMapSelectionState {
           didHydrateFromDb.current = true;
         }
 
-        // If session had extra items, immediately push merged up to DB (your rule = immediate sync)
+        // If session had extra items, immediately push merged up to DB (immediate sync)
         if (merged.length !== dbProductIds.length) {
           const putRes = await apiClient.put<{ productIds: string[] }>("/map-selection", {
             productIds: merged,
@@ -110,10 +141,10 @@ export function useMapSelection(): UseMapSelectionState {
     };
   }, [isDbBacked]);
 
-  // Persist to sessionStorage on change (always)
+  // Persist to sessionStorage on change (after hydration)
   useEffect(() => {
-    writeSessionProductIds(productIds);
-  }, [productIds]);
+    if (isHydrated) writeSessionProductIds(productIds);
+  }, [productIds, isHydrated]);
 
   // Debounced DB sync for signed-in users
   const syncTimerRef = useRef<number | null>(null);
@@ -199,7 +230,9 @@ export function useMapSelection(): UseMapSelectionState {
   const toggleProduct = useCallback(
     (productId: string) => {
       if (!productId) return;
-      update((prev) => (prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]));
+      update((prev) =>
+        prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]
+      );
     },
     [update]
   );
@@ -208,11 +241,15 @@ export function useMapSelection(): UseMapSelectionState {
     update(() => []);
   }, [update]);
 
-  const isSelected = useCallback((productId: string) => productIds.includes(productId), [productIds]);
+  const isSelected = useCallback(
+    (productId: string) => productIds.includes(productId),
+    [productIds]
+  );
 
-  return useMemo(
+  const contextValue = useMemo<UseMapSelectionState>(
     () => ({
       productIds,
+      isHydrated,
       addProduct,
       removeProduct,
       toggleProduct,
@@ -221,6 +258,43 @@ export function useMapSelection(): UseMapSelectionState {
       isSyncing,
       syncError,
     }),
-    [productIds, addProduct, removeProduct, toggleProduct, clear, isSelected, isSyncing, syncError]
+    [
+      productIds,
+      isHydrated,
+      addProduct,
+      removeProduct,
+      toggleProduct,
+      clear,
+      isSelected,
+      isSyncing,
+      syncError,
+    ]
   );
+
+  return (
+    <MapSelectionContext.Provider value={contextValue}>{children}</MapSelectionContext.Provider>
+  );
+}
+
+export function useMapSelection(): UseMapSelectionState {
+  const context = useContext(MapSelectionContext);
+
+  if (!context) {
+    throw new Error("useMapSelection must be used within a MapSelectionProvider");
+  }
+
+  return context;
+}
+
+/**
+ * Map selection provider that auto-mounts under AuthProvider.
+ * Mirrors AuthAwareCartProvider so a single mount in the root layout
+ * gives every component (Header, product cards, sheets) one shared store.
+ */
+export function AuthAwareMapSelectionProvider({
+  children,
+}: {
+  children: ReactNode;
+}): React.ReactElement {
+  return <MapSelectionProvider>{children}</MapSelectionProvider>;
 }
