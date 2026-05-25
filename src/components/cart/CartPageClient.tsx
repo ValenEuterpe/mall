@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useCallback, useMemo } from "react";
+import React, { useCallback, useEffect, useMemo } from "react";
 import { useLocale, useTranslations } from "next-intl";
 import { Trash2 } from "lucide-react";
 
@@ -13,6 +13,19 @@ import { toast } from "@/lib/utils/toast";
 import { EmptyCart } from "./EmptyCart";
 import { CartShopGroup } from "./CartShopGroup";
 import { CartSummary } from "./CartSummary";
+
+import { useIsMobile } from "@/hooks/use-media-query";
+import { useMultiMapData } from "@/hooks/use-multi-map-data";
+import { useShopPopup } from "@/hooks/use-shop-popup";
+import {
+  useSidebarToggle,
+  SIDEBAR_PANELS,
+} from "@/contexts/sidebar-toggle-context";
+import { MobilePanelSheet } from "@/components/layout/MobilePanelSheet";
+import { MapPanel } from "@/components/home/MapPanel";
+import type { BuildingOverlay } from "@/components/home/LeafletMapView";
+import type { ProductPinData } from "@/hooks/use-map-pins";
+import { useRouter } from "@/i18n/routing";
 
 function CartSkeleton(): React.ReactElement {
   return (
@@ -27,7 +40,10 @@ function CartSkeleton(): React.ReactElement {
 
 export function CartPageClient(): React.ReactElement {
   const t = useTranslations("cart");
+  const tHome = useTranslations("home");
   const locale = useLocale();
+  const router = useRouter();
+  const isMobile = useIsMobile();
   const { isAuthenticated } = useAuth();
   const {
     items,
@@ -41,6 +57,21 @@ export function CartPageClient(): React.ReactElement {
     removeItem,
     clearCart,
   } = useCart();
+
+  const { mapOpen } = useSidebarToggle();
+
+  const {
+    buildings: mapBuildings,
+    globalCenter,
+    globalLoading,
+    globalError,
+    setFloorForBuilding,
+    allShopsBySvgId,
+    allShopSvgIds,
+  } = useMultiMapData();
+
+  const { activeShopSvgId, activeShop, handleShopClick, handleCloseShopPopup } =
+    useShopPopup(allShopsBySvgId);
 
   const handleRemove = useCallback(
     (productId: string) => {
@@ -68,6 +99,77 @@ export function CartPageClient(): React.ReactElement {
     });
   }, [getItemsByShop]);
 
+  const buildingOverlays: BuildingOverlay[] = useMemo(
+    () =>
+      mapBuildings.map((b) => ({
+        buildingCode: b.buildingCode,
+        svgContent: b.svgMarkup,
+        center: b.center,
+        rotation: b.rotation,
+        scale: b.scale,
+        floors: b.floors,
+        currentFloor: b.currentFloor,
+        onFloorChange: (floor: string) =>
+          setFloorForBuilding(b.buildingCode, floor),
+      })),
+    [mapBuildings, setFloorForBuilding]
+  );
+
+  const cartPins: ProductPinData[] = useMemo(() => {
+    return items
+      .filter((item) => item.shopLocation?.svgId)
+      .map((item) => ({
+        productId: item.id,
+        svgId: item.shopLocation!.svgId!,
+        thumbnail: item.images[0] || "",
+        name: item.name,
+        price: item.price,
+        shopName: item.shopName,
+      }));
+  }, [items]);
+
+  useEffect(() => {
+    if (mapBuildings.length === 0) return;
+    const firstItem = items.find((item) => item.shopLocation?.svgId);
+    if (!firstItem) return;
+    const code = firstItem.shopCode ?? "";
+    const floorMatch = code.match(/F(\d+)/i);
+    const buildingMatch = code.match(/B(\d+)/i);
+    if (floorMatch && buildingMatch) {
+      const buildingCode = `B${buildingMatch[1]}`;
+      const building = mapBuildings.find(
+        (b) => b.buildingCode === buildingCode
+      );
+      if (building && building.currentFloor !== floorMatch[1]) {
+        setFloorForBuilding(buildingCode, floorMatch[1]);
+      }
+    }
+  }, [mapBuildings.length]);
+
+  const handleViewProduct = useCallback(
+    (productId: string) => {
+      router.push(`/products/${productId}`);
+    },
+    [router]
+  );
+
+  const mapPanelProps = {
+    mapCenter: globalCenter,
+    mapLoading: globalLoading,
+    mapError: globalError,
+    selectedCount: cartPins.length,
+    shopSvgIds: allShopSvgIds,
+    activeShopSvgId: activeShopSvgId ?? null,
+    onShopClick: handleShopClick,
+    productPins: cartPins,
+    shopsBySvgId: allShopsBySvgId,
+    onRemoveProduct: () => {},
+    onViewProduct: handleViewProduct,
+    activeShop,
+    onCloseShopPopup: handleCloseShopPopup,
+    buildings: buildingOverlays,
+  };
+
   if (!isHydrated) {
     return (
       <div className="container mx-auto max-w-4xl p-6">
@@ -84,9 +186,8 @@ export function CartPageClient(): React.ReactElement {
     );
   }
 
-  return (
+  const cartContent = (
     <div className="container mx-auto max-w-4xl space-y-6 p-6">
-      {/* Header */}
       <div className="flex items-center justify-between">
         <div>
           <h1 className="text-2xl font-bold tracking-tight">{t("title")}</h1>
@@ -105,7 +206,6 @@ export function CartPageClient(): React.ReactElement {
         </Button>
       </div>
 
-      {/* Shop Groups + Summary */}
       <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
         <div className="space-y-4">
           {shopGroups.map((group) => (
@@ -132,6 +232,36 @@ export function CartPageClient(): React.ReactElement {
           />
         </div>
       </div>
+    </div>
+  );
+
+  if (isMobile) {
+    return (
+      <div className="relative w-full overflow-x-hidden">
+        {cartContent}
+
+        <MobilePanelSheet name={SIDEBAR_PANELS.map} title={tHome("map.title")}>
+          <div className="h-full p-3">
+            <div className="border-accent h-full rounded-lg border-4 shadow-lg">
+              <MapPanel {...mapPanelProps} />
+            </div>
+          </div>
+        </MobilePanelSheet>
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex w-full">
+      <div className="min-w-0 flex-1">{cartContent}</div>
+
+      {mapOpen && (
+        <aside className="sticky top-16 hidden h-[calc(100vh-4rem)] w-1/3 shrink-0 self-start p-3 md:block">
+          <div className="border-accent h-full rounded-lg border-4 shadow-lg">
+            <MapPanel {...mapPanelProps} />
+          </div>
+        </aside>
+      )}
     </div>
   );
 }

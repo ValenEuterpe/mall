@@ -114,7 +114,9 @@ export function useProductSearch(
   const debouncedSearch = useDebounce(searchQuery, 300);
   const [categories, setCategories] = useState<ProductCategory[]>([]);
   const [selectedCategory, setSelectedCategory] = useState("all");
-  const [availableTags, setAvailableTags] = useState<Array<{ id: string; name: string; key: string }>>([]);
+  const [availableTags, setAvailableTags] = useState<
+    Array<{ id: string; name: string; key: string }>
+  >([]);
   const [selectedTagIds, setSelectedTagIds] = useState<string[]>([]);
   const [priceRange, setPriceRange] = useState<[number, number]>([
     0,
@@ -131,19 +133,24 @@ export function useProductSearch(
       }
 
       // If it's a subcategory, we should probably get tags for its parent category
-      const cat = categories.find(c => c.id === selectedCategory);
-      const categoryId = cat?.type === "subcategory" ? cat.parentId : selectedCategory;
+      const cat = categories.find((c) => c.id === selectedCategory);
+      const categoryId =
+        cat?.type === "subcategory" ? cat.parentId : selectedCategory;
 
       if (!categoryId) return;
 
       try {
-        const res = await apiClient.get<any[]>(`/mall-owner/tags?categoryId=${categoryId}`);
+        const res = await apiClient.get<any[]>(
+          `/tags?categoryId=${categoryId}`
+        );
         if (res.success) {
-          setAvailableTags(res.data.map((t: any) => ({
-            id: t.id,
-            key: t.key,
-            name: t[`name_${locale}`] || t.name_en,
-          })));
+          setAvailableTags(
+            res.data.map((t: any) => ({
+              id: t.id,
+              key: t.key,
+              name: t[`name_${locale}`] || t.name_en,
+            }))
+          );
         }
       } catch {
         // Silent fail

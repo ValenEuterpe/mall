@@ -107,12 +107,8 @@ export default function ProductDetailPage({
     [mapBuildings, setFloorForBuilding]
   );
 
-  const {
-    activeShopSvgId,
-    activeShop,
-    handleShopClick,
-    handleCloseShopPopup,
-  } = useShopPopup(allShopsBySvgId);
+  const { activeShopSvgId, activeShop, handleShopClick, handleCloseShopPopup } =
+    useShopPopup(allShopsBySvgId);
 
   const {
     productPins,
@@ -229,7 +225,17 @@ export default function ProductDetailPage({
         },
       },
     });
-  }, [addItem, inCart, inStock, product, t, router, mapBuildings, setFloorForBuilding, mapPinsAddToMap]);
+  }, [
+    addItem,
+    inCart,
+    inStock,
+    product,
+    t,
+    router,
+    mapBuildings,
+    setFloorForBuilding,
+    mapPinsAddToMap,
+  ]);
 
   const handleWishlist = useCallback(() => {
     if (!product) return;
@@ -351,7 +357,7 @@ export default function ProductDetailPage({
     return (
       <div className="container py-8">
         <Skeleton className="mb-6 h-4 w-48" />
-        <div className="grid gap-8 lg:grid-cols-2">
+        <div className="grid gap-4 lg:grid-cols-2 lg:gap-8">
           <Skeleton className="aspect-square w-full rounded-lg" />
           <div className="space-y-4">
             <Skeleton className="h-8 w-3/4" />
@@ -381,7 +387,7 @@ export default function ProductDetailPage({
 
   // ---- Product content (shared between mobile and desktop) ----
   const productContent = (
-    <div className="container py-6 lg:py-8">
+    <div className="container px-3 py-4 lg:px-8 lg:py-8">
       <div className="mb-6">
         <nav className="text-muted-foreground text-sm">
           <Link href="/">{t("breadcrumb.home")}</Link>
@@ -392,9 +398,9 @@ export default function ProductDetailPage({
         </nav>
       </div>
 
-      <div className="grid gap-8 lg:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2 lg:gap-8">
         <div className="space-y-4">
-          <div className="bg-muted relative aspect-square overflow-hidden rounded-lg">
+          <div className="bg-muted relative aspect-[4/3] overflow-hidden rounded-lg lg:aspect-square">
             {product.images[0] ? (
               <Image
                 src={product.images[0]}
@@ -411,8 +417,8 @@ export default function ProductDetailPage({
           </div>
         </div>
 
-        <div className="space-y-6">
-          <div className="flex items-start justify-between gap-4">
+        <div className="space-y-4 lg:space-y-6">
+          <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:justify-between sm:gap-4">
             <div>
               {product.brand && (
                 <p className="text-muted-foreground mb-1 text-sm font-medium tracking-wider uppercase">
@@ -480,7 +486,7 @@ export default function ProductDetailPage({
           </div>
 
           <div className="flex items-baseline gap-4">
-            <span className="text-primary text-3xl font-bold lg:text-4xl">
+            <span className="text-primary text-2xl font-bold lg:text-4xl">
               {formattedPrice}
             </span>
             {!inStock && <Badge variant="destructive">{t("outOfStock")}</Badge>}
@@ -488,7 +494,7 @@ export default function ProductDetailPage({
 
           <Separator />
 
-          <div className="space-y-6">
+          <div className="space-y-4 lg:space-y-6">
             <div>
               <h2 className="text-muted-foreground mb-3 text-sm font-semibold tracking-wide uppercase">
                 {t("tabs.description")}
@@ -531,7 +537,7 @@ export default function ProductDetailPage({
 
           <Separator />
 
-          <div className="flex gap-4">
+          <div className="flex flex-col gap-3 sm:flex-row sm:gap-4">
             <Button
               size="lg"
               className="flex-1"

@@ -518,6 +518,11 @@ export function Header({
   const pathname = usePathname();
   const isMobile = useIsMobile();
   const [scrolled, setScrolled] = React.useState(false);
+  const [mounted, setMounted] = React.useState(false);
+
+  React.useEffect(() => {
+    setMounted(true);
+  }, []);
   const { isAuthenticated } = useAuth();
   const { itemCount: cartCount } = useCart();
 
@@ -526,6 +531,7 @@ export function Header({
   const isHomePage = pathname === "/";
   const isShopPage = pathname.startsWith("/shops");
   const isProductPage = pathname.startsWith("/products");
+  const isCartPage = pathname.startsWith("/cart");
 
   const searchParams = useSearchParams();
   const isSearchActive = Boolean(searchParams.get("q"));
@@ -594,7 +600,9 @@ export function Header({
               variant="ghost"
               size="icon"
               onClick={toggleFilter}
-              className={cn(filterOpen && "bg-primary text-primary-foreground")}
+              className={cn(
+                mounted && filterOpen && "bg-primary text-primary-foreground"
+              )}
               aria-label={t("toggleFilters")}
             >
               <SlidersHorizontal className="h-5 w-5" />
@@ -608,12 +616,14 @@ export function Header({
           <LanguageSwitcher />
 
           {/* Map toggle — visible on homepage, shop pages, and product pages */}
-          {(isHomePage || isShopPage || isProductPage) && (
+          {(isHomePage || isShopPage || isProductPage || isCartPage) && (
             <Button
               variant="ghost"
               size="icon"
               onClick={toggleMap}
-              className={cn(mapOpen && "bg-primary text-primary-foreground")}
+              className={cn(
+                mounted && mapOpen && "bg-primary text-primary-foreground"
+              )}
               aria-label={t("toggleMap")}
             >
               <Map className="h-5 w-5" />
