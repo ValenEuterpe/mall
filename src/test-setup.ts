@@ -1,9 +1,12 @@
-// Set up environment variables for tests BEFORE importing anything else
-process.env.NODE_ENV = "test";
-process.env.JWT_SECRET = "test_jwt_secret_key_for_testing_only";
-process.env.JWT_REFRESH_SECRET = "test_jwt_refresh_secret_for_testing_only";
-process.env.NEXT_PUBLIC_APP_NAME = "Wholesale Market Test";
-process.env.DATABASE_URL = "postgresql://test:test@localhost:5432/test";
+// Set up environment variables for tests BEFORE importing anything else.
+// `NODE_ENV` is typed read-only by @types/node, so write through a widened
+// view of process.env instead of assigning to the typed property directly.
+const testEnv = process.env as Record<string, string>;
+testEnv.NODE_ENV = "test";
+testEnv.JWT_SECRET = "test_jwt_secret_key_for_testing_only";
+testEnv.JWT_REFRESH_SECRET = "test_jwt_refresh_secret_for_testing_only";
+testEnv.NEXT_PUBLIC_APP_NAME = "Wholesale Market Test";
+testEnv.DATABASE_URL = "postgresql://test:test@localhost:5432/test";
 
 import "@testing-library/jest-dom/vitest";
 import { vi } from "vitest";
