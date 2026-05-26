@@ -294,6 +294,13 @@ export const LeafletMapView = memo(function LeafletMapView({
 
       const baseWidth = 200 * b.scale;
       const baseHeight = baseWidth / processed.aspectRatio;
+      // Apply the current zoom-derived scale in the initial marker HTML so the
+      // wrapper renders at the right size immediately on re-creation (e.g.,
+      // floor swap while the user is zoomed in). Without this, the inline
+      // transform is scale(1) until the next zoom event writes the true value.
+      const initialBaseZoom =
+        baseZoomsRef.current.get(b.buildingCode) ?? map.getZoom();
+      const initialScale = Math.pow(2, map.getZoom() - initialBaseZoom);
 
       const icon = L.divIcon({
         className: "svg-marker-wrapper",
@@ -302,7 +309,7 @@ export const LeafletMapView = memo(function LeafletMapView({
             width: ${baseWidth}px;
             height: ${baseHeight}px;
             position: relative;
-            transform: rotate(${b.rotation}deg);
+            transform: rotate(${b.rotation}deg) scale(${initialScale});
             transform-origin: center center;
           ">
             ${processed.content}
@@ -596,6 +603,10 @@ export const LeafletMapView = memo(function LeafletMapView({
 
     const baseWidth = 200 * scale;
     const baseHeight = baseWidth / aspectRatio;
+    // Mirror of the multi-building fix: write the current zoom-derived scale
+    // into the initial marker HTML so a remount (e.g., floor change while
+    // zoomed) doesn't briefly render at scale(1) before the next zoom event.
+    const initialScale = Math.pow(2, map.getZoom() - baseZoomRef.current);
 
     const icon = L.divIcon({
       className: "svg-marker-wrapper",
@@ -604,7 +615,7 @@ export const LeafletMapView = memo(function LeafletMapView({
           width: ${baseWidth}px;
           height: ${baseHeight}px;
           position: relative;
-          transform: rotate(${rotation}deg);
+          transform: rotate(${rotation}deg) scale(${initialScale});
           transform-origin: center center;
         ">
           ${content}
