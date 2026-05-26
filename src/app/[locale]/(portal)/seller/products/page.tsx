@@ -416,6 +416,12 @@ export default function SellerProductsPage(): React.ReactElement {
           handleCloseEditModal();
           void fetchProducts();
         }}
+        onDelete={() => {
+          const id = editingProductId;
+          const p = id ? items.find((i) => i.id === id) : null;
+          handleCloseEditModal();
+          if (p) handleDeleteClick(p);
+        }}
       />
     </div>
   );

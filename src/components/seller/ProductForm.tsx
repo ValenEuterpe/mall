@@ -83,6 +83,7 @@ interface ProductFormProps {
   productId?: string;
   onSuccess?: () => void;
   onClose?: () => void;
+  onDelete?: () => void;
   embedded?: boolean;
 }
 
@@ -117,6 +118,7 @@ export function ProductForm({
   productId,
   onSuccess,
   onClose,
+  onDelete,
   embedded,
 }: ProductFormProps) {
   const t = useTranslations("seller.productForm");
@@ -498,28 +500,44 @@ export function ProductForm({
       )}
 
       {embedded && (
-        <div className="mb-4 flex items-center justify-end gap-3">
-          <Button
-            type="button"
-            variant="outline"
-            onClick={onClose}
-            className="h-10 px-6 font-semibold"
-          >
-            {t("cancel")}
-          </Button>
-          <Button
-            type="submit"
-            form="product-form"
-            disabled={isSaving}
-            className="shadow-primary/20 hover:shadow-primary/30 h-10 gap-2 px-8 font-bold shadow-lg transition-all"
-          >
-            {isSaving ? (
-              <Loader2 className="h-4 w-4 animate-spin" />
-            ) : (
-              <Save className="h-4 w-4" />
+        <div className="mb-4 flex items-center justify-between gap-3">
+          <div>
+            {mode === "edit" && onDelete && (
+              <Button
+                type="button"
+                variant="destructive"
+                onClick={onDelete}
+                disabled={isSaving}
+                className="h-10 gap-2 px-6 font-semibold"
+              >
+                <Trash2 className="h-4 w-4" />
+                {tCommon("delete")}
+              </Button>
             )}
-            {isSaving ? t("saving") : t("save")}
-          </Button>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="outline"
+              onClick={onClose}
+              className="h-10 px-6 font-semibold"
+            >
+              {t("cancel")}
+            </Button>
+            <Button
+              type="submit"
+              form="product-form"
+              disabled={isSaving}
+              className="shadow-primary/20 hover:shadow-primary/30 h-10 gap-2 px-8 font-bold shadow-lg transition-all"
+            >
+              {isSaving ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                <Save className="h-4 w-4" />
+              )}
+              {isSaving ? t("saving") : t("save")}
+            </Button>
+          </div>
         </div>
       )}
 

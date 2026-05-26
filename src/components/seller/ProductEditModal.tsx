@@ -47,6 +47,7 @@ export interface ProductEditModalProps {
   isOpen: boolean;
   onClose: () => void;
   onSaved?: () => void;
+  onDelete?: () => void;
 }
 
 export const ProductEditModal = memo(function ProductEditModal({
@@ -54,6 +55,7 @@ export const ProductEditModal = memo(function ProductEditModal({
   isOpen,
   onClose,
   onSaved,
+  onDelete,
 }: ProductEditModalProps) {
   const t = useTranslations("seller.products");
   const tModal = useTranslations("productModal");
@@ -159,6 +161,7 @@ export const ProductEditModal = memo(function ProductEditModal({
             initialData={transformProductToFormData(product)}
             onSuccess={handleFormSuccess}
             onClose={onClose}
+            onDelete={onDelete}
             embedded
           />
         ) : (
