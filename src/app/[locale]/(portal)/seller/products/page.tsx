@@ -8,7 +8,7 @@ import React, {
   useState,
 } from "react";
 import { useTranslations } from "next-intl";
-import { Plus, Trash2, Loader2, Package } from "lucide-react";
+import { Plus, Loader2, Package } from "lucide-react";
 
 import {
   apiClient,
@@ -23,17 +23,10 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog";
-import {
   SellerProductCard,
   SellerProductCardSkeleton,
   ProductEditModal,
+  DeleteProductDialog,
 } from "@/components/seller";
 import { ProductDetailModal } from "@/components/products/ProductDetailModal";
 
@@ -158,7 +151,6 @@ export default function SellerProductsPage(): React.ReactElement {
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [productToDelete, setProductToDelete] =
     useState<SellerProductListItem | null>(null);
-  const [isDeleting, setIsDeleting] = useState(false);
 
   const [selectedProductId, setSelectedProductId] = useState<string | null>(
     null
@@ -170,30 +162,6 @@ export default function SellerProductsPage(): React.ReactElement {
   const handleDeleteClick = (product: SellerProductListItem) => {
     setProductToDelete(product);
     setDeleteDialogOpen(true);
-  };
-
-  const handleDeleteConfirm = async () => {
-    if (!productToDelete) return;
-
-    setIsDeleting(true);
-    try {
-      const res = await apiClient.delete(
-        `/sellers/products/${productToDelete.id}`
-      );
-      if (res.success) {
-        toast.success(tSeller("deleteSuccess"));
-        setItems((prev) => prev.filter((p) => p.id !== productToDelete.id));
-        setMeta((prev) => (prev ? { ...prev, total: prev.total - 1 } : null));
-      } else {
-        toast.error(tSeller("deleteFailed"));
-      }
-    } catch (e: any) {
-      toast.error(e?.message || tSeller("deleteFailed"));
-    } finally {
-      setIsDeleting(false);
-      setDeleteDialogOpen(false);
-      setProductToDelete(null);
-    }
   };
 
   const handleShowDetails = useCallback((productId: string) => {
@@ -354,44 +322,22 @@ export default function SellerProductsPage(): React.ReactElement {
       </Card>
 
       {/* Delete Confirmation Dialog */}
-      <Dialog open={deleteDialogOpen} onOpenChange={setDeleteDialogOpen}>
-        <DialogContent>
-          <DialogHeader>
-            <DialogTitle>{tSeller("deleteDialog.title")}</DialogTitle>
-            <DialogDescription>
-              {tSeller("deleteDialog.description", {
-                name: productToDelete?.name || "",
-              })}
-            </DialogDescription>
-          </DialogHeader>
-          <DialogFooter>
-            <Button
-              variant="outline"
-              onClick={() => setDeleteDialogOpen(false)}
-              disabled={isDeleting}
-            >
-              {tSeller("deleteDialog.cancel")}
-            </Button>
-            <Button
-              variant="destructive"
-              onClick={handleDeleteConfirm}
-              disabled={isDeleting}
-            >
-              {isDeleting ? (
-                <>
-                  <Loader2 className="mr-2 h-4 w-4 animate-spin" />
-                  {tSeller("deleteDialog.deleting")}
-                </>
-              ) : (
-                <>
-                  <Trash2 className="mr-2 h-4 w-4" />
-                  {tSeller("deleteDialog.confirm")}
-                </>
-              )}
-            </Button>
-          </DialogFooter>
-        </DialogContent>
-      </Dialog>
+      <DeleteProductDialog
+        open={deleteDialogOpen}
+        onOpenChange={setDeleteDialogOpen}
+        product={
+          productToDelete
+            ? { id: productToDelete.id, name: productToDelete.name }
+            : null
+        }
+        onDeleted={(deletedId) => {
+          setItems((prev) => prev.filter((p) => p.id !== deletedId));
+          setMeta((prev) =>
+            prev ? { ...prev, total: prev.total - 1 } : null
+          );
+          setProductToDelete(null);
+        }}
+      />
 
       {/* Product Detail Modal */}
       <ProductDetailModal

@@ -5,3 +5,5 @@ export {
 export type { SellerProductCardProps } from "./SellerProductCard";
 export { ProductEditModal } from "./ProductEditModal";
 export type { ProductEditModalProps } from "./ProductEditModal";
+export { DeleteProductDialog } from "./DeleteProductDialog";
+export type { DeleteProductDialogProps } from "./DeleteProductDialog";
