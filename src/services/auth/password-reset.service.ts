@@ -12,7 +12,7 @@ import type {
   UserRole,
   PasswordResetErrorCode,
 } from "@/types/auth";
-import type { AccountType, PasswordResetRequestErrorCode } from "@/types/auth";
+import type { AccountType } from "@/types/auth";
 
 const config = AUTH_CONFIG.passwordReset;
 

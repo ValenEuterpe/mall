@@ -30,12 +30,13 @@ export function TooltipTrigger({
 }
 
 export function TooltipContent({
-  children,
+  // Stub component — content is intentionally not rendered. Prop is on the
+  // public type for source compatibility with callers.
+  children: _children,
 }: {
   children: React.ReactNode;
   side?: "top" | "bottom" | "left" | "right";
   className?: string;
 }) {
-  // Not rendered (stub)
   return null;
 }

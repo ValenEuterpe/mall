@@ -23,7 +23,7 @@ const createVenueSchema = z.object({
  * GET /api/v1/mall/venues
  * List all venues for the mall
  */
-async function listVenuesHandler(req: NextRequest): Promise<NextResponse> {
+async function listVenuesHandler(_req: NextRequest): Promise<NextResponse> {
   // Get the mall first
   const mall = await prisma.mall.findFirst();
   if (!mall) {

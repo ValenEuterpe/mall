@@ -46,7 +46,8 @@ export function UnifiedPageClient(): React.ReactElement {
     productsLoading,
     hasMore,
     page,
-    searchQuery,
+    // `searchQuery` value is read elsewhere via URL; only the setter is used here.
+    searchQuery: _searchQuery,
     setSearchQuery,
     categories,
     selectedCategory,
@@ -158,12 +159,6 @@ export function UnifiedPageClient(): React.ReactElement {
     () => products.find((p) => p.id === selectedProductId) ?? null,
     [products, selectedProductId]
   );
-
-  const handleAddSelectedToMap = useCallback(() => {
-    if (selectedProduct) {
-      handleAddToMap(selectedProduct);
-    }
-  }, [selectedProduct, handleAddToMap]);
 
   const handleCategoryClick = useCallback(
     (categoryId: string) => {

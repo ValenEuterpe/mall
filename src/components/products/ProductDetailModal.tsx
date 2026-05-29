@@ -9,9 +9,7 @@ import {
   Edit2,
   ExternalLink,
   ImageOff,
-  Loader2,
   MapPin,
-  Package,
   ShoppingCart,
   ShoppingBag,
   Store,
@@ -33,6 +31,7 @@ import { apiClient } from "@/lib/api-client";
 import { toast } from "@/lib/utils/toast";
 import { cn } from "@/lib/utils";
 import { formatPrice } from "@/types/product";
+import { SalePriceDisplay } from "@/components/shared/SalePriceDisplay";
 import { useCart } from "@/hooks/use-cart";
 import type { CartProduct } from "@/lib/cart/types";
 
@@ -119,7 +118,7 @@ export const ProductDetailModal = memo(function ProductDetailModal({
           `/products/${productId}`,
           { locale },
           {
-            showErrorToast: false
+            showErrorToast: false,
           }
         );
         if (!cancelled && res.success) {
@@ -315,20 +314,11 @@ export const ProductDetailModal = memo(function ProductDetailModal({
                     : t("outOfStock")}
                 </Badge>
               </div>
-              {formattedBasePrice ? (
-                <div className="flex items-baseline gap-2">
-                  <p className="text-destructive text-2xl font-bold">
-                    {formattedPrice}
-                  </p>
-                  <p className="text-muted-foreground text-base line-through">
-                    {formattedBasePrice}
-                  </p>
-                </div>
-              ) : (
-                <p className="text-primary text-2xl font-bold">
-                  {formattedPrice}
-                </p>
-              )}
+              <SalePriceDisplay
+                effectivePrice={formattedPrice ?? ""}
+                basePrice={formattedBasePrice}
+                size="lg"
+              />
               {product.brand && (
                 <p className="text-muted-foreground text-sm">
                   {t("brand")}: {product.brand}

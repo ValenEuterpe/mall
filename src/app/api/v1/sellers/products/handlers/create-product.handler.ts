@@ -20,8 +20,8 @@ import { checkForDuplicateSkuOrBarcode } from "../queries/product-duplicate-chec
 function extractMultilingualFields(data: Record<string, unknown>) {
   // Get name from either format
   let name_en = data.name_en as string | undefined;
-  let name_ru = data.name_ru as string | undefined;
-  let name_am = data.name_am as string | undefined;
+  const name_ru = data.name_ru as string | undefined;
+  const name_am = data.name_am as string | undefined;
 
   // If legacy name provided but no multilingual, use it as the source
   if (data.name && !name_en && !name_ru && !name_am) {
@@ -31,8 +31,8 @@ function extractMultilingualFields(data: Record<string, unknown>) {
 
   // Same for descriptions
   let description_en = data.description_en as string | undefined;
-  let description_ru = data.description_ru as string | undefined;
-  let description_am = data.description_am as string | undefined;
+  const description_ru = data.description_ru as string | undefined;
+  const description_am = data.description_am as string | undefined;
 
   if (
     data.description &&
@@ -44,8 +44,8 @@ function extractMultilingualFields(data: Record<string, unknown>) {
   }
 
   let detailDescription_en = data.detailDescription_en as string | undefined;
-  let detailDescription_ru = data.detailDescription_ru as string | undefined;
-  let detailDescription_am = data.detailDescription_am as string | undefined;
+  const detailDescription_ru = data.detailDescription_ru as string | undefined;
+  const detailDescription_am = data.detailDescription_am as string | undefined;
 
   if (
     data.detailDescription &&
@@ -130,7 +130,7 @@ export async function createProductHandler(
   }
 
   // Extract and prepare multilingual fields
-  let multilingualFields = extractMultilingualFields(
+  const multilingualFields = extractMultilingualFields(
     data as Record<string, unknown>
   );
 
@@ -258,12 +258,15 @@ export async function createProductHandler(
       // Destructure to separate priceTiers and non-DB fields from product data
       const {
         priceTiers,
-        autoTranslate,
-        tagIds, // Separate from productData
-        // Remove legacy fields that are now handled via multilingual
-        name,
-        description,
-        detailDescription,
+        // The following are destructured purely to strip them from
+        // `productData` (the rest spread used in the create call). They
+        // are intentionally not consumed here.
+        autoTranslate: _autoTranslate,
+        tagIds: _tagIds,
+        // Legacy fields now handled via multilingual columns.
+        name: _name,
+        description: _description,
+        detailDescription: _detailDescription,
         ...productData
       } = data;
 

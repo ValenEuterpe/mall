@@ -46,7 +46,7 @@ const SearchSuggestionsDropdownContent = React.forwardRef<
       query,
       open,
       onSelect,
-      onClose,
+      onClose: _onClose,
     }: Props,
     ref
   ) => {

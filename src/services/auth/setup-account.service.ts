@@ -12,7 +12,6 @@ import type {
   SetupAccountRole,
   SetupErrorCode,
   InvitationValidation,
-  InvitationData,
 } from "@/types/auth";
 
 const config = AUTH_CONFIG.setupAccount;
@@ -232,7 +231,9 @@ export async function updateSetupLoginMetadata(
 export function sendSetupWelcomeEmail(
   email: string,
   displayName: string,
-  role: SetupAccountRole
+  // `role` is on the public signature but currently not branched on inside
+  // the function; the dashboard URL is hard-coded to the seller path below.
+  _role: SetupAccountRole
 ): void {
   if (!config.sendWelcomeEmail) {
     return;

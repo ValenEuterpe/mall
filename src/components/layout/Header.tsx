@@ -116,7 +116,7 @@ function SearchBar() {
   const handleSuggestionSelect = (
     kind: "product",
     id: string,
-    label: string
+    _label: string
   ) => {
     setDropdownOpen(false);
     setQuery("");

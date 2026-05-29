@@ -276,7 +276,7 @@ export function MapView({
 
           document.body.removeChild(measureLayer);
           return { content: processedContent, aspectRatio, pathIds };
-        } catch (e) {
+        } catch (_e) {
           // Fallback
           document.body.removeChild(measureLayer);
           svgEl.setAttribute("width", "100%");
@@ -556,7 +556,7 @@ export function MapView({
       });
 
       // Rotation Logic
-      setupHandle(".rotate-handle", (e) => {
+      setupHandle(".rotate-handle", (_e) => {
         const rect = wrapper.getBoundingClientRect();
         const cx = rect.left + rect.width / 2;
         const cy = rect.top + rect.height / 2;

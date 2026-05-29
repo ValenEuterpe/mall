@@ -2,7 +2,7 @@
 
 import React, { memo, useCallback, useState } from "react";
 import Image from "next/image";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Check, ExternalLink, ImageOff, MapPin, Package } from "lucide-react";
 
 import { Card, CardContent, CardFooter } from "@/components/ui/card";
@@ -142,18 +142,16 @@ export const ShopCard = memo(function ShopCard({
   showSellerInfo = true,
   className,
   priority = false,
-  onShopClick,
+  // Accepted from ShopGrid for API parity but currently not wired to any
+  // element — the card itself uses an inner <Link>. Prefixed to silence
+  // no-unused-vars without breaking the public prop surface.
+  onShopClick: _onShopClick,
 }: ShopCardProps) {
   const t = useTranslations("shops.card");
-  const locale = useLocale();
 
   const tCommon = useTranslations("common");
   const shopName = shop.shopName || formatShopLocation(shop.fullCode, tCommon);
   const sellerName = shop.seller?.businessName;
-
-  const handleCardClick = useCallback(() => {
-    onShopClick?.(shop);
-  }, [onShopClick, shop]);
 
   if (variant === "compact") {
     return (

@@ -27,7 +27,7 @@ export const shopUpdateSchema = z.object({
     shopName: z.string().min(2).optional(),
     description: z.string().optional(),
     imageUrl: z.string().optional(),
-    svgId: z.string().optional(),
+    svgId: z.string().optional().nullable(),
     shopTypeId: z.string().optional().nullable(),
     coordinates: z.object({ x: z.number(), y: z.number() }).optional(),
     openingHours: z.record(z.string(), z.string()).optional(),

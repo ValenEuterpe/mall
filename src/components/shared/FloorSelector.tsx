@@ -20,12 +20,14 @@ export const FloorSelector = memo(function FloorSelector({
   onChange,
   floorLabel = "Floor",
 }: FloorSelectorProps) {
-  if (floors.length <= 1) return null;
-
+  // Hook must run on every render — early-return below would otherwise
+  // violate react-hooks/rules-of-hooks.
   const currentIndex = useMemo(
     () => floors.findIndex((f) => f.floor === currentFloor),
     [floors, currentFloor]
   );
+
+  if (floors.length <= 1) return null;
 
   const currentFloorData = currentIndex >= 0 ? floors[currentIndex] : null;
   const canGoUp = currentIndex < floors.length - 1;

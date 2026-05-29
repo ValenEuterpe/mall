@@ -9,14 +9,27 @@
 
 const tsParser = require("@typescript-eslint/parser");
 const tsPlugin = require("@typescript-eslint/eslint-plugin");
+const reactHooks = require("eslint-plugin-react-hooks");
 
 module.exports = [
   {
+    // Globally-ignored paths. Mirrors tsconfig.json `exclude` for test files so
+    // lint and type-check agree on what counts as production code.
     ignores: [
       "**/.next/**",
       "**/node_modules/**",
       "**/prisma/generated/**",
       "**/tsconfig.tsbuildinfo",
+      // Stale worktrees from other agents — out-of-tree snapshots, not
+      // production source. Lint must not double-count them.
+      "**/.kilo/**",
+      // Tests and test infrastructure: excluded from tsc (tsconfig.json) and
+      // from lint for the same reason — different lifecycle, looser rules.
+      "**/*.test.ts",
+      "**/*.test.tsx",
+      "**/__tests__/**",
+      "src/test-utils/**",
+      "src/test-setup.ts",
     ],
   },
   {
@@ -35,17 +48,50 @@ module.exports = [
     },
     plugins: {
       "@typescript-eslint": tsPlugin,
+      "react-hooks": reactHooks,
     },
     rules: {
-      // Keep a small baseline without producing noisy warnings.
-      "prefer-const": "off",
+      // React hooks correctness. `rules-of-hooks` is non-negotiable — any
+      // violation is a runtime bug. `exhaustive-deps` stays at `warn` because
+      // it produces false positives on intentional one-shot effects; CI's
+      // lint gate exits 0 on warnings, so this surfaces hints without
+      // breaking the build. Mass-disabling is forbidden — review per site.
+      "react-hooks/rules-of-hooks": "error",
+      "react-hooks/exhaustive-deps": "warn",
 
-      // Unused-vars warnings are common in route files (method signatures) and
-      // service layers (feature-flagged code). We rely on TypeScript and reviews.
+      // `let` bindings that are never reassigned should be `const`. The
+      // auto-fixer handles this mechanically.
+      "prefer-const": "error",
+
+      // Unused symbols are a real code smell. We let the TS-aware variant
+      // handle this (the core rule double-flags TypeScript constructs) and
+      // allow the `_` prefix as an escape hatch for required-by-signature
+      // params (route handlers, event handlers) and intentionally-ignored
+      // catch bindings.
       "no-unused-vars": "off",
-      "@typescript-eslint/no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": [
+        "error",
+        {
+          argsIgnorePattern: "^_",
+          varsIgnorePattern: "^_",
+          caughtErrorsIgnorePattern: "^_",
+          destructuredArrayIgnorePattern: "^_",
+        },
+      ],
 
       "@typescript-eslint/no-explicit-any": "off",
+    },
+  },
+  {
+    // Prisma scripts (seed, backfills) are one-shot operational code with a
+    // different style budget than production source — iterative loops, ad-hoc
+    // variables, and intentionally unused imports during data shape exploration
+    // are normal here. Phases 1/2 keep their rules off for this scope.
+    files: ["prisma/**/*.ts"],
+    rules: {
+      "prefer-const": "off",
+      "no-unused-vars": "off",
+      "@typescript-eslint/no-unused-vars": "off",
     },
   },
 ];

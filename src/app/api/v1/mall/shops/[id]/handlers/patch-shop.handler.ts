@@ -24,7 +24,8 @@ export async function patchShopHandler(
 
     // Parse partial update
     const data = await validateBody(request, shopUpdateSchema.partial());
-    const { contacts, ...shopFields } = data;
+    // `contacts` is intentionally stripped from the rest spread (handled separately).
+    const { contacts: _contacts, ...shopFields } = data;
 
     // Perform update
     const updatedShop = await prisma.shop.update({

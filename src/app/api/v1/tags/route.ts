@@ -4,7 +4,7 @@ import { withMiddleware } from "@/lib/api/middleware";
 import { successResponse, createdResponse } from "@/lib/api/response";
 import prisma from "@/lib/db/prisma";
 import { buildTransliterations } from "@/lib/search/transliterate";
-import { translateText, isTranslationAvailable, type SupportedLocale } from "@/lib/translation";
+import { translateText, isTranslationAvailable } from "@/lib/translation";
 import { tagSellerCreateSchema } from "@/lib/validation/schemas/tag";
 import type { AuthenticatedUser } from "@/types/auth";
 

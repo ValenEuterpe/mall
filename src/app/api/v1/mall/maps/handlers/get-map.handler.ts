@@ -2,7 +2,6 @@ import { NextRequest } from "next/server";
 import prisma from "@/lib/db/prisma";
 import { successResponse } from "@/lib/api/response";
 
-import { mapQuerySchema } from "../schemas";
 import type { MapResponse } from "../types";
 import { buildShopWhereClause } from "../utils/build-shop-where-clause";
 import { transformShopForMap } from "../utils/transform-shop-for-map";
@@ -35,7 +34,7 @@ export async function getMapHandler(
 
   let svgUrl: string | null = null;
   let mapId: string | null = null;
-  let mapType: "building" | "venue" | null = null;
+  let _mapType: "building" | "venue" | null = null;
   let resolvedBuildingId: string | null = null;
   let resolvedBuildingCode: string | null = null;
   let buildingGeo: {
@@ -66,7 +65,7 @@ export async function getMapHandler(
       const floorMap = floor.floorMap!;
       svgUrl = floorMap.svgUrl;
       mapId = floorMap.id;
-      mapType = "building";
+      _mapType = "building";
       resolvedBuildingId = building.id;
       resolvedBuildingCode = building.code;
       // Use floor-level geo if available, fall back to building-level
@@ -87,7 +86,7 @@ export async function getMapHandler(
     if (venue && venue.svgUrl) {
       svgUrl = venue.svgUrl;
       mapId = venue.id;
-      mapType = "venue";
+      _mapType = "venue";
       // Capture venue geo-positioning for map display
       buildingGeo = {
         latitude: venue.latitude,
@@ -124,7 +123,7 @@ export async function getMapHandler(
       const floorMap = floor.floorMap!;
       svgUrl = floorMap.svgUrl;
       mapId = floorMap.id;
-      mapType = "building";
+      _mapType = "building";
       resolvedBuildingId = firstBuilding.id;
       resolvedBuildingCode = firstBuilding.code;
       // Use floor-level geo if available, fall back to building-level
@@ -143,7 +142,7 @@ export async function getMapHandler(
       if (firstVenue && firstVenue.svgUrl) {
         svgUrl = firstVenue.svgUrl;
         mapId = firstVenue.id;
-        mapType = "venue";
+        _mapType = "venue";
         buildingGeo = {
           latitude: firstVenue.latitude,
           longitude: firstVenue.longitude,

@@ -1,4 +1,3 @@
-import { NextRequest } from "next/server";
 import { withMiddleware } from "@/lib/api/middleware";
 import { listProductsHandler } from "./handlers/list-products.handler";
 import { createProductHandler } from "./handlers/create-product.handler";

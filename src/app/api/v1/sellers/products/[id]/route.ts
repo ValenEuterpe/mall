@@ -163,7 +163,7 @@ async function putHandler(
   const input = await validateBody(request, productUpdateSchema);
 
   let finalTagIds = input.tagIds;
-  let data = buildProductUpdateData(input);
+  const data = buildProductUpdateData(input);
 
   // AI Tagging if autoTranslate is requested
   if (input.autoTranslate && isTranslationAvailable()) {
@@ -210,7 +210,9 @@ async function putHandler(
     }
   }
 
-  const updated = await prisma.$transaction(async (tx) => {
+  // Transaction is awaited for its side effects (product + tag sync);
+  // the final response is built from a fresh re-fetch below.
+  await prisma.$transaction(async (tx) => {
     const p = await tx.product.update({
       where: { id },
       data,

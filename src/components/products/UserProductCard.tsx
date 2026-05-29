@@ -17,6 +17,7 @@ import {
 } from "@/components/ui/tooltip";
 import { cn } from "@/lib/utils";
 import { toast } from "@/lib/utils/toast";
+import { SalePriceDisplay } from "@/components/shared/SalePriceDisplay";
 import { useMapSelection } from "@/hooks/use-map-selection";
 import { useCart } from "@/hooks/use-cart";
 import { formatShopLocation } from "@/lib/utils/format-shop-location";
@@ -363,15 +364,6 @@ export const UserProductCard = memo(function UserProductCard({
     ]
   );
 
-  const handleShowDetailsClick = useCallback(
-    (e: React.MouseEvent) => {
-      e.preventDefault();
-      e.stopPropagation();
-      onShowDetails?.();
-    },
-    [onShowDetails]
-  );
-
   const formattedPrice = useMemo(
     () => formatPrice(Number(product.basePrice), locale),
     [product.basePrice, locale]
@@ -403,18 +395,11 @@ export const UserProductCard = memo(function UserProductCard({
               </h3>
               {showShopInfo && product.shop && <ShopInfo shop={product.shop} />}
             </div>
-            {formattedEffectivePrice ? (
-              <div className="flex items-baseline gap-1.5">
-                <p className="text-destructive font-bold">
-                  {formattedEffectivePrice}
-                </p>
-                <p className="text-muted-foreground text-xs line-through">
-                  {formattedPrice}
-                </p>
-              </div>
-            ) : (
-              <p className="text-primary font-bold">{formattedPrice}</p>
-            )}
+            <SalePriceDisplay
+              effectivePrice={formattedEffectivePrice ?? formattedPrice}
+              basePrice={formattedEffectivePrice ? formattedPrice : null}
+              size="sm"
+            />
           </div>
         </div>
       </Card>
@@ -508,18 +493,11 @@ export const UserProductCard = memo(function UserProductCard({
         )}
 
         <div className="mt-3 flex items-baseline justify-between">
-          {formattedEffectivePrice ? (
-            <div className="flex items-baseline gap-2">
-              <p className="text-destructive text-xl font-bold">
-                {formattedEffectivePrice}
-              </p>
-              <p className="text-muted-foreground text-sm line-through">
-                {formattedPrice}
-              </p>
-            </div>
-          ) : (
-            <p className="text-primary text-xl font-bold">{formattedPrice}</p>
-          )}
+          <SalePriceDisplay
+            effectivePrice={formattedEffectivePrice ?? formattedPrice}
+            basePrice={formattedEffectivePrice ? formattedPrice : null}
+            size="default"
+          />
         </div>
       </CardContent>
 

@@ -8,8 +8,10 @@ const priceTierSchema = z.object({
   price: z.number().positive("Price must be positive"),
 });
 
-// Multilingual text fields - at least one language required
-const multilingualTextSchema = z
+// The following multilingual schemas are kept for reference / potential use
+// by the create/update flows but are not currently referenced. Prefixed with
+// `_` so the lint rule treats them as intentionally retained.
+const _multilingualTextSchema = z
   .object({
     en: z.string().max(255).optional(),
     ru: z.string().max(255).optional(),
@@ -19,15 +21,13 @@ const multilingualTextSchema = z
     message: "At least one language is required",
   });
 
-// Multilingual description (longer text)
-const multilingualDescriptionSchema = z.object({
+const _multilingualDescriptionSchema = z.object({
   en: z.string().max(2000).optional(),
   ru: z.string().max(2000).optional(),
   am: z.string().max(2000).optional(),
 });
 
-// Multilingual detail description (very long text)
-const multilingualDetailDescriptionSchema = z.object({
+const _multilingualDetailDescriptionSchema = z.object({
   en: z.string().max(10000).optional(),
   ru: z.string().max(10000).optional(),
   am: z.string().max(10000).optional(),

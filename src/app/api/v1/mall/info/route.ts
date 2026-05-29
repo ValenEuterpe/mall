@@ -25,7 +25,7 @@ const updateMallSchema = createMallSchema.partial();
  * GET /api/v1/mall/info
  * Get mall information (assumes single mall for now)
  */
-async function getMallHandler(req: NextRequest): Promise<NextResponse> {
+async function getMallHandler(_req: NextRequest): Promise<NextResponse> {
   const mall = await prisma.mall.findFirst({
     include: {
       buildings: {

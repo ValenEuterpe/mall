@@ -1,4 +1,3 @@
-import { NextRequest } from "next/server";
 import { withMiddleware } from "@/lib/api/middleware";
 import { getMapHandler } from "./handlers/get-map.handler";
 import { postMapHandler } from "./handlers/post-map.handler";

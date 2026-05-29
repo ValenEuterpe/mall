@@ -8,7 +8,6 @@ import type {
   UserRole,
   SessionOwner,
   SessionWithRelations,
-  RefreshErrorCode,
 } from "@/types/auth";
 
 const config = AUTH_CONFIG.tokenRefresh;

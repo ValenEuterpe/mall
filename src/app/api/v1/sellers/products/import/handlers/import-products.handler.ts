@@ -12,7 +12,6 @@ import {
     MAX_FILE_SIZE,
     BATCH_SIZE
 } from "../constants";
-import { productRowSchema } from "../schemas";  // Referenced in validators, but imported here if needed
 import { validateProductRow } from "../validators";
 import { transformRowToProduct } from "../transforms";
 import { getSellerShop } from "../../queries/get-seller-shop";

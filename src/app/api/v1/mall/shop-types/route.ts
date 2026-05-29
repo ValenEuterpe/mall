@@ -5,7 +5,7 @@ import prisma from "@/lib/db/prisma";
 import { createShopTypeSchema } from "./schemas";
 
 async function listShopTypesHandler(
-  req: NextRequest
+  _req: NextRequest
 ): Promise<NextResponse> {
   const shopTypes = await prisma.shopType.findMany({
     orderBy: { sortOrder: "asc" },

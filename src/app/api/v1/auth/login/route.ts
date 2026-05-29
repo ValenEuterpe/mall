@@ -9,7 +9,7 @@ import { Prisma } from "@/prisma/generated/client";
 import { AUTH_CONFIG } from "@/lib/config/auth.config";
 
 // Types
-import type { UserLoginResponse, UserLoginErrorCode } from "@/types/auth";
+import type { UserLoginResponse } from "@/types/auth";
 
 // Utilities
 import { userLoginSchema } from "@/lib/validation/schemas/auth";

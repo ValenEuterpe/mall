@@ -26,7 +26,7 @@ const createBuildingSchema = z.object({
  * GET /api/v1/mall/buildings
  * List all buildings for the mall
  */
-async function listBuildingsHandler(req: NextRequest): Promise<NextResponse> {
+async function listBuildingsHandler(_req: NextRequest): Promise<NextResponse> {
   // Get the mall first
   const mall = await prisma.mall.findFirst();
   if (!mall) {

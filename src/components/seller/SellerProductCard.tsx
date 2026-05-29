@@ -14,7 +14,6 @@ import {
   Percent,
   ShoppingCart,
   Sparkles,
-  Trash2,
   CalendarIcon,
   X,
 } from "lucide-react";
@@ -56,7 +55,7 @@ import type {
   SellerProductCardData,
   ProductDiscountData,
 } from "@/types/product";
-import { formatPrice, getStockStatus } from "@/types/product";
+import { formatPrice } from "@/types/product";
 
 export interface SellerProductCardProps {
   product: SellerProductCardData;
@@ -297,11 +296,9 @@ export const SellerProductCard = memo(function SellerProductCard({
   });
   const [isSavingSale, setIsSavingSale] = useState(false);
   const [saleLangTab, setSaleLangTab] = useState<"en" | "ru" | "am">("en");
-  const [isTranslatingSale, setIsTranslatingSale] = useState(false);
   const [startDateOpen, setStartDateOpen] = useState(false);
   const [endDateOpen, setEndDateOpen] = useState(false);
 
-  const stockStatus = getStockStatus(localQuantity);
   const activeDiscounts = localDiscounts.filter((d) => d.isActive);
 
   const mutations = useSellerProductMutations({ productId: product.id });

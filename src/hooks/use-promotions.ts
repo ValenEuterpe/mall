@@ -243,7 +243,7 @@ export function usePromotions(): UsePromotionsReturn {
 
     if (p.length === 0) return;
 
-    let nextIndex = idx + 1;
+    const nextIndex = idx + 1;
 
     if (nextIndex >= p.length) {
       // Pool exhausted — refetch for a new shuffled set

@@ -18,7 +18,9 @@ interface CartSummaryProps {
 
 export function CartSummary({
   totalPrice,
-  itemCount,
+  // `itemCount` is in the public prop type but the summary currently
+  // displays `totalQuantity` instead; kept on the contract for callers.
+  itemCount: _itemCount,
   totalQuantity,
   locale,
 }: CartSummaryProps): React.ReactElement {

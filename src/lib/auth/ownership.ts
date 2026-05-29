@@ -216,7 +216,7 @@ export async function checkResourceOwnership<
     }
 
     return resource[ownerField] === user.userId;
-  } catch (error) {
+  } catch (_error) {
     return false;
   }
 }

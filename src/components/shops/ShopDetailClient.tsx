@@ -16,7 +16,7 @@ import { formatShopLocation } from "@/lib/utils/format-shop-location";
 import { Card, CardContent } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link, useRouter } from "@/i18n/routing";
+import { useRouter } from "@/i18n/routing";
 import { useIsMobile } from "@/hooks/use-media-query";
 import { useMultiMapData } from "@/hooks/use-multi-map-data";
 import type { BuildingOverlay } from "@/components/home/LeafletMapView";

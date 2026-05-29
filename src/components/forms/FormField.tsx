@@ -38,25 +38,6 @@ import { AlertCircle, Eye, EyeOff, HelpCircle } from "lucide-react";
 // Types
 // ============================================================================
 
-type FieldType =
-  | "text"
-  | "email"
-  | "password"
-  | "number"
-  | "tel"
-  | "url"
-  | "textarea"
-  | "select"
-  | "checkbox"
-  | "radio"
-  | "switch"
-  | "hidden"
-  | "date"
-  | "time"
-  | "datetime-local"
-  | "file"
-  | "color";
-
 interface SelectOption {
   value: string;
   label: string;
@@ -316,6 +297,12 @@ export function FormField(props: FormFieldProps) {
   const error = getNestedError(errors, name);
   const value = watch(name);
 
+  // Unconditional hook: only meaningful for password text inputs below, but
+  // React requires hooks to be called in the same order on every render —
+  // the text-input branch is taken conditionally, so the state must live up
+  // here at the top level. See react-hooks/rules-of-hooks.
+  const [showPassword, setShowPassword] = useState(false);
+
   // Hidden field - no wrapper.
   // Use `setValue` so we don't render a controlled <input> with both register + value.
   if (props.type === "hidden") {
@@ -367,7 +354,6 @@ export function FormField(props: FormFieldProps) {
       autoComplete,
     } = props as TextFieldProps;
 
-    const [showPassword, setShowPassword] = useState(false);
     const isPassword = type === "password";
     const inputType = isPassword ? (showPassword ? "text" : "password") : type;
 

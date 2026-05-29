@@ -79,7 +79,7 @@ export function ShopAssignmentPanel({
       } else {
         toast.error(t("loadFailed"));
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error(t("loadFailed"));
     } finally {
       setLoading(false);
@@ -111,7 +111,7 @@ export function ShopAssignmentPanel({
       } else {
         toast.error(t("assignFailed"));
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error(t("assignFailed"));
     }
   };

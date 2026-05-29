@@ -253,7 +253,7 @@ export function useCategory(
 } {
   const { enabled = true } = options;
 
-  const { categories, isLoading, error, getCategoryById, getCategoryByKey } = useCategories({
+  const { categories: _categories, isLoading, error, getCategoryById, getCategoryByKey } = useCategories({
     enabled: enabled && Boolean(idOrKey),
   });
 

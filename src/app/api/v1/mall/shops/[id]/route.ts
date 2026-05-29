@@ -1,4 +1,3 @@
-import { NextRequest } from "next/server";
 import { withMiddleware } from "@/lib/api/middleware";
 import { getShopHandler } from "./handlers/get-shop.handler";
 import { putShopHandler } from "./handlers/put-shop.handler";

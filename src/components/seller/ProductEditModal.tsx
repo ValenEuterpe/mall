@@ -2,7 +2,7 @@
 
 import React, { memo, useEffect, useState } from "react";
 import { useLocale, useTranslations } from "next-intl";
-import { ExternalLink, Loader2, ShoppingBag } from "lucide-react";
+import { ExternalLink, ShoppingBag } from "lucide-react";
 
 import {
   Dialog,

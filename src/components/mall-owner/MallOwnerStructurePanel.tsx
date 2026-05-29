@@ -5,7 +5,6 @@ import { useTranslations } from "next-intl";
 import {
   ChevronDown,
   ChevronRight,
-  ChevronUp,
   Building2,
   Layers,
   Store,
@@ -834,7 +833,9 @@ function ShopTypesSection({
   onEdit,
   onDelete,
   loading,
-  t,
+  // `t` is part of the prop contract but the section uses its own scoped
+  // `useTranslations("mallOwner.structure.shopTypes")` below.
+  t: _t,
 }: {
   shopTypes: ShopTypeData[];
   onAdd: () => void;
@@ -1533,7 +1534,7 @@ export function MallOwnerStructurePanel(): React.ReactElement {
       const res = await apiClient.get<any>("/mall/venues");
       const data = unwrapApiResponse<VenueData[]>(res);
       setVenues(data || []);
-    } catch (err) {
+    } catch (_err) {
       // Silently fail - venues may not exist yet (mall not configured)
       setVenues([]);
     }
@@ -1544,7 +1545,7 @@ export function MallOwnerStructurePanel(): React.ReactElement {
       const res = await apiClient.get<any>("/mall/sellers?limit=1000");
       const data = unwrapApiResponse<SellerListItem[]>(res);
       setSellers(data || []);
-    } catch (err) {
+    } catch (_err) {
       // Silently fail - sellers are optional for structure view
     }
   }, []);

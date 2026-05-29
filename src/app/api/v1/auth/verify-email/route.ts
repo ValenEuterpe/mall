@@ -173,8 +173,6 @@ export async function GET(
 export async function PUT(
     request: NextRequest
 ): Promise<NextResponse<ResendEmailResponse>> {
-    const clientIp = getClientIp(request);
-
     try {
         // 1. Parse and validate request body
         let body: unknown;

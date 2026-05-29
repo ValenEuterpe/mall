@@ -18,14 +18,14 @@ type CookieOptions = {
 export function getAccessTokenCookieOptions(): CookieOptions {
   return {
     ...cookieConfig.base,
-    maxAge: 15 * 60,
+    maxAge: 60 * 60, // 1 hour (increased from 15 min)
   };
 }
 
 export function getRefreshTokenCookieOptions(): CookieOptions {
   return {
     ...cookieConfig.base,
-    maxAge: 7 * 24 * 60 * 60,
+    maxAge: 30 * 24 * 60 * 60, // 30 days (increased from 7 days)
   };
 }
 

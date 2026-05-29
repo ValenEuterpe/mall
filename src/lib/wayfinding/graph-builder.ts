@@ -7,8 +7,6 @@
 
 import type {
   WayfindingData,
-  WayfindingVertex,
-  WayfindingEdge,
   NavigationGraph,
   NavigationVertex,
 } from "./types";

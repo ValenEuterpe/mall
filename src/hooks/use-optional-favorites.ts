@@ -19,7 +19,7 @@ export function useOptionalFavorites(): {
   const pathname = usePathname();
 
   const {
-    isFavorite: checkIsFavorite,
+    isFavorite: _checkIsFavorite,
     addFavorite,
     removeFavorite,
     productIds,

@@ -2,7 +2,7 @@ import { productRowSchema } from "./schemas";
 
 export function validateProductRow(
     row: Record<string, unknown>,
-    index: number
+    _index: number
 ): { valid: boolean; errors: string[] } {
     const errors: string[] = [];
 

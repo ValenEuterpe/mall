@@ -25,7 +25,7 @@ export const AUTH_CONFIG = {
   },
 
   session: {
-    expiryDuration: 60 * 60 * 24 * 7, // 7 days
+    expiryDuration: 60 * 60 * 24 * 30, // 30 days (increased from 7 days)
     extendOnActivity: true,
   },
 

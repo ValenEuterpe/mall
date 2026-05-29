@@ -3,7 +3,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { Prisma } from "@/prisma/generated/client";
 import { AUTH_CONFIG } from "@/lib/config/auth.config";
-import type { PasswordResetRequestResponse, AccountType } from "@/types/auth";
+import type { PasswordResetRequestResponse } from "@/types/auth";
 import { passwordResetRequestSchema } from "@/lib/validation/schemas/auth";
 import { normalizeEmail } from "@/lib/utils/email";
 import { getClientIp } from "@/lib/http/request";
@@ -14,7 +14,6 @@ import { methodNotAllowed } from "@/app/response";
 import {
     findFoundAccountByEmail,
     logPasswordResetRequestEvent,
-    checkAccountActiveForReset,
 } from "@/services";
 import {
     createPasswordResetRequestErrorResponse,

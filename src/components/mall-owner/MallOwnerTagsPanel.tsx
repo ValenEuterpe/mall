@@ -128,7 +128,7 @@ export function MallOwnerTagsPanel(): React.ReactElement {
       } else {
         toast.error(body.error?.message || t("fetchError"));
       }
-    } catch (err) {
+    } catch (_err) {
       toast.error(t("fetchError"));
     } finally {
       setLoading(false);
@@ -158,7 +158,7 @@ export function MallOwnerTagsPanel(): React.ReactElement {
       } else {
         toast.error(body.error?.message || t("createError"));
       }
-    } catch (err) {
+    } catch (_err) {
       toast.error(t("createError"));
     } finally {
       setSubmitting(false);
@@ -181,7 +181,7 @@ export function MallOwnerTagsPanel(): React.ReactElement {
       } else {
         toast.error(body.error?.message || t("updateError"));
       }
-    } catch (err) {
+    } catch (_err) {
       toast.error(t("updateError"));
     } finally {
       setSubmitting(false);
@@ -202,7 +202,7 @@ export function MallOwnerTagsPanel(): React.ReactElement {
       } else {
         toast.error(body.error?.message || t("deleteError"));
       }
-    } catch (err) {
+    } catch (_err) {
       toast.error(t("deleteError"));
     } finally {
       setSubmitting(false);
@@ -229,7 +229,7 @@ export function MallOwnerTagsPanel(): React.ReactElement {
       } else {
         toast.error(body.error?.message || t("seedError"));
       }
-    } catch (err) {
+    } catch (_err) {
       toast.error(t("seedError"));
     } finally {
       setSubmitting(false);

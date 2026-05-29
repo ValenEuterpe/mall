@@ -10,7 +10,6 @@ import {
   Instagram,
   Facebook,
   Send,
-  Loader2,
   Building2,
 } from "lucide-react";
 

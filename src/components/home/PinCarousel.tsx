@@ -2,7 +2,6 @@
 
 import React, { memo, useCallback, useEffect, useRef, useState } from "react";
 import Image from "next/image";
-import { useTranslations } from "next-intl";
 import { Store, X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -42,7 +41,6 @@ export const PinCarousel = memo(function PinCarousel({
   onRemoveProduct,
   onViewProduct,
 }: PinCarouselProps) {
-  const t = useTranslations("home.products");
   const [activeIndex, setActiveIndex] = useState(0);
   const scrollRef = useRef<HTMLDivElement>(null);
 

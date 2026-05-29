@@ -1,13 +1,6 @@
 "use client";
 
-import React, {
-  use,
-  useCallback,
-  useEffect,
-  useMemo,
-  useRef,
-  useState,
-} from "react";
+import React, { use, useCallback, useEffect, useMemo, useRef } from "react";
 import Image from "next/image";
 import { useLocale, useTranslations } from "next-intl";
 import {
@@ -26,12 +19,13 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { Skeleton } from "@/components/ui/skeleton";
-import { Link, useRouter } from "@/i18n/routing";
+import { Link } from "@/i18n/routing";
 import { useCart } from "@/hooks/use-cart";
 import type { CartProduct } from "@/lib/cart/types";
 import { toast } from "@/lib/utils/toast";
 import { cn } from "@/lib/utils";
 import { formatAmdPrice } from "@/lib/utils/price";
+import { SalePriceDisplay } from "@/components/shared/SalePriceDisplay";
 import {
   useProduct,
   useProducts,
@@ -62,7 +56,6 @@ export default function ProductDetailPage({
   const tProducts = useTranslations("products");
   const tHome = useTranslations("home");
   const locale = useLocale();
-  const router = useRouter();
 
   const { product, isLoading, error } = useProduct(id);
   const { addItem, isInCart } = useCart();
@@ -127,6 +120,11 @@ export default function ProductDetailPage({
   const formattedPrice = useMemo(() => {
     if (!product) return "";
     return formatAmdPrice(product.pricing.effectivePrice, locale);
+  }, [locale, product]);
+
+  const formattedBasePrice = useMemo(() => {
+    if (!product || !product.pricing.hasDiscount) return null;
+    return formatAmdPrice(product.pricing.basePrice, locale);
   }, [locale, product]);
 
   const categoryLabel = useMemo(() => {
@@ -476,9 +474,11 @@ export default function ProductDetailPage({
           </div>
 
           <div className="flex items-baseline gap-4">
-            <span className="text-primary text-2xl font-bold lg:text-4xl">
-              {formattedPrice}
-            </span>
+            <SalePriceDisplay
+              effectivePrice={formattedPrice}
+              basePrice={formattedBasePrice}
+              size="lg"
+            />
             {!inStock && <Badge variant="destructive">{t("outOfStock")}</Badge>}
           </div>
 

@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { Heart, ArrowLeft, Loader2 } from "lucide-react";
+import { Heart, ArrowLeft } from "lucide-react";
 
 import { Link } from "@/i18n/routing";
 import { useFavorites } from "@/hooks/use-favorites";

@@ -2,9 +2,8 @@
 
 import { NextRequest, NextResponse } from "next/server";
 import { ZodError } from "zod";
-import { AppError, RateLimitError, isAppError } from "./custom-errors";
+import { RateLimitError, isAppError } from "./custom-errors";
 import { logger } from "@/lib/utils/logger";
-import type { Prisma } from "@/prisma/generated/client";
 
 // ============================================================================
 // TYPES

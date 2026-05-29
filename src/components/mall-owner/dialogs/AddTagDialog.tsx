@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
-import { useLocale, useTranslations } from "next-intl";
+import { useTranslations } from "next-intl";
 import { Loader2, Sparkles, AlertCircle } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
@@ -42,8 +42,6 @@ interface AddTagDialogProps {
   categoryName: string;
 }
 
-type Locale = "en" | "ru" | "am";
-
 const cyrillic = /[Ѐ-ӿ]/;
 const armenian = /[԰-֏]/;
 const latin = /[a-zA-Z]/;
@@ -59,7 +57,6 @@ export function AddTagDialog({
   const t = useTranslations("mallOwner.tags");
   const sellerT = useTranslations("seller.productForm");
   const commonT = useTranslations("common");
-  const locale = useLocale() as Locale;
 
   const [nameEn, setNameEn] = useState("");
   const [nameRu, setNameRu] = useState("");

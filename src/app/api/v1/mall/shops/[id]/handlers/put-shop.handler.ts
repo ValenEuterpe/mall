@@ -26,7 +26,8 @@ export async function putShopHandler(
 
     // Validate and parse request body
     const data = await validateBody(request, shopUpdateSchema);
-    const { contacts, ...shopFields } = data;
+    // `contacts` is intentionally stripped from the rest spread (handled separately).
+    const { contacts: _contacts, ...shopFields } = data;
 
     // If fullCode is being changed, check for conflicts
     if (shopFields.fullCode && shopFields.fullCode !== existingShop.fullCode) {

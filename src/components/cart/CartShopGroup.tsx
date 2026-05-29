@@ -24,7 +24,9 @@ interface CartShopGroupProps {
 }
 
 export const CartShopGroup = memo(function CartShopGroup({
-  shopId,
+  // `shopId` is part of the prop contract (consumers pass it) but isn't
+  // currently consumed inside the row; kept on the type but unbound here.
+  shopId: _shopId,
   shopName,
   shopCode,
   items,

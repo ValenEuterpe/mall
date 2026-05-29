@@ -54,7 +54,9 @@ export function buildCalculatedRoute(
   graph: NavigationGraph,
   path: string[],
   totalDistance: number,
-  walkingSpeed: number = DEFAULT_WALKING_SPEED
+  // Currently unused — body uses a hard-coded `walkingSpeedMps` constant.
+  // Kept on the signature for source compatibility with callers.
+  _walkingSpeed: number = DEFAULT_WALKING_SPEED
 ): CalculatedRoute {
   if (path.length === 0) {
     return {

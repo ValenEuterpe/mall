@@ -3,7 +3,6 @@
 import React, { useCallback, useEffect, useMemo, useState } from "react";
 
 import { useTranslations } from "next-intl";
-import { useLocale } from "next-intl";
 import dynamic from "next/dynamic";
 import { formatDistanceToNow } from "date-fns";
 import { formatShopLocation } from "@/lib/utils/format-shop-location";
@@ -116,7 +115,6 @@ export function MallOwnerSellersPanel(): React.ReactElement {
 
   const toast = useToast();
   const router = useRouter();
-  const locale = useLocale();
 
   // Data state
   const [sellers, setSellers] = useState<SellerListItem[]>([]);
@@ -173,7 +171,7 @@ export function MallOwnerSellersPanel(): React.ReactElement {
     globalLoading,
     globalError,
     setFloorForBuilding,
-    allShopsBySvgId,
+    allShopsBySvgId: _allShopsBySvgId,
     allShopSvgIds,
   } = useMultiMapData({ includeVacant: true });
 

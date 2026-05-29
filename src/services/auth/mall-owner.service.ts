@@ -4,7 +4,7 @@ import prisma from "@/lib/db/prisma";
 import { AUTH_CONFIG } from "@/lib/config/auth.config";
 import { maskEmail } from "@/lib/utils/email";
 import { logger } from "@/lib/utils/logger";
-import type { MallOwnerInfo, MagicLinkErrorCode } from "@/types/auth";
+import type { MallOwnerInfo } from "@/types/auth";
 import { verifyMagicLinkToken, consumeMagicLinkToken } from "@/lib/auth/email";
 import { VerifyLoginErrorCode, MallOwnerRecord } from "@/types/auth";
 

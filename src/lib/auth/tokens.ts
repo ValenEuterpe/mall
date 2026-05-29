@@ -4,7 +4,7 @@ import jwt from "jsonwebtoken";
 import { nanoid } from "nanoid";
 import { env } from "@/env";
 import { AUTH_CONFIG } from "@/lib/config/auth.config";
-import type { AccessTokenPayload, RefreshTokenPayload, UserRole } from "@/types/auth";
+import type { AccessTokenPayload, RefreshTokenPayload } from "@/types/auth";
 
 const jwtConfig = AUTH_CONFIG.jwt;
 

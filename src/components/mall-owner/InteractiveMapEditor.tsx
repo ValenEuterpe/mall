@@ -9,7 +9,6 @@ import { Slider } from "@/components/ui/slider";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Card, CardContent, CardHeader } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
 import {
   Select,
   SelectContent,
@@ -85,18 +84,19 @@ interface ParsedShopId {
   shop: number;
 }
 
-// Dynamically import Map component (Leaflet requires window)
-const MapContainer = dynamic(
+// Dynamically import Map component (Leaflet requires window). Kept as `_`-prefixed
+// scaffolding for an in-progress map editor; not currently rendered.
+const _MapContainer = dynamic(
   () => import("react-leaflet").then((mod) => mod.MapContainer),
   { ssr: false }
 );
-const TileLayer = dynamic(
+const _TileLayer = dynamic(
   () => import("react-leaflet").then((mod) => mod.TileLayer),
   { ssr: false }
 );
 // Default mall location (Yerevan, Armenia - target market)
 const DEFAULT_CENTER: [number, number] = [40.1872, 44.5152];
-const DEFAULT_ZOOM = 17;
+const _DEFAULT_ZOOM = 17;
 
 export function InteractiveMapEditor() {
   const t = useTranslations("mapEditor");
@@ -165,7 +165,7 @@ export function InteractiveMapEditor() {
         setMall(data.data);
       }
       // Don't auto-open dialog - show inline prompt instead
-    } catch (error) {
+    } catch (_error) {
       toast.error(t("messages.loadFailed"));
     } finally {
       setLoading(false);
@@ -248,7 +248,7 @@ export function InteractiveMapEditor() {
       } else {
         toast.error(data.error?.message || t("messages.configFailed"));
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error(t("messages.configFailed"));
     }
   };
@@ -287,7 +287,7 @@ export function InteractiveMapEditor() {
         setSvgFile(null);
         setSvgContent("");
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error(t("messages.parseFailed"));
       setSvgFile(null);
       setSvgContent("");
@@ -323,7 +323,7 @@ export function InteractiveMapEditor() {
             data.error?.message || t("messages.updatePositionFailed")
           );
         }
-      } catch (error) {
+      } catch (_error) {
         toast.error(t("messages.updatePositionFailed"));
       }
     } else if (selectedBuilding) {
@@ -352,7 +352,7 @@ export function InteractiveMapEditor() {
             data.error?.message || t("messages.updatePositionFailed")
           );
         }
-      } catch (error) {
+      } catch (_error) {
         toast.error(t("messages.updatePositionFailed"));
       }
     } else if (selectedVenue) {
@@ -380,7 +380,7 @@ export function InteractiveMapEditor() {
             data.error?.message || t("messages.updatePositionFailed")
           );
         }
-      } catch (error) {
+      } catch (_error) {
         toast.error(t("messages.updatePositionFailed"));
       }
     }
@@ -643,7 +643,7 @@ export function InteractiveMapEditor() {
       } else {
         toast.error(t("shopAssignment.assignFailed"));
       }
-    } catch (error) {
+    } catch (_error) {
       toast.error(t("shopAssignment.assignFailed"));
     }
   };
@@ -1023,7 +1023,7 @@ export function InteractiveMapEditor() {
             <Card className="lg:col-span-2">
               <CardContent className="p-4">
                 {/* Map will be rendered here */}
-                <div className="mb-4 h-[500px] overflow-hidden rounded-lg border">
+                <div className="relative isolate mb-4 h-[500px] overflow-hidden rounded-lg border">
                   <MapView
                     center={
                       mall ? [mall.latitude, mall.longitude] : DEFAULT_CENTER

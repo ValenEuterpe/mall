@@ -5,7 +5,7 @@ import prisma from "@/lib/db/prisma";
 import { createCategorySchema } from "./schemas";
 
 async function listCategoriesAdminHandler(
-  req: NextRequest
+  _req: NextRequest
 ): Promise<NextResponse> {
   const categories = await prisma.category.findMany({
     orderBy: { key: "asc" },

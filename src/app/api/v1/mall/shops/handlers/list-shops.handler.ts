@@ -12,7 +12,6 @@ import {
     buildStableOrderBy,
 } from "@/lib/utils/search";
 import { paginatedResponse } from "@/lib/api/response";
-import { Prisma } from "@/prisma/generated/client";
 import { logger } from "@/lib/utils/logger";
 import { SEARCHABLE_FIELDS, SORTABLE_FIELDS, DEFAULT_SORT } from "../constants";
 import { SHOP_LIST_SELECT } from "../selects";
@@ -22,7 +21,10 @@ import { getSummaryStats } from "../queries/get-summary-stats";
 import { buildWhereClause } from "../utils/build-where-clause";
 
 export async function listShopsHandler(request: NextRequest): Promise<NextResponse> {
-    const user = requireAuth(request, ["MALL_OWNER"]);
+    // Auth is enforced here for its side effect (throws on unauthorized);
+    // the returned user object isn't needed because the handler operates on
+    // mall-scoped data, not user-scoped data.
+    requireAuth(request, ["MALL_OWNER"]);
     const { searchParams } = new URL(request.url);
 
     // Parse pagination

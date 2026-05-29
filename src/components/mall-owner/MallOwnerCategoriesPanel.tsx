@@ -509,7 +509,7 @@ export function MallOwnerCategoriesPanel(): React.ReactElement {
     }
   }, [deleteDialog, fetchCategories, t, toast]);
 
-  const handleEditSubSub = (item: SubSubcategoryData, parentId: string) => {
+  const handleEditSubSub = (item: SubSubcategoryData, _parentId: string) => {
     openEditDialog("subSubcategory", { ...item, icon: null });
   };
 

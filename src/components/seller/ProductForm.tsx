@@ -544,10 +544,10 @@ export function ProductForm({
       <form
         id="product-form"
         onSubmit={handleSubmit}
-        className="grid grid-cols-1 gap-8 lg:grid-cols-3"
+        className="grid grid-cols-1 gap-8 lg:grid-cols-2"
       >
-        {/* Main Content (Left Column) */}
-        <div className="space-y-8 lg:col-span-2">
+        {/* Identity & Content (Left Column) */}
+        <div className="space-y-8">
           {/* Basic Information */}
           <Card className="overflow-hidden border-none bg-white/50 shadow-md backdrop-blur-sm">
             <CardHeader className="bg-muted/30 border-b pb-4">
@@ -611,6 +611,78 @@ export function ProductForm({
             </CardContent>
           </Card>
 
+          {/* Category */}
+          <Card className="overflow-hidden border-none bg-white/50 shadow-md backdrop-blur-sm">
+            <CardHeader className="bg-muted/30 border-b pb-4">
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <Badge
+                  variant="outline"
+                  className="bg-primary shadow-primary/20 flex h-6 w-6 items-center justify-center rounded-full border-none p-0 text-white shadow-sm"
+                >
+                  2
+                </Badge>
+                {t("category")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-6 pt-6">
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold">
+                  {t("category")} <span className="text-destructive">*</span>
+                </Label>
+                <Select
+                  value={formData.categoryId}
+                  onValueChange={(value) => handleChange("categoryId", value)}
+                  disabled={categoriesLoading}
+                >
+                  <SelectTrigger
+                    className={cn(
+                      "h-11",
+                      errors.categoryId && "border-destructive"
+                    )}
+                  >
+                    <SelectValue placeholder={t("categoryPlaceholder")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {categories.map((category) => (
+                      <SelectItem key={category.id} value={category.id}>
+                        {category.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+                {errors.categoryId && (
+                  <p data-field-error className="text-destructive text-sm">
+                    {errors.categoryId}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <Label className="text-sm font-semibold">
+                  {t("subcategory")}
+                </Label>
+                <Select
+                  value={formData.subcategoryId}
+                  onValueChange={(value) =>
+                    handleChange("subcategoryId", value)
+                  }
+                  disabled={!formData.categoryId || subcategories.length === 0}
+                >
+                  <SelectTrigger className="h-11">
+                    <SelectValue placeholder={t("subcategoryPlaceholder")} />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {subcategories.map((subcategory) => (
+                      <SelectItem key={subcategory.id} value={subcategory.id}>
+                        {subcategory.name}
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
+              </div>
+            </CardContent>
+          </Card>
+
           {/* Translations */}
           <Card className="overflow-hidden border-none bg-white/50 shadow-md backdrop-blur-sm">
             <CardHeader className="bg-muted/30 flex flex-row items-center justify-between border-b pb-4">
@@ -619,7 +691,7 @@ export function ProductForm({
                   variant="outline"
                   className="bg-primary shadow-primary/20 flex h-6 w-6 items-center justify-center rounded-full border-none p-0 text-white shadow-sm"
                 >
-                  2
+                  3
                 </Badge>
                 <Globe className="text-primary h-5 w-5 animate-pulse" />
                 {t("translations")}
@@ -772,9 +844,74 @@ export function ProductForm({
               </Tabs>
             </CardContent>
           </Card>
+
+          {/* Images */}
+          <Card className="overflow-hidden border-none bg-white/50 shadow-md backdrop-blur-sm">
+            <CardHeader className="bg-muted/30 border-b pb-4">
+              <CardTitle className="flex items-center gap-2 text-xl">
+                <Badge
+                  variant="outline"
+                  className="bg-primary shadow-primary/20 flex h-6 w-6 items-center justify-center rounded-full border-none p-0 text-white shadow-sm"
+                >
+                  4
+                </Badge>
+                <ImagePlus className="text-primary h-5 w-5" />
+                {t("images")}
+              </CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4 pt-6">
+              <div className="grid grid-cols-3 gap-2">
+                {formData.images.map((url, index) => (
+                  <div
+                    key={index}
+                    className="group relative aspect-square overflow-hidden rounded-xl border bg-white shadow-sm"
+                  >
+                    <img
+                      src={url}
+                      alt={`Image ${index + 1}`}
+                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
+                    />
+                    <button
+                      type="button"
+                      onClick={() => handleRemoveImage(index)}
+                      className="bg-destructive/90 absolute top-1 right-1 rounded-full p-1 text-white opacity-100 md:opacity-0 md:transition-opacity md:group-hover:opacity-100"
+                    >
+                      <X className="h-3.5 w-3.5" />
+                    </button>
+                  </div>
+                ))}
+
+                {formData.images.length < 5 && (
+                  <label className="border-primary/20 bg-muted/30 hover:bg-primary/5 hover:border-primary/50 group flex aspect-square cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all">
+                    <input
+                      type="file"
+                      accept="image/*"
+                      multiple
+                      onChange={handleImageUpload}
+                      disabled={isUploading}
+                      className="hidden"
+                    />
+                    {isUploading ? (
+                      <Loader2 className="text-primary h-6 w-6 animate-spin" />
+                    ) : (
+                      <div className="flex flex-col items-center gap-1 transition-transform group-hover:scale-110">
+                        <ImagePlus className="text-primary/60 h-6 w-6" />
+                        <span className="text-primary/60 text-[10px] font-bold uppercase">
+                          {formData.images.length}/5
+                        </span>
+                      </div>
+                    )}
+                  </label>
+                )}
+              </div>
+              <p className="text-muted-foreground animate-pulse text-center text-[10px]">
+                {t("imagesHelp")}
+              </p>
+            </CardContent>
+          </Card>
         </div>
 
-        {/* Sidebar Actions (Right Column) */}
+        {/* Details & Settings (Right Column) */}
         <div className="space-y-8">
           {/* Pricing & Stock Card */}
           <Card className="overflow-hidden border-none bg-white/50 shadow-md backdrop-blur-sm">
@@ -784,7 +921,7 @@ export function ProductForm({
                   variant="outline"
                   className="bg-primary shadow-primary/20 flex h-6 w-6 items-center justify-center rounded-full border-none p-0 text-white shadow-sm"
                 >
-                  3
+                  5
                 </Badge>
                 {t("pricing")}
               </CardTitle>
@@ -857,7 +994,7 @@ export function ProductForm({
                   variant="outline"
                   className="bg-primary shadow-primary/20 flex h-6 w-6 items-center justify-center rounded-full border-none p-0 text-white shadow-sm"
                 >
-                  4
+                  6
                 </Badge>
                 {t("identifiers")}
               </CardTitle>
@@ -893,78 +1030,6 @@ export function ProductForm({
             </CardContent>
           </Card>
 
-          {/* Category Card */}
-          <Card className="overflow-hidden border-none bg-white/50 shadow-md backdrop-blur-sm">
-            <CardHeader className="bg-muted/30 border-b pb-4">
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <Badge
-                  variant="outline"
-                  className="bg-primary shadow-primary/20 flex h-6 w-6 items-center justify-center rounded-full border-none p-0 text-white shadow-sm"
-                >
-                  5
-                </Badge>
-                {t("category")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-6 pt-6">
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold">
-                  {t("category")} <span className="text-destructive">*</span>
-                </Label>
-                <Select
-                  value={formData.categoryId}
-                  onValueChange={(value) => handleChange("categoryId", value)}
-                  disabled={categoriesLoading}
-                >
-                  <SelectTrigger
-                    className={cn(
-                      "h-11",
-                      errors.categoryId && "border-destructive"
-                    )}
-                  >
-                    <SelectValue placeholder={t("categoryPlaceholder")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {categories.map((category) => (
-                      <SelectItem key={category.id} value={category.id}>
-                        {category.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-                {errors.categoryId && (
-                  <p data-field-error className="text-destructive text-sm">
-                    {errors.categoryId}
-                  </p>
-                )}
-              </div>
-
-              <div className="space-y-2">
-                <Label className="text-sm font-semibold">
-                  {t("subcategory")}
-                </Label>
-                <Select
-                  value={formData.subcategoryId}
-                  onValueChange={(value) =>
-                    handleChange("subcategoryId", value)
-                  }
-                  disabled={!formData.categoryId || subcategories.length === 0}
-                >
-                  <SelectTrigger className="h-11">
-                    <SelectValue placeholder={t("subcategoryPlaceholder")} />
-                  </SelectTrigger>
-                  <SelectContent>
-                    {subcategories.map((subcategory) => (
-                      <SelectItem key={subcategory.id} value={subcategory.id}>
-                        {subcategory.name}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
-              </div>
-            </CardContent>
-          </Card>
-
           {/* Tags Card */}
           <Card className="overflow-hidden border-none bg-white/50 shadow-md backdrop-blur-sm">
             <CardHeader className="bg-muted/30 border-b pb-4">
@@ -973,7 +1038,7 @@ export function ProductForm({
                   variant="outline"
                   className="bg-primary shadow-primary/20 flex h-6 w-6 items-center justify-center rounded-full border-none p-0 text-white shadow-sm"
                 >
-                  6
+                  7
                 </Badge>
                 <TagIcon className="text-primary h-5 w-5" />
                 {t("tags")}
@@ -1046,71 +1111,6 @@ export function ProductForm({
                   {t("aiTaggingTip")}
                 </p>
               </div>
-            </CardContent>
-          </Card>
-
-          {/* Images Card */}
-          <Card className="overflow-hidden border-none bg-white/50 shadow-md backdrop-blur-sm">
-            <CardHeader className="bg-muted/30 border-b pb-4">
-              <CardTitle className="flex items-center gap-2 text-xl">
-                <Badge
-                  variant="outline"
-                  className="bg-primary shadow-primary/20 flex h-6 w-6 items-center justify-center rounded-full border-none p-0 text-white shadow-sm"
-                >
-                  7
-                </Badge>
-                <ImagePlus className="text-primary h-5 w-5" />
-                {t("images")}
-              </CardTitle>
-            </CardHeader>
-            <CardContent className="space-y-4 pt-6">
-              <div className="grid grid-cols-3 gap-2">
-                {formData.images.map((url, index) => (
-                  <div
-                    key={index}
-                    className="group relative aspect-square overflow-hidden rounded-xl border bg-white shadow-sm"
-                  >
-                    <img
-                      src={url}
-                      alt={`Image ${index + 1}`}
-                      className="h-full w-full object-cover transition-transform duration-500 group-hover:scale-110"
-                    />
-                    <button
-                      type="button"
-                      onClick={() => handleRemoveImage(index)}
-                      className="bg-destructive/90 absolute top-1 right-1 rounded-full p-1 text-white opacity-100 md:opacity-0 md:transition-opacity md:group-hover:opacity-100"
-                    >
-                      <X className="h-3.5 w-3.5" />
-                    </button>
-                  </div>
-                ))}
-
-                {formData.images.length < 5 && (
-                  <label className="border-primary/20 bg-muted/30 hover:bg-primary/5 hover:border-primary/50 group flex aspect-square cursor-pointer flex-col items-center justify-center rounded-xl border-2 border-dashed transition-all">
-                    <input
-                      type="file"
-                      accept="image/*"
-                      multiple
-                      onChange={handleImageUpload}
-                      disabled={isUploading}
-                      className="hidden"
-                    />
-                    {isUploading ? (
-                      <Loader2 className="text-primary h-6 w-6 animate-spin" />
-                    ) : (
-                      <div className="flex flex-col items-center gap-1 transition-transform group-hover:scale-110">
-                        <ImagePlus className="text-primary/60 h-6 w-6" />
-                        <span className="text-primary/60 text-[10px] font-bold uppercase">
-                          {formData.images.length}/5
-                        </span>
-                      </div>
-                    )}
-                  </label>
-                )}
-              </div>
-              <p className="text-muted-foreground animate-pulse text-center text-[10px]">
-                {t("imagesHelp")}
-              </p>
             </CardContent>
           </Card>
 

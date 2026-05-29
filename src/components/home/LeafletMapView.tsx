@@ -1,6 +1,6 @@
 "use client";
 
-import { memo, useEffect, useRef, useCallback, useState } from "react";
+import { memo, useEffect, useRef, useState } from "react";
 import { useTranslations } from "next-intl";
 import L from "leaflet";
 import "leaflet/dist/leaflet.css";
