@@ -25,12 +25,12 @@ export function FieldGroup({
       {(title || description) && (
         <div className="space-y-1">
           {title && (
-            <legend className="text-lg font-semibold leading-none tracking-tight">
+            <legend className="text-lg leading-none font-semibold tracking-tight">
               {title}
             </legend>
           )}
           {description && (
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <p className="text-muted-foreground text-sm">{description}</p>
           )}
         </div>
       )}
@@ -106,19 +106,19 @@ export function FieldSection({
     <div
       className={cn(
         "space-y-6",
-        bordered && "rounded-lg border bg-card p-6",
+        bordered && "bg-card rounded-lg border p-6",
         className
       )}
     >
       {(title || description) && (
         <div className="space-y-1">
           {title && (
-            <h3 className="text-lg font-semibold leading-none tracking-tight">
+            <h3 className="text-lg leading-none font-semibold tracking-tight">
               {title}
             </h3>
           )}
           {description && (
-            <p className="text-sm text-muted-foreground">{description}</p>
+            <p className="text-muted-foreground text-sm">{description}</p>
           )}
         </div>
       )}
@@ -157,7 +157,7 @@ export function FormActions({
         "flex items-center gap-3 pt-6",
         alignClass[align],
         sticky &&
-          "sticky bottom-0 -mx-6 mt-6 border-t bg-background/95 py-4 px-6 backdrop-blur supports-[backdrop-filter]:bg-background/60",
+          "bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky bottom-0 -mx-6 mt-6 border-t px-6 py-4 backdrop-blur",
         className
       )}
     >

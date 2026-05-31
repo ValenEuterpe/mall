@@ -24,7 +24,14 @@ import { useRouter } from "@/i18n/routing";
 import { apiClient, ApiClientError } from "@/lib/api-client";
 import { toast } from "@/lib/utils/toast";
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -35,7 +42,14 @@ import { cn } from "@/lib/utils";
 
 import type { UserRole } from "@/types/auth";
 
-type PageState = "validating" | "ready" | "submitting" | "success" | "expired" | "invalid" | "error";
+type PageState =
+  | "validating"
+  | "ready"
+  | "submitting"
+  | "success"
+  | "expired"
+  | "invalid"
+  | "error";
 
 const REDIRECT_DELAY_SECONDS = 3;
 const PASSWORD_MIN_LENGTH = 8;
@@ -83,14 +97,14 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
     return (
       <div className="relative">
         <Lock
-          className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+          className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
           aria-hidden="true"
         />
         <Input
           ref={ref}
           type={showPassword ? "text" : "password"}
           className={cn(
-            "pl-10 pr-10",
+            "pr-10 pl-10",
             error && "border-destructive focus-visible:ring-destructive",
             className
           )}
@@ -100,15 +114,15 @@ const PasswordInput = React.forwardRef<HTMLInputElement, PasswordInputProps>(
           type="button"
           variant="ghost"
           size="sm"
-          className="absolute right-0 top-0 h-full px-3 py-2 hover:bg-transparent"
+          className="absolute top-0 right-0 h-full px-3 py-2 hover:bg-transparent"
           onClick={() => setShowPassword((prev) => !prev)}
           aria-label={showPassword ? t("hidePassword") : t("showPassword")}
           tabIndex={-1}
         >
           {showPassword ? (
-            <EyeOff className="h-4 w-4 text-muted-foreground" />
+            <EyeOff className="text-muted-foreground h-4 w-4" />
           ) : (
-            <Eye className="h-4 w-4 text-muted-foreground" />
+            <Eye className="text-muted-foreground h-4 w-4" />
           )}
         </Button>
       </div>
@@ -164,10 +178,10 @@ function SuccessView({
         </div>
 
         <h2 className="mb-2 text-2xl font-bold">{t("successTitle")}</h2>
-        <p className="mb-6 text-muted-foreground">{t("successSubtitle")}</p>
+        <p className="text-muted-foreground mb-6">{t("successSubtitle")}</p>
 
         {redirectCountdown > 0 ? (
-          <div className="flex items-center gap-2 text-sm text-muted-foreground">
+          <div className="text-muted-foreground flex items-center gap-2 text-sm">
             <Loader2 className="h-4 w-4 animate-spin" />
             {t("redirectCountdown", { seconds: redirectCountdown })}
           </div>
@@ -181,7 +195,7 @@ function SuccessView({
         {redirectCountdown > 0 && (
           <button
             onClick={onGoToLogin}
-            className="mt-4 text-sm text-muted-foreground underline-offset-4 hover:underline"
+            className="text-muted-foreground mt-4 text-sm underline-offset-4 hover:underline"
           >
             {t("skipCountdown")}
           </button>
@@ -228,12 +242,17 @@ function ErrorView({
   return (
     <Card className="w-full">
       <CardContent className="flex flex-col items-center justify-center py-12 text-center">
-        <div className={cn("mb-6 flex h-20 w-20 items-center justify-center rounded-full", config.iconBg)}>
+        <div
+          className={cn(
+            "mb-6 flex h-20 w-20 items-center justify-center rounded-full",
+            config.iconBg
+          )}
+        >
           <Icon className={cn("h-10 w-10", config.iconColor)} />
         </div>
 
         <h2 className="mb-2 text-2xl font-bold">{config.title}</h2>
-        <p className="mb-6 max-w-sm text-muted-foreground">{message}</p>
+        <p className="text-muted-foreground mb-6 max-w-sm">{message}</p>
 
         <Button onClick={onRequestNew} className="gap-2">
           {t("requestNew")}
@@ -244,16 +263,35 @@ function ErrorView({
   );
 }
 
-function PasswordStrength({ password }: { password: string }): React.ReactElement | null {
+function PasswordStrength({
+  password,
+}: {
+  password: string;
+}): React.ReactElement | null {
   const t = useTranslations("auth.resetPasswordConfirm");
 
   const requirements = useMemo(
     () => [
       { key: "length", label: t("reqLength"), regex: /.{8,}/, required: true },
-      { key: "uppercase", label: t("reqUppercase"), regex: /[A-Z]/, required: true },
-      { key: "lowercase", label: t("reqLowercase"), regex: /[a-z]/, required: true },
+      {
+        key: "uppercase",
+        label: t("reqUppercase"),
+        regex: /[A-Z]/,
+        required: true,
+      },
+      {
+        key: "lowercase",
+        label: t("reqLowercase"),
+        regex: /[a-z]/,
+        required: true,
+      },
       { key: "number", label: t("reqNumber"), regex: /[0-9]/, required: true },
-      { key: "special", label: t("reqSpecial"), regex: /[!@#$%^&*(),.?\":{}|<>]/, required: false },
+      {
+        key: "special",
+        label: t("reqSpecial"),
+        regex: /[!@#$%^&*(),.?\":{}|<>]/,
+        required: false,
+      },
     ],
     [t]
   );
@@ -308,7 +346,11 @@ function PasswordStrength({ password }: { password: string }): React.ReactElemen
               req.met ? "text-green-600" : "text-muted-foreground"
             )}
           >
-            {req.met ? <Check className="h-3 w-3 flex-shrink-0" /> : <X className="h-3 w-3 flex-shrink-0" />}
+            {req.met ? (
+              <Check className="h-3 w-3 flex-shrink-0" />
+            ) : (
+              <X className="h-3 w-3 flex-shrink-0" />
+            )}
             <span>
               {req.label}
               {!req.required ? ` (${t("recommended")})` : ""}
@@ -348,7 +390,11 @@ export default function ResetPasswordConfirmPage(): React.ReactElement {
     mode: "onBlur",
   });
 
-  const watchedPassword = useWatch({ control, name: "password", defaultValue: "" });
+  const watchedPassword = useWatch({
+    control,
+    name: "password",
+    defaultValue: "",
+  });
 
   const validateToken = useCallback(async () => {
     if (!token) {
@@ -382,7 +428,10 @@ export default function ResetPasswordConfirmPage(): React.ReactElement {
       if (apiError.code === "TOKEN_EXPIRED") {
         setPageState("expired");
         setError(t("expiredMessage"));
-      } else if (apiError.code === "INVALID_TOKEN" || apiError.code === "TOKEN_NOT_FOUND") {
+      } else if (
+        apiError.code === "INVALID_TOKEN" ||
+        apiError.code === "TOKEN_NOT_FOUND"
+      ) {
         setPageState("invalid");
         setError(t("invalidMessage"));
       } else {
@@ -404,7 +453,10 @@ export default function ResetPasswordConfirmPage(): React.ReactElement {
       return;
     }
 
-    const timer = setTimeout(() => setRedirectCountdown((prev) => prev - 1), 1000);
+    const timer = setTimeout(
+      () => setRedirectCountdown((prev) => prev - 1),
+      1000
+    );
     return () => clearTimeout(timer);
   }, [pageState, redirectCountdown, router]);
 
@@ -418,7 +470,11 @@ export default function ResetPasswordConfirmPage(): React.ReactElement {
       try {
         const response = await apiClient.post<ResetConfirmSuccessData>(
           "/auth/reset-password/confirm",
-          { token, password: data.password, confirmPassword: data.confirmPassword },
+          {
+            token,
+            password: data.password,
+            confirmPassword: data.confirmPassword,
+          },
           { showErrorToast: false }
         );
 
@@ -465,11 +521,22 @@ export default function ResetPasswordConfirmPage(): React.ReactElement {
   if (pageState === "validating") return <FormSkeleton />;
 
   if (pageState === "success") {
-    return <SuccessView redirectCountdown={redirectCountdown} onGoToLogin={goToLogin} />;
+    return (
+      <SuccessView
+        redirectCountdown={redirectCountdown}
+        onGoToLogin={goToLogin}
+      />
+    );
   }
 
   if (pageState === "expired" || pageState === "invalid") {
-    return <ErrorView type={pageState} message={error || t("errorMessage")} onRequestNew={requestNew} />;
+    return (
+      <ErrorView
+        type={pageState}
+        message={error || t("errorMessage")}
+        onRequestNew={requestNew}
+      />
+    );
   }
 
   const isSubmitting = pageState === "submitting";
@@ -478,15 +545,17 @@ export default function ResetPasswordConfirmPage(): React.ReactElement {
     <Card className="w-full">
       <CardHeader className="space-y-4">
         <div className="flex justify-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-            <ShieldCheck className="h-7 w-7 text-primary" />
+          <div className="bg-primary/10 flex h-14 w-14 items-center justify-center rounded-full">
+            <ShieldCheck className="text-primary h-7 w-7" />
           </div>
         </div>
 
         <div className="space-y-1 text-center">
           <CardTitle className="text-2xl">{t("title")}</CardTitle>
           <CardDescription>
-            {userEmail ? t("subtitleWithEmail", { email: userEmail }) : t("subtitle")}
+            {userEmail
+              ? t("subtitleWithEmail", { email: userEmail })
+              : t("subtitle")}
           </CardDescription>
         </div>
       </CardHeader>
@@ -513,7 +582,7 @@ export default function ResetPasswordConfirmPage(): React.ReactElement {
               {...register("password")}
             />
             {errors.password && (
-              <p className="flex items-center gap-1 text-sm text-destructive">
+              <p className="text-destructive flex items-center gap-1 text-sm">
                 <AlertCircle className="h-3 w-3" />
                 {errors.password.message}
               </p>
@@ -523,7 +592,8 @@ export default function ResetPasswordConfirmPage(): React.ReactElement {
 
           <div className="space-y-2">
             <Label htmlFor="confirm-new-password">
-              {t("confirmNewPassword")} <span className="text-destructive">*</span>
+              {t("confirmNewPassword")}{" "}
+              <span className="text-destructive">*</span>
             </Label>
             <PasswordInput
               id="confirm-new-password"
@@ -534,7 +604,7 @@ export default function ResetPasswordConfirmPage(): React.ReactElement {
               {...register("confirmPassword")}
             />
             {errors.confirmPassword && (
-              <p className="flex items-center gap-1 text-sm text-destructive">
+              <p className="text-destructive flex items-center gap-1 text-sm">
                 <AlertCircle className="h-3 w-3" />
                 {errors.confirmPassword.message}
               </p>
@@ -543,7 +613,12 @@ export default function ResetPasswordConfirmPage(): React.ReactElement {
         </CardContent>
 
         <CardFooter>
-          <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="w-full"
+            size="lg"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />

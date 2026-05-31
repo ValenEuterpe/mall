@@ -12,7 +12,10 @@ interface UseApiState<T> {
   isError: boolean;
 }
 
-interface UseApiOptions<T> extends Omit<RequestConfig, "signal" | "params" | "body" | "method"> {
+interface UseApiOptions<T> extends Omit<
+  RequestConfig,
+  "signal" | "params" | "body" | "method"
+> {
   immediate?: boolean;
   initialData?: T | null;
   cacheKey?: string;
@@ -28,8 +31,10 @@ interface UseApiReturn<T> extends UseApiState<T> {
   abort: () => void;
 }
 
-interface UseMutationOptions<TData, TVariables>
-  extends Omit<RequestConfig, "signal" | "body" | "params" | "method"> {
+interface UseMutationOptions<TData, TVariables> extends Omit<
+  RequestConfig,
+  "signal" | "body" | "params" | "method"
+> {
   onSuccess?: (data: TData, variables: TVariables) => void;
   onError?: (error: ApiClientError, variables: TVariables) => void;
   onSettled?: (
@@ -165,7 +170,16 @@ export function useApi<T>(
 
       return null;
     }
-  }, [endpoint, paramsKey, cacheKey, cacheTime, onSuccess, onError, onSettled, requestConfig]);
+  }, [
+    endpoint,
+    paramsKey,
+    cacheKey,
+    cacheTime,
+    onSuccess,
+    onError,
+    onSettled,
+    requestConfig,
+  ]);
 
   const reset = useCallback(() => {
     abortControllerRef.current?.abort();

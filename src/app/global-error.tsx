@@ -30,11 +30,11 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
   return (
     <html lang="en">
       <body>
-        <div className="flex min-h-screen items-center justify-center bg-background p-4">
+        <div className="bg-background flex min-h-screen items-center justify-center p-4">
           <Card className="w-full max-w-lg shadow-xl">
             <CardHeader className="space-y-2 text-center">
-              <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
-                <AlertTriangle className="h-8 w-8 text-destructive" />
+              <div className="bg-destructive/10 mx-auto flex h-16 w-16 items-center justify-center rounded-full">
+                <AlertTriangle className="text-destructive h-8 w-8" />
               </div>
               <CardTitle className="text-2xl">Application Error</CardTitle>
               <CardDescription>
@@ -45,15 +45,15 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
             <CardContent className="space-y-4">
               {error.digest && (
                 <div className="text-center">
-                  <p className="text-xs text-muted-foreground">
+                  <p className="text-muted-foreground text-xs">
                     Error Reference: {error.digest}
                   </p>
                 </div>
               )}
 
               {process.env.NODE_ENV === "development" && (
-                <div className="rounded-md bg-muted p-4">
-                  <pre className="max-h-32 overflow-auto text-xs text-destructive">
+                <div className="bg-muted rounded-md p-4">
+                  <pre className="text-destructive max-h-32 overflow-auto text-xs">
                     {error.message}
                   </pre>
                 </div>
@@ -65,7 +65,11 @@ export default function GlobalError({ error, reset }: GlobalErrorProps) {
                 <RefreshCw className="mr-2 h-4 w-4" />
                 Try Again
               </Button>
-              <Button variant="outline" size="lg" onClick={() => (window.location.href = "/")}>
+              <Button
+                variant="outline"
+                size="lg"
+                onClick={() => (window.location.href = "/")}
+              >
                 <Home className="mr-2 h-4 w-4" />
                 Go Home
               </Button>

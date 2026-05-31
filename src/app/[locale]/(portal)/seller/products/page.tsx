@@ -332,9 +332,7 @@ export default function SellerProductsPage(): React.ReactElement {
         }
         onDeleted={(deletedId) => {
           setItems((prev) => prev.filter((p) => p.id !== deletedId));
-          setMeta((prev) =>
-            prev ? { ...prev, total: prev.total - 1 } : null
-          );
+          setMeta((prev) => (prev ? { ...prev, total: prev.total - 1 } : null));
           setProductToDelete(null);
         }}
       />

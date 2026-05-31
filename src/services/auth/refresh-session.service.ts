@@ -162,7 +162,10 @@ async function handleTokenReuseAttack(
   userId: string,
   role: UserRole
 ): Promise<void> {
-  logger.error("Token reuse detected, invalidating all sessions", { role, userId });
+  logger.error("Token reuse detected, invalidating all sessions", {
+    role,
+    userId,
+  });
 
   const roleFieldMap: Record<UserRole, string> = {
     USER: "userId",

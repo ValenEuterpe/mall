@@ -79,9 +79,7 @@ export const CartShopGroup = memo(function CartShopGroup({
           <span className="text-muted-foreground text-sm">
             {t("shopSubtotal")}
           </span>
-          <span className="font-semibold">
-            {formatPrice(subtotal, locale)}
-          </span>
+          <span className="font-semibold">{formatPrice(subtotal, locale)}</span>
         </div>
       </CardContent>
     </Card>

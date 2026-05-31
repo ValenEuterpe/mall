@@ -18,8 +18,8 @@ import {
 const LocationPickerMap = dynamic(() => import("./LocationPickerMap"), {
   ssr: false,
   loading: () => (
-    <div className="w-full h-[300px] bg-muted rounded-lg flex items-center justify-center">
-      <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+    <div className="bg-muted flex h-[300px] w-full items-center justify-center rounded-lg">
+      <div className="border-primary h-6 w-6 animate-spin rounded-full border-b-2"></div>
     </div>
   ),
 });
@@ -42,7 +42,7 @@ export function MallSetupDialog({
 }: MallSetupDialogProps) {
   const t = useTranslations("mapEditor.dialogs.mallSetup");
   const commonT = useTranslations("common");
-  
+
   const [name, setName] = useState("");
   const [position, setPosition] = useState<{ lat: number; lng: number }>({
     lat: defaultCenter[0],
@@ -83,20 +83,23 @@ export function MallSetupDialog({
               required
             />
           </div>
-          
+
           <div>
             <Label>{t("locationLabel")}</Label>
-            <p className="text-sm text-muted-foreground mb-2">
+            <p className="text-muted-foreground mb-2 text-sm">
               {t("locationHelp")}
             </p>
-            <div className="rounded-lg overflow-hidden border">
+            <div className="overflow-hidden rounded-lg border">
               <LocationPickerMap
                 position={position}
                 onPositionChange={setPosition}
               />
             </div>
-            <p className="text-xs text-muted-foreground mt-1">
-              {t("selectedCoords", { lat: position.lat.toFixed(6), lng: position.lng.toFixed(6) })}
+            <p className="text-muted-foreground mt-1 text-xs">
+              {t("selectedCoords", {
+                lat: position.lat.toFixed(6),
+                lng: position.lng.toFixed(6),
+              })}
             </p>
           </div>
 

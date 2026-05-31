@@ -104,9 +104,7 @@ export function PasswordConfirmDialog({
                 }
               }}
             />
-            {error && (
-              <p className="text-destructive text-sm">{error}</p>
-            )}
+            {error && <p className="text-destructive text-sm">{error}</p>}
           </div>
         </div>
 

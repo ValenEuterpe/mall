@@ -63,13 +63,15 @@ export function AddTagDialog({
   const [nameAm, setNameAm] = useState("");
   const [subcategoryId, setSubcategoryId] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState(0);
-  const [subcategories, setSubcategories] = useState<Array<{ id: string; name_en: string }>>([]);
+  const [subcategories, setSubcategories] = useState<
+    Array<{ id: string; name_en: string }>
+  >([]);
   const [translating, setTranslating] = useState(false);
   const [transliterationPreview, setTransliterationPreview] = useState("");
 
   useEffect(() => {
     if (!open || !categoryId || categoryId === "all") return;
-    
+
     const fetchSubcategories = async () => {
       try {
         const res = await apiClient.get<any[]>(`/mall/categories`);
@@ -113,11 +115,13 @@ export function AddTagDialog({
   }, [transliterationSource]);
 
   const latinInCyrillic = useMemo(
-    () => nameRu.trim().length >= 2 && latin.test(nameRu) && !cyrillic.test(nameRu),
+    () =>
+      nameRu.trim().length >= 2 && latin.test(nameRu) && !cyrillic.test(nameRu),
     [nameRu]
   );
   const latinInArmenian = useMemo(
-    () => nameAm.trim().length >= 2 && latin.test(nameAm) && !armenian.test(nameAm),
+    () =>
+      nameAm.trim().length >= 2 && latin.test(nameAm) && !armenian.test(nameAm),
     [nameAm]
   );
 
@@ -196,7 +200,9 @@ export function AddTagDialog({
                 <Label htmlFor="tag-subcategory">{t("subcategoryNone")}</Label>
                 <Select
                   value={subcategoryId || "none"}
-                  onValueChange={(v) => setSubcategoryId(v === "none" ? null : v)}
+                  onValueChange={(v) =>
+                    setSubcategoryId(v === "none" ? null : v)
+                  }
                 >
                   <SelectTrigger id="tag-subcategory">
                     <SelectValue placeholder={t("subcategoryNone")} />
@@ -212,7 +218,7 @@ export function AddTagDialog({
                 </Select>
               </div>
             )}
-            
+
             <div className="space-y-2">
               <Label htmlFor="tag-name-en">{t("nameEnLabel")}</Label>
               <Input
@@ -231,7 +237,7 @@ export function AddTagDialog({
                 placeholder="e.g. Джоггеры"
               />
               {latinInCyrillic && (
-                <p className="text-xs text-amber-700 flex items-center gap-1.5">
+                <p className="flex items-center gap-1.5 text-xs text-amber-700">
                   <AlertCircle className="h-3.5 w-3.5" />
                   {sellerT("latinInCyrillicWarning")}
                 </p>
@@ -246,7 +252,7 @@ export function AddTagDialog({
                 placeholder="e.g. Ջոգերներ"
               />
               {latinInArmenian && (
-                <p className="text-xs text-amber-700 flex items-center gap-1.5">
+                <p className="flex items-center gap-1.5 text-xs text-amber-700">
                   <AlertCircle className="h-3.5 w-3.5" />
                   {sellerT("latinInArmenianWarning")}
                 </p>
@@ -257,7 +263,10 @@ export function AddTagDialog({
               type="button"
               variant="outline"
               size="sm"
-              disabled={translating || !(nameEn.trim() || nameRu.trim() || nameAm.trim())}
+              disabled={
+                translating ||
+                !(nameEn.trim() || nameRu.trim() || nameAm.trim())
+              }
               onClick={handleAutoFill}
               className="w-full"
             >
@@ -275,8 +284,10 @@ export function AddTagDialog({
             </Button>
 
             {transliterationPreview && (
-              <div className="rounded-md border bg-background p-2 text-xs">
-                <span className="text-muted-foreground">{sellerT("latinFormForSearch")}: </span>
+              <div className="bg-background rounded-md border p-2 text-xs">
+                <span className="text-muted-foreground">
+                  {sellerT("latinFormForSearch")}:{" "}
+                </span>
                 <span className="font-mono">{transliterationPreview}</span>
               </div>
             )}
@@ -302,9 +313,16 @@ export function AddTagDialog({
             </Button>
             <Button
               type="submit"
-              disabled={submitting || (!nameEn.trim() && !nameRu.trim() && !nameAm.trim())}
+              disabled={
+                submitting ||
+                (!nameEn.trim() && !nameRu.trim() && !nameAm.trim())
+              }
             >
-              {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : t("addTag")}
+              {submitting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t("addTag")
+              )}
             </Button>
           </DialogFooter>
         </form>

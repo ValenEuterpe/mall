@@ -46,8 +46,7 @@ export function DeleteProductDialog({
         toast.error(t("deleteFailed"));
       }
     } catch (e: unknown) {
-      const message =
-        e instanceof Error ? e.message : t("deleteFailed");
+      const message = e instanceof Error ? e.message : t("deleteFailed");
       toast.error(message);
     } finally {
       setIsDeleting(false);

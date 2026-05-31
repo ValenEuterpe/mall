@@ -242,7 +242,10 @@ export function sendSetupWelcomeEmail(
   const dashboardUrl = `${process.env.NEXT_PUBLIC_APP_URL}/seller/dashboard`;
 
   sendWelcomeEmail(email, displayName, dashboardUrl).catch((error) => {
-    logger.error("Failed to send welcome email", { recipient: maskEmail(email), error });
+    logger.error("Failed to send welcome email", {
+      recipient: maskEmail(email),
+      error,
+    });
   });
 }
 

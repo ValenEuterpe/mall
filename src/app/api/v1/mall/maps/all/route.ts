@@ -15,9 +15,7 @@ import { transformShopForMap } from "../utils/transform-shop-for-map";
  * - includeShops: true/false (default true)
  * - includeVacant: true/false (default true)
  */
-async function getAllMapsHandler(
-  request: NextRequest
-): Promise<NextResponse> {
+async function getAllMapsHandler(request: NextRequest): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
   const includeShops = searchParams.get("includeShops") !== "false";
   const includeVacant = searchParams.get("includeVacant") !== "false";
@@ -120,12 +118,13 @@ async function getAllMapsHandler(
   );
 
   const headers = new Headers();
-  headers.set(
-    "Cache-Control",
-    "public, max-age=60, stale-while-revalidate=30"
-  );
+  headers.set("Cache-Control", "public, max-age=60, stale-while-revalidate=30");
 
-  return successResponse({ buildings: result }, 200, Object.fromEntries(headers));
+  return successResponse(
+    { buildings: result },
+    200,
+    Object.fromEntries(headers)
+  );
 }
 
 export const GET = withMiddleware(getAllMapsHandler, {

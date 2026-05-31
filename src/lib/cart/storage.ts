@@ -47,7 +47,10 @@ export function loadCartFromStorage(userId: string | undefined): CartItem[] {
   }
 }
 
-export function saveCartToStorage(items: CartItem[], userId: string | undefined): void {
+export function saveCartToStorage(
+  items: CartItem[],
+  userId: string | undefined
+): void {
   if (!isClient) return;
 
   const key = getStorageKey(userId);

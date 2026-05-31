@@ -1,0 +1,40 @@
+version: 2
+updates:
+  # npm dependencies — weekly check, group minor/patch updates into a single PR
+  # to keep noise down. Major updates still come as individual PRs so they get
+  # proper review.
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 5
+    groups:
+      minor-and-patch:
+        patterns:
+          - "*"
+        update-types:
+          - "minor"
+          - "patch"
+    # Keep React on the major version we target; let dependabot still propose
+    # patches/minors but never auto-bump majors without review.
+    ignore:
+      - dependency-name: "react"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "react-dom"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "next"
+        update-types: ["version-update:semver-major"]
+
+  # GitHub Actions — also weekly; mostly low-risk version pins on
+  # actions/checkout, setup-node, cache, etc.
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+      day: "monday"
+      time: "06:00"
+      timezone: "UTC"
+    open-pull-requests-limit: 3

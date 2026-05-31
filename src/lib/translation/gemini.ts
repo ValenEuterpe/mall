@@ -55,18 +55,18 @@ async function detectLanguage(text: string): Promise<SupportedLocale> {
   // Simple heuristic detection based on character ranges
   // Armenian: Unicode range U+0530–U+058F
   // Russian: Cyrillic range U+0400–U+04FF
-  
+
   const armenianPattern = /[\u0530-\u058F]/;
   const cyrillicPattern = /[\u0400-\u04FF]/;
-  
+
   if (armenianPattern.test(text)) {
     return "am";
   }
-  
+
   if (cyrillicPattern.test(text)) {
     return "ru";
   }
-  
+
   return "en";
 }
 
@@ -75,11 +75,11 @@ async function detectLanguage(text: string): Promise<SupportedLocale> {
  */
 async function callGeminiAPI(prompt: string): Promise<string> {
   const apiKey = env.GEMINI_API_KEY;
-  
+
   if (!apiKey) {
     throw new Error("GEMINI_API_KEY is not configured");
   }
-  
+
   const response = await fetch(
     `https://generativelanguage.googleapis.com/v1beta/models/gemini-3-flash-preview:generateContent?key=${apiKey}`,
     {
@@ -106,21 +106,21 @@ async function callGeminiAPI(prompt: string): Promise<string> {
       }),
     }
   );
-  
+
   if (!response.ok) {
     const errorText = await response.text();
     throw new Error(`Gemini API error: ${response.status} - ${errorText}`);
   }
-  
+
   const data = await response.json();
-  
+
   // Extract text from Gemini response
   const content = data.candidates?.[0]?.content?.parts?.[0]?.text;
-  
+
   if (!content) {
     throw new Error("No content in Gemini response");
   }
-  
+
   return content.trim();
 }
 
@@ -197,14 +197,14 @@ async function translateToLanguage(
   if (sourceLanguage === targetLanguage) {
     return text;
   }
-  
+
   const prompt = `Translate the following ${LANGUAGE_NAMES[sourceLanguage]} text to ${LANGUAGE_NAMES[targetLanguage]}. 
 This is a product name/description for a wholesale marketplace. Keep it concise and professional.
 Only output the translation, nothing else.
 
 Text to translate:
 ${text}`;
-  
+
   return callGeminiAPI(prompt);
 }
 
@@ -220,17 +220,17 @@ export async function translateText(text: string): Promise<TranslationResult> {
       detectedLanguage: "en",
     };
   }
-  
+
   const detectedLanguage = await detectLanguage(text);
   const targetLanguages = ALL_LOCALES.filter((l) => l !== detectedLanguage);
-  
+
   // Translate to the other two languages in parallel
   const translations = await Promise.all(
     targetLanguages.map((targetLang) =>
       translateToLanguage(text, detectedLanguage, targetLang)
     )
   );
-  
+
   // Build result object
   const result: TranslationResult = {
     en: "",
@@ -238,15 +238,15 @@ export async function translateText(text: string): Promise<TranslationResult> {
     am: "",
     detectedLanguage,
   };
-  
+
   // Set the original text for the detected language
   result[detectedLanguage] = text;
-  
+
   // Set translations for other languages
   targetLanguages.forEach((lang, index) => {
     result[lang] = translations[index];
   });
-  
+
   return result;
 }
 
@@ -257,13 +257,13 @@ export async function translateBatch(
   input: BatchTranslationInput
 ): Promise<BatchTranslationResult> {
   const result: BatchTranslationResult = {};
-  
+
   // Process each field that has content
   const fieldsToTranslate: Array<{
     key: keyof BatchTranslationInput;
     value: string;
   }> = [];
-  
+
   if (input.name && input.name.trim()) {
     fieldsToTranslate.push({ key: "name", value: input.name });
   }
@@ -276,27 +276,27 @@ export async function translateBatch(
       value: input.detailDescription,
     });
   }
-  
+
   if (fieldsToTranslate.length === 0) {
     return result;
   }
-  
+
   // If only one field, use single translation
   if (fieldsToTranslate.length === 1) {
     const field = fieldsToTranslate[0];
     result[field.key] = await translateText(field.value);
     return result;
   }
-  
+
   // For multiple fields, use batch prompt for efficiency
   const detectedLanguage = await detectLanguage(fieldsToTranslate[0].value);
   const targetLanguages = ALL_LOCALES.filter((l) => l !== detectedLanguage);
-  
+
   // Build batch prompt
   const fieldsList = fieldsToTranslate
     .map((f, i) => `${i + 1}. [${f.key}]: ${f.value}`)
     .join("\n");
-  
+
   const batchPrompt = `Translate the following ${LANGUAGE_NAMES[detectedLanguage]} product fields to ${targetLanguages.map((l) => LANGUAGE_NAMES[l]).join(" and ")}.
 This is for a wholesale marketplace. Keep translations concise and professional.
 
@@ -311,10 +311,10 @@ Output format (JSON only, no markdown):
 Only include fields that were provided. Here are the fields:
 
 ${fieldsList}`;
-  
+
   try {
     const response = await callGeminiAPI(batchPrompt);
-    
+
     // Parse JSON response (handle potential markdown code blocks)
     let jsonStr = response;
     if (response.includes("```json")) {
@@ -322,9 +322,9 @@ ${fieldsList}`;
     } else if (response.includes("```")) {
       jsonStr = response.replace(/```\n?/g, "");
     }
-    
+
     const parsed = JSON.parse(jsonStr.trim());
-    
+
     // Build result
     for (const field of fieldsToTranslate) {
       const translationResult: TranslationResult = {
@@ -333,10 +333,10 @@ ${fieldsList}`;
         am: "",
         detectedLanguage,
       };
-      
+
       // Set original text
       translationResult[detectedLanguage] = field.value;
-      
+
       // Set translations
       for (const targetLang of targetLanguages) {
         const translation = parsed.translations?.[targetLang]?.[field.key];
@@ -344,22 +344,25 @@ ${fieldsList}`;
           translationResult[targetLang] = translation;
         }
       }
-      
+
       result[field.key] = translationResult;
     }
   } catch (error) {
     // Fallback to individual translations if batch fails
-    console.error("Batch translation failed, falling back to individual:", error);
-    
+    console.error(
+      "Batch translation failed, falling back to individual:",
+      error
+    );
+
     const translations = await Promise.all(
       fieldsToTranslate.map((f) => translateText(f.value))
     );
-    
+
     fieldsToTranslate.forEach((field, index) => {
       result[field.key] = translations[index];
     });
   }
-  
+
   return result;
 }
 
@@ -414,7 +417,7 @@ Output format: ["tag_key1", "tag_key2"]`;
 
   try {
     const response = await callGeminiAPI(prompt);
-    
+
     // Parse JSON response (handle potential markdown code blocks)
     let jsonStr = response;
     if (response.includes("```json")) {
@@ -422,17 +425,17 @@ Output format: ["tag_key1", "tag_key2"]`;
     } else if (response.includes("```")) {
       jsonStr = response.replace(/```\n?/g, "");
     }
-    
+
     const suggestedKeys = JSON.parse(jsonStr.trim());
-    
+
     if (!Array.isArray(suggestedKeys)) {
       console.error("Gemini returned non-array for tags:", suggestedKeys);
       return [];
     }
 
     // Validate that returned keys exist in available tags
-    const validKeys = availableTags.map(t => t.key);
-    return suggestedKeys.filter(key => validKeys.includes(key));
+    const validKeys = availableTags.map((t) => t.key);
+    return suggestedKeys.filter((key) => validKeys.includes(key));
   } catch (error) {
     console.error("AI tagging failed:", error);
     return [];

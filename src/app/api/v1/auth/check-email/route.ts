@@ -35,12 +35,23 @@ export async function POST(request: NextRequest) {
   } catch (error) {
     // If this is a known Prisma error, normalize it to a safe response
     if (error instanceof Prisma.PrismaClientKnownRequestError) {
-      return buildEmailCheckResponse("", { found: false, type: null, info: null });
+      return buildEmailCheckResponse("", {
+        found: false,
+        type: null,
+        info: null,
+      });
     }
 
     // Fail closed: do not reveal details
-    return buildEmailCheckResponse("", { found: false, type: null, info: null });
+    return buildEmailCheckResponse("", {
+      found: false,
+      type: null,
+      info: null,
+    });
   } finally {
-    await ensureMinResponseTime(startTime, AUTH_CONFIG.emailCheck.minResponseTime);
+    await ensureMinResponseTime(
+      startTime,
+      AUTH_CONFIG.emailCheck.minResponseTime
+    );
   }
 }

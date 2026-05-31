@@ -21,7 +21,10 @@ async function updateTagHandler(
     });
     if (!existing) {
       return NextResponse.json(
-        { success: false, error: { code: "TAG_NOT_FOUND", message: "Tag not found" } },
+        {
+          success: false,
+          error: { code: "TAG_NOT_FOUND", message: "Tag not found" },
+        },
         { status: 404 }
       );
     }
@@ -31,14 +34,22 @@ async function updateTagHandler(
     });
     if (!sub || sub.categoryId !== existing.categoryId) {
       return NextResponse.json(
-        { success: false, error: { code: "INVALID_SUBCATEGORY", message: "Subcategory does not belong to category" } },
+        {
+          success: false,
+          error: {
+            code: "INVALID_SUBCATEGORY",
+            message: "Subcategory does not belong to category",
+          },
+        },
         { status: 400 }
       );
     }
   }
 
   // Recompute transliteration whenever a Russian or Armenian name changes.
-  let transliterationUpdate: { transliteration: string | null } | Record<string, never> = {};
+  let transliterationUpdate:
+    | { transliteration: string | null }
+    | Record<string, never> = {};
   if (validated.name_ru !== undefined || validated.name_am !== undefined) {
     const current = await prisma.tag.findUnique({
       where: { id },
@@ -46,9 +57,11 @@ async function updateTagHandler(
     });
     if (current) {
       const next_ru = validated.name_ru ?? current.name_ru;
-      const next_am = validated.name_am === undefined ? current.name_am : validated.name_am;
+      const next_am =
+        validated.name_am === undefined ? current.name_am : validated.name_am;
       transliterationUpdate = {
-        transliteration: buildTransliterations([next_ru, next_am]).join(" ") || null,
+        transliteration:
+          buildTransliterations([next_ru, next_am]).join(" ") || null,
       };
     }
   }

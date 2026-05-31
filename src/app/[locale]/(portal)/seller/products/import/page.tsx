@@ -78,7 +78,10 @@ const MAPPABLE_FIELDS = [
 
 export default function SellerProductsImportPage(): React.ReactElement {
   const t = useTranslations("portal.sellerProductsImport");
-  const { isAuthorized, isLoading: isAuthLoading } = useRequireRole("SELLER", "/unauthorized");
+  const { isAuthorized, isLoading: isAuthLoading } = useRequireRole(
+    "SELLER",
+    "/unauthorized"
+  );
 
   // Step state
   const [step, setStep] = useState<Step>("upload");
@@ -91,7 +94,9 @@ export default function SellerProductsImportPage(): React.ReactElement {
 
   // Preview / mapping state
   const [preview, setPreview] = useState<PreviewData | null>(null);
-  const [columnMapping, setColumnMapping] = useState<Record<string, string>>({});
+  const [columnMapping, setColumnMapping] = useState<Record<string, string>>(
+    {}
+  );
   const [isPreviewing, setIsPreviewing] = useState(false);
 
   // Import state
@@ -104,7 +109,10 @@ export default function SellerProductsImportPage(): React.ReactElement {
   // Derived
   // -------------------------------------------------------------------------
 
-  const mappedFields = useMemo(() => new Set(Object.values(columnMapping)), [columnMapping]);
+  const mappedFields = useMemo(
+    () => new Set(Object.values(columnMapping)),
+    [columnMapping]
+  );
 
   const allRequiredMapped = useMemo(
     () => REQUIRED_FIELDS.every((f) => mappedFields.has(f)),
@@ -165,20 +173,17 @@ export default function SellerProductsImportPage(): React.ReactElement {
     [t]
   );
 
-  const handleMappingChange = useCallback(
-    (header: string, value: string) => {
-      setColumnMapping((prev) => {
-        const next = { ...prev };
-        if (value === "__skip__") {
-          delete next[header];
-        } else {
-          next[header] = value;
-        }
-        return next;
-      });
-    },
-    []
-  );
+  const handleMappingChange = useCallback((header: string, value: string) => {
+    setColumnMapping((prev) => {
+      const next = { ...prev };
+      if (value === "__skip__") {
+        delete next[header];
+      } else {
+        next[header] = value;
+      }
+      return next;
+    });
+  }, []);
 
   const handleBackToUpload = useCallback(() => {
     setStep("upload");
@@ -249,7 +254,7 @@ export default function SellerProductsImportPage(): React.ReactElement {
       <div className="flex items-center justify-between gap-3">
         <div>
           <h1 className="text-2xl font-bold">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+          <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
         </div>
         <Button asChild variant="secondary">
           <Link href="/seller/products">{t("actions.back")}</Link>
@@ -265,7 +270,7 @@ export default function SellerProductsImportPage(): React.ReactElement {
           </Button>
         </CardHeader>
         <CardContent>
-          <p className="text-sm text-muted-foreground">{t("template.help")}</p>
+          <p className="text-muted-foreground text-sm">{t("template.help")}</p>
         </CardContent>
       </Card>
 
@@ -284,7 +289,9 @@ export default function SellerProductsImportPage(): React.ReactElement {
                 accept=".xlsx,.xls"
                 onChange={(e) => handleFileSelect(e.target.files?.[0] ?? null)}
               />
-              <p className="text-xs text-muted-foreground">{t("form.fileHelp")}</p>
+              <p className="text-muted-foreground text-xs">
+                {t("form.fileHelp")}
+              </p>
             </div>
 
             <div className="grid gap-3 sm:grid-cols-3">
@@ -312,13 +319,13 @@ export default function SellerProductsImportPage(): React.ReactElement {
             </div>
 
             {isPreviewing && (
-              <div className="flex items-center gap-2 text-sm text-muted-foreground">
+              <div className="text-muted-foreground flex items-center gap-2 text-sm">
                 <Loader2 className="h-4 w-4 animate-spin" />
                 {t("loading")}
               </div>
             )}
 
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            {error && <p className="text-destructive text-sm">{error}</p>}
           </CardContent>
         </Card>
       )}
@@ -329,10 +336,10 @@ export default function SellerProductsImportPage(): React.ReactElement {
           <CardHeader className="gap-3 sm:flex-row sm:items-center sm:justify-between">
             <div>
               <CardTitle className="text-base">{t("mapping.title")}</CardTitle>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="text-muted-foreground mt-1 text-xs">
                 {t("mapping.subtitle")}
               </p>
-              <p className="mt-1 text-xs text-muted-foreground">
+              <p className="text-muted-foreground mt-1 text-xs">
                 {t("mapping.rowsFound", { count: preview.totalRows })}
               </p>
             </div>
@@ -395,7 +402,10 @@ export default function SellerProductsImportPage(): React.ReactElement {
                           <div className="flex items-center gap-2">
                             <span className="truncate">{header}</span>
                             {isAutoMatched && currentValue !== "__skip__" && (
-                              <Badge variant="secondary" className="shrink-0 text-[10px] px-1.5 py-0">
+                              <Badge
+                                variant="secondary"
+                                className="shrink-0 px-1.5 py-0 text-[10px]"
+                              >
                                 {t("mapping.autoMatched")}
                               </Badge>
                             )}
@@ -406,7 +416,7 @@ export default function SellerProductsImportPage(): React.ReactElement {
                             {preview.sampleData.map((row, i) => (
                               <span
                                 key={i}
-                                className="truncate text-xs text-muted-foreground"
+                                className="text-muted-foreground truncate text-xs"
                                 title={row[header]}
                               >
                                 {row[header] || "—"}
@@ -417,7 +427,9 @@ export default function SellerProductsImportPage(): React.ReactElement {
                         <TableCell>
                           <Select
                             value={currentValue}
-                            onValueChange={(v) => handleMappingChange(header, v)}
+                            onValueChange={(v) =>
+                              handleMappingChange(header, v)
+                            }
                           >
                             <SelectTrigger
                               className={
@@ -445,7 +457,9 @@ export default function SellerProductsImportPage(): React.ReactElement {
                                     disabled={alreadyUsed}
                                   >
                                     {t(`mapping.fields.${field}`)}
-                                    {REQUIRED_FIELDS.includes(field) ? " *" : ""}
+                                    {REQUIRED_FIELDS.includes(field)
+                                      ? " *"
+                                      : ""}
                                   </SelectItem>
                                 );
                               })}
@@ -461,7 +475,7 @@ export default function SellerProductsImportPage(): React.ReactElement {
 
             {/* Required fields warning */}
             {!allRequiredMapped && (
-              <p className="text-sm text-destructive">
+              <p className="text-destructive text-sm">
                 {t("mapping.unmappedRequired")}
               </p>
             )}
@@ -482,13 +496,13 @@ export default function SellerProductsImportPage(): React.ReactElement {
                 )}
               </Button>
               {progress !== null && (
-                <p className="text-xs text-muted-foreground">
+                <p className="text-muted-foreground text-xs">
                   {t("progress", { progress })}
                 </p>
               )}
             </div>
 
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            {error && <p className="text-destructive text-sm">{error}</p>}
 
             {/* Results */}
             {result && <ImportResultCard result={result} t={t} />}
@@ -542,7 +556,7 @@ function ImportResultCard({
       {result.warnings?.length ? (
         <div className="space-y-1">
           <p className="text-xs font-medium">{t("result.warnings")}</p>
-          <ul className="list-inside list-disc text-xs text-muted-foreground">
+          <ul className="text-muted-foreground list-inside list-disc text-xs">
             {result.warnings.map((w, idx) => (
               <li key={idx}>{w}</li>
             ))}
@@ -553,7 +567,7 @@ function ImportResultCard({
       {result.errors?.length ? (
         <div className="space-y-1">
           <p className="text-xs font-medium">{t("result.errors")}</p>
-          <ul className="list-inside list-disc text-xs text-destructive">
+          <ul className="text-destructive list-inside list-disc text-xs">
             {result.errors.slice(0, 20).map((e, idx) => (
               <li key={idx}>
                 {t("result.errorRow", { row: e.row })}: {e.message}
@@ -561,8 +575,10 @@ function ImportResultCard({
             ))}
           </ul>
           {result.errors.length > 20 && (
-            <p className="text-xs text-muted-foreground">
-              {t("result.errorsTruncated", { count: result.errors.length - 20 })}
+            <p className="text-muted-foreground text-xs">
+              {t("result.errorsTruncated", {
+                count: result.errors.length - 20,
+              })}
             </p>
           )}
         </div>

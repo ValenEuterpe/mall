@@ -11,37 +11,37 @@ import { getExistingShop } from "../utils/get-existing-shop";
 import { SHOP_DETAIL_SELECT } from "../selects";
 
 export async function patchShopHandler(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
-    const user = requireAuth(request, ["MALL_OWNER"]);
-    const { id } = await params;
+  const user = requireAuth(request, ["MALL_OWNER"]);
+  const { id } = await params;
 
-    validateShopId(id);
+  validateShopId(id);
 
-    // Verify shop exists
-    await getExistingShop(id);  // Minimal check
+  // Verify shop exists
+  await getExistingShop(id); // Minimal check
 
-    // Parse partial update
-    const data = await validateBody(request, shopUpdateSchema.partial());
-    // `contacts` is intentionally stripped from the rest spread (handled separately).
-    const { contacts: _contacts, ...shopFields } = data;
+  // Parse partial update
+  const data = await validateBody(request, shopUpdateSchema.partial());
+  // `contacts` is intentionally stripped from the rest spread (handled separately).
+  const { contacts: _contacts, ...shopFields } = data;
 
-    // Perform update
-    const updatedShop = await prisma.shop.update({
-        where: { id },
-        data: {
-            ...shopFields,
-            updatedAt: new Date(),
-        },
-        select: SHOP_DETAIL_SELECT,
-    });
+  // Perform update
+  const updatedShop = await prisma.shop.update({
+    where: { id },
+    data: {
+      ...shopFields,
+      updatedAt: new Date(),
+    },
+    select: SHOP_DETAIL_SELECT,
+  });
 
-    logger.info("Shop partially updated", {
-        shopId: id,
-        userId: user.userId,
-        fields: Object.keys(data),
-    });
+  logger.info("Shop partially updated", {
+    shopId: id,
+    userId: user.userId,
+    fields: Object.keys(data),
+  });
 
-    return successResponse(transformShopForDetail(updatedShop));
+  return successResponse(transformShopForDetail(updatedShop));
 }

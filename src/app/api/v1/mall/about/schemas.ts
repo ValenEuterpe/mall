@@ -6,7 +6,13 @@ export const updateMallAboutSchema = z.object({
   description_am: z.string().max(5000).optional().nullable(),
   workingHours: z.string().max(500).optional().nullable(),
   contactPhone: z.string().max(50).optional().nullable(),
-  contactEmail: z.string().email().max(200).optional().nullable().or(z.literal("")),
+  contactEmail: z
+    .string()
+    .email()
+    .max(200)
+    .optional()
+    .nullable()
+    .or(z.literal("")),
   logoUrl: z.string().url().max(500).optional().nullable().or(z.literal("")),
   socialLinks: z
     .object({

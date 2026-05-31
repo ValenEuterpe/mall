@@ -32,7 +32,13 @@ async function listTagsHandler(req: NextRequest) {
         select: { name_en: true, key: true },
       },
       subcategory: {
-        select: { id: true, name_en: true, name_ru: true, name_am: true, key: true },
+        select: {
+          id: true,
+          name_en: true,
+          name_ru: true,
+          name_am: true,
+          key: true,
+        },
       },
       _count: {
         select: { products: true },
@@ -41,21 +47,29 @@ async function listTagsHandler(req: NextRequest) {
   });
 
   // Manual join for seller names (since relation is not in schema.prisma)
-  const sellerIds = [...new Set(tags.map(t => t.createdBySellerId).filter(Boolean))] as string[];
-  const sellers = sellerIds.length > 0 
-    ? await prisma.seller.findMany({
-        where: { id: { in: sellerIds } },
-        select: { id: true, businessName: true }
-      })
-    : [];
+  const sellerIds = [
+    ...new Set(tags.map((t) => t.createdBySellerId).filter(Boolean)),
+  ] as string[];
+  const sellers =
+    sellerIds.length > 0
+      ? await prisma.seller.findMany({
+          where: { id: { in: sellerIds } },
+          select: { id: true, businessName: true },
+        })
+      : [];
 
-  const sellerMap = Object.fromEntries(sellers.map(s => [s.id, s.businessName]));
+  const sellerMap = Object.fromEntries(
+    sellers.map((s) => [s.id, s.businessName])
+  );
 
-  const data = tags.map(t => ({
+  const data = tags.map((t) => ({
     ...t,
-    createdBySeller: t.createdBySellerId 
-      ? { id: t.createdBySellerId, businessName: sellerMap[t.createdBySellerId] || "Unknown Seller" }
-      : null
+    createdBySeller: t.createdBySellerId
+      ? {
+          id: t.createdBySellerId,
+          businessName: sellerMap[t.createdBySellerId] || "Unknown Seller",
+        }
+      : null,
   }));
 
   return successResponse(data);
@@ -69,7 +83,8 @@ async function createTagHandler(req: NextRequest) {
   const body = await req.json();
   const validated = tagCreateSchema.parse(body);
 
-  const key = validated.key || slugFrom(validated.name_en) || `tag-${Date.now()}`;
+  const key =
+    validated.key || slugFrom(validated.name_en) || `tag-${Date.now()}`;
 
   // Validate subcategory ↔ category relationship if provided
   if (validated.subcategoryId) {
@@ -79,7 +94,13 @@ async function createTagHandler(req: NextRequest) {
     });
     if (!sub || sub.categoryId !== validated.categoryId) {
       return NextResponse.json(
-        { success: false, error: { code: "INVALID_SUBCATEGORY", message: "Subcategory does not belong to category" } },
+        {
+          success: false,
+          error: {
+            code: "INVALID_SUBCATEGORY",
+            message: "Subcategory does not belong to category",
+          },
+        },
         { status: 400 }
       );
     }
@@ -102,7 +123,10 @@ async function createTagHandler(req: NextRequest) {
   }
 
   const transliterationText =
-    buildTransliterations([validated.name_ru, validated.name_am ?? undefined]).join(" ") || null;
+    buildTransliterations([
+      validated.name_ru,
+      validated.name_am ?? undefined,
+    ]).join(" ") || null;
 
   const tag = await prisma.tag.create({
     data: {

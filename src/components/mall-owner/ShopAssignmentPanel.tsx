@@ -122,11 +122,11 @@ export function ShopAssignmentPanel({
     return (
       <Card>
         <CardHeader className="pb-2">
-          <h3 className="font-semibold text-sm">{t("title")}</h3>
+          <h3 className="text-sm font-semibold">{t("title")}</h3>
         </CardHeader>
         <CardContent>
           <div className="flex items-center justify-center py-8">
-            <div className="animate-spin rounded-full h-6 w-6 border-b-2 border-primary"></div>
+            <div className="border-primary h-6 w-6 animate-spin rounded-full border-b-2"></div>
           </div>
         </CardContent>
       </Card>
@@ -137,13 +137,13 @@ export function ShopAssignmentPanel({
     return (
       <Card>
         <CardHeader className="pb-2">
-          <h3 className="font-semibold text-sm">{t("title")}</h3>
+          <h3 className="text-sm font-semibold">{t("title")}</h3>
         </CardHeader>
         <CardContent>
-          <div className="text-center py-6 text-muted-foreground">
-            <Store className="h-8 w-8 mx-auto mb-2 opacity-50" />
+          <div className="text-muted-foreground py-6 text-center">
+            <Store className="mx-auto mb-2 h-8 w-8 opacity-50" />
             <p className="text-sm font-medium">{t("noShops")}</p>
-            <p className="text-xs mt-1">{t("noShopsHint")}</p>
+            <p className="mt-1 text-xs">{t("noShopsHint")}</p>
           </div>
         </CardContent>
       </Card>
@@ -155,9 +155,10 @@ export function ShopAssignmentPanel({
       <Card>
         <CardHeader className="pb-2">
           <div className="flex items-center justify-between">
-            <h3 className="font-semibold text-sm">{t("title")}</h3>
+            <h3 className="text-sm font-semibold">{t("title")}</h3>
             <Badge variant="outline" className="text-xs">
-              {shops.filter((s) => s.svgId).length}/{shops.length} {t("assigned")}
+              {shops.filter((s) => s.svgId).length}/{shops.length}{" "}
+              {t("assigned")}
             </Badge>
           </div>
         </CardHeader>
@@ -171,25 +172,23 @@ export function ShopAssignmentPanel({
                 return (
                   <div
                     key={shop.id}
-                    className={`
-                      flex items-center justify-between p-2 rounded-md cursor-pointer transition-colors
-                      ${isSelected 
-                        ? "bg-primary/10 border border-primary" 
+                    className={`flex cursor-pointer items-center justify-between rounded-md p-2 transition-colors ${
+                      isSelected
+                        ? "bg-primary/10 border-primary border"
                         : "hover:bg-muted border border-transparent"
-                      }
-                    `}
+                    } `}
                     onClick={() => onSelectShop(isSelected ? null : shop)}
                   >
                     <div className="flex items-center gap-2">
                       {hasAssignment ? (
                         <CheckCircle className="h-4 w-4 text-green-500" />
                       ) : (
-                        <Circle className="h-4 w-4 text-muted-foreground" />
+                        <Circle className="text-muted-foreground h-4 w-4" />
                       )}
                       <div>
                         <p className="text-sm font-medium">{shop.fullCode}</p>
                         {shop.shopName && (
-                          <p className="text-xs text-muted-foreground">
+                          <p className="text-muted-foreground text-xs">
                             {shop.shopName}
                           </p>
                         )}
@@ -212,7 +211,7 @@ export function ShopAssignmentPanel({
                             handleClearAssignment(shop);
                           }}
                         >
-                          <XCircle className="h-4 w-4 text-destructive" />
+                          <XCircle className="text-destructive h-4 w-4" />
                         </Button>
                       )}
                     </div>
@@ -224,8 +223,8 @@ export function ShopAssignmentPanel({
 
           {/* Instructions */}
           {selectedShop && (
-            <div className="border-t p-3 bg-muted/50">
-              <p className="text-xs text-muted-foreground">
+            <div className="bg-muted/50 border-t p-3">
+              <p className="text-muted-foreground text-xs">
                 {selectedShop.svgId ? (
                   <>
                     {t("currentPath")}: <strong>{selectedShop.svgId}</strong>
@@ -238,44 +237,49 @@ export function ShopAssignmentPanel({
           )}
 
           {/* Legend */}
-          <div className="border-t p-3 space-y-1">
+          <div className="space-y-1 border-t p-3">
             <div className="flex items-center gap-2 text-xs">
-              <div className="w-3 h-3 rounded bg-green-500/30 border border-green-500"></div>
+              <div className="h-3 w-3 rounded border border-green-500 bg-green-500/30"></div>
               <span className="text-muted-foreground">{t("legendFree")}</span>
             </div>
             <div className="flex items-center gap-2 text-xs">
-              <div className="w-3 h-3 rounded bg-red-500/30 border border-red-500"></div>
-              <span className="text-muted-foreground">{t("legendAssigned")}</span>
+              <div className="h-3 w-3 rounded border border-red-500 bg-red-500/30"></div>
+              <span className="text-muted-foreground">
+                {t("legendAssigned")}
+              </span>
             </div>
             <div className="flex items-center gap-2 text-xs">
-              <div className="w-3 h-3 rounded bg-blue-500/30 border border-blue-500"></div>
-              <span className="text-muted-foreground">{t("legendSelected")}</span>
+              <div className="h-3 w-3 rounded border border-blue-500 bg-blue-500/30"></div>
+              <span className="text-muted-foreground">
+                {t("legendSelected")}
+              </span>
             </div>
           </div>
         </CardContent>
       </Card>
 
       {/* Reassign confirmation dialog */}
-      <Dialog open={!!pendingPathAssignment} onOpenChange={() => onCancelReassign()}>
+      <Dialog
+        open={!!pendingPathAssignment}
+        onOpenChange={() => onCancelReassign()}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>{t("reassignTitle")}</DialogTitle>
             <DialogDescription>
-              {pendingPathAssignment?.currentShop && selectedShop && (
+              {pendingPathAssignment?.currentShop &&
+                selectedShop &&
                 t("reassignDescription", {
                   shop: pendingPathAssignment.currentShop.fullCode,
                   newShop: selectedShop.fullCode,
-                })
-              )}
+                })}
             </DialogDescription>
           </DialogHeader>
           <DialogFooter>
             <Button variant="outline" onClick={onCancelReassign}>
               {t("reassignCancel")}
             </Button>
-            <Button onClick={onConfirmReassign}>
-              {t("reassignConfirm")}
-            </Button>
+            <Button onClick={onConfirmReassign}>{t("reassignConfirm")}</Button>
           </DialogFooter>
         </DialogContent>
       </Dialog>

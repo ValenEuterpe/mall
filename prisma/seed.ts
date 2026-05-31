@@ -84,7 +84,9 @@ async function main() {
               key: subcategoryKey,
               name_en: enCategory.subcategories[subcategoryKey],
               name_ru: ruCategory.subcategories[subcategoryKey],
-              name_am: amCategory?.subcategories?.[subcategoryKey] || enCategory.subcategories[subcategoryKey],
+              name_am:
+                amCategory?.subcategories?.[subcategoryKey] ||
+                enCategory.subcategories[subcategoryKey],
             })
           ),
         },
@@ -129,7 +131,8 @@ async function main() {
         tagSkipped++;
         continue;
       }
-      const transliteration = buildTransliterations([tag.name_ru, tag.name_am]).join(" ") || null;
+      const transliteration =
+        buildTransliterations([tag.name_ru, tag.name_am]).join(" ") || null;
       await prisma.tag.create({
         data: {
           categoryId: category.id,
@@ -145,18 +148,68 @@ async function main() {
     }
   }
 
-  console.log(`✅ Tags seeded (inserted ${tagInserted}, skipped ${tagSkipped})`);
+  console.log(
+    `✅ Tags seeded (inserted ${tagInserted}, skipped ${tagSkipped})`
+  );
 
   // 3b. Seed Shop Types
   console.log("🏪 Seeding shop types...");
 
   const defaultShopTypes = [
-    { key: "SHOP", name_en: "Shop", name_ru: "Магазин", name_am: "Խանdelays", icon: "store", supportsProducts: true, sortOrder: 0 },
-    { key: "INFORMATION_BOARD", name_en: "Information Board", name_ru: "Информационная доска", name_am: null, icon: "info", supportsProducts: false, sortOrder: 1 },
-    { key: "EATERY", name_en: "Eatery", name_ru: "Кафе/Столовая", name_am: null, icon: "utensils", supportsProducts: false, sortOrder: 2 },
-    { key: "LOUNGE", name_en: "Lounge", name_ru: "Зона отдыха", name_am: null, icon: "sofa", supportsProducts: false, sortOrder: 3 },
-    { key: "SERVICE_POINT", name_en: "Service Point", name_ru: "Пункт обслуживания", name_am: null, icon: "wrench", supportsProducts: false, sortOrder: 4 },
-    { key: "STORAGE", name_en: "Storage", name_ru: "Склад", name_am: null, icon: "warehouse", supportsProducts: false, sortOrder: 5 },
+    {
+      key: "SHOP",
+      name_en: "Shop",
+      name_ru: "Магазин",
+      name_am: "Խանdelays",
+      icon: "store",
+      supportsProducts: true,
+      sortOrder: 0,
+    },
+    {
+      key: "INFORMATION_BOARD",
+      name_en: "Information Board",
+      name_ru: "Информационная доска",
+      name_am: null,
+      icon: "info",
+      supportsProducts: false,
+      sortOrder: 1,
+    },
+    {
+      key: "EATERY",
+      name_en: "Eatery",
+      name_ru: "Кафе/Столовая",
+      name_am: null,
+      icon: "utensils",
+      supportsProducts: false,
+      sortOrder: 2,
+    },
+    {
+      key: "LOUNGE",
+      name_en: "Lounge",
+      name_ru: "Зона отдыха",
+      name_am: null,
+      icon: "sofa",
+      supportsProducts: false,
+      sortOrder: 3,
+    },
+    {
+      key: "SERVICE_POINT",
+      name_en: "Service Point",
+      name_ru: "Пункт обслуживания",
+      name_am: null,
+      icon: "wrench",
+      supportsProducts: false,
+      sortOrder: 4,
+    },
+    {
+      key: "STORAGE",
+      name_en: "Storage",
+      name_ru: "Склад",
+      name_am: null,
+      icon: "warehouse",
+      supportsProducts: false,
+      sortOrder: 5,
+    },
   ];
 
   for (const st of defaultShopTypes) {

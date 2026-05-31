@@ -2,7 +2,10 @@ import { NextRequest, NextResponse } from "next/server";
 import { requireAuth } from "@/lib/api/auth-helper";
 import prisma from "@/lib/db/prisma";
 import { noContentResponse } from "@/lib/api/response";
-import { ValidationError, AuthenticationError } from "@/lib/errors/custom-errors";
+import {
+  ValidationError,
+  AuthenticationError,
+} from "@/lib/errors/custom-errors";
 import { verifyPassword } from "@/lib/auth/password";
 import { logger } from "@/lib/utils/logger";
 import { validateSellerId } from "../../utils/validate-seller-id";
@@ -19,7 +22,9 @@ export async function deleteSellerHandler(
   validateSellerId(id);
 
   // Password re-confirmation: destructive action, never trust client-only checks.
-  const body = (await request.json().catch(() => null)) as { password?: unknown } | null;
+  const body = (await request.json().catch(() => null)) as {
+    password?: unknown;
+  } | null;
   const password = typeof body?.password === "string" ? body.password : null;
   if (!password) {
     throw new ValidationError("Password is required to remove a seller");

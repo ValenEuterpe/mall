@@ -58,7 +58,9 @@ async function main() {
   });
 
   console.log(`✅ Mall Owner ready: ${result.email} (id: ${result.id})`);
-  console.log(`   allowedIps: ${allowedIps.length === 0 ? "(none — open access)" : allowedIps.join(", ")}`);
+  console.log(
+    `   allowedIps: ${allowedIps.length === 0 ? "(none — open access)" : allowedIps.join(", ")}`
+  );
 
   await prisma.$disconnect();
   await pool.end();

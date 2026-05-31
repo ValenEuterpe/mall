@@ -24,19 +24,15 @@ async function dedupCheckHandler(req: NextRequest) {
   const body = await req.json().catch(() => null);
   if (!body || typeof body !== "object") {
     return NextResponse.json(
-      { success: false, error: { code: "VALIDATION_ERROR", message: "Invalid body" } },
+      {
+        success: false,
+        error: { code: "VALIDATION_ERROR", message: "Invalid body" },
+      },
       { status: 400 }
     );
   }
 
-  const {
-    categoryId,
-    subcategoryId,
-    name_en,
-    name_ru,
-    name_am,
-    q,
-  } = body as {
+  const { categoryId, subcategoryId, name_en, name_ru, name_am, q } = body as {
     categoryId?: string;
     subcategoryId?: string | null;
     name_en?: string | null;
@@ -47,7 +43,10 @@ async function dedupCheckHandler(req: NextRequest) {
 
   if (!categoryId) {
     return NextResponse.json(
-      { success: false, error: { code: "VALIDATION_ERROR", message: "categoryId is required" } },
+      {
+        success: false,
+        error: { code: "VALIDATION_ERROR", message: "categoryId is required" },
+      },
       { status: 400 }
     );
   }
@@ -56,7 +55,8 @@ async function dedupCheckHandler(req: NextRequest) {
   const en = (name_en ?? q ?? "").trim();
   const ru = (name_ru ?? q ?? "").trim();
   const am = (name_am ?? q ?? "").trim();
-  const transliterationText = buildTransliterations([ru, am]).join(" ") || (q ?? "").toLowerCase();
+  const transliterationText =
+    buildTransliterations([ru, am]).join(" ") || (q ?? "").toLowerCase();
 
   if (!en && !ru && !am && !transliterationText) {
     return successResponse({ candidates: [] as DedupCandidate[] });

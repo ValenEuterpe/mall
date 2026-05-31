@@ -1,15 +1,26 @@
 import { NextRequest, NextResponse } from "next/server";
 
 import { requireAuth, AuthError } from "@/lib/api/auth-helper";
-import { createErrorResponse, createSuccessResponse, methodNotAllowed } from "@/app/response";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  methodNotAllowed,
+} from "@/app/response";
 import prisma from "@/lib/db/prisma";
-import { enforceRateLimit, publicReadRateLimiter } from "@/lib/utils/rate-limit";
+import {
+  enforceRateLimit,
+  publicReadRateLimiter,
+} from "@/lib/utils/rate-limit";
 import { mapSelectionPayloadSchema } from "./schemas";
 
 export async function GET(request: NextRequest): Promise<NextResponse> {
   try {
     const user = requireAuth(request);
-    const limited = enforceRateLimit(request, publicReadRateLimiter, user.userId);
+    const limited = enforceRateLimit(
+      request,
+      publicReadRateLimiter,
+      user.userId
+    );
     if (limited) return limited.response;
 
     // Map selection is currently supported only for regular customers.
@@ -45,7 +56,11 @@ export async function GET(request: NextRequest): Promise<NextResponse> {
 export async function PUT(request: NextRequest): Promise<NextResponse> {
   try {
     const user = requireAuth(request);
-    const limited = enforceRateLimit(request, publicReadRateLimiter, user.userId);
+    const limited = enforceRateLimit(
+      request,
+      publicReadRateLimiter,
+      user.userId
+    );
     if (limited) return limited.response;
 
     if (user.role !== "USER") {

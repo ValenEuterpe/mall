@@ -153,9 +153,7 @@ export async function saveFileWithThumbnail(
           .catch(() => {});
       }
       throw new StorageError(
-        originalRes.error?.message ||
-          thumbRes.error?.message ||
-          "Upload failed"
+        originalRes.error?.message || thumbRes.error?.message || "Upload failed"
       );
     }
 
@@ -212,9 +210,7 @@ export async function deleteFile(url: string): Promise<boolean> {
 export async function deleteFiles(
   urls: string[]
 ): Promise<{ deleted: number; failed: number }> {
-  const keys = urls
-    .map(urlToObjectKey)
-    .filter((k): k is string => k !== null);
+  const keys = urls.map(urlToObjectKey).filter((k): k is string => k !== null);
 
   if (keys.length === 0) {
     return { deleted: 0, failed: urls.length };

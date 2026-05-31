@@ -149,11 +149,17 @@ export function CreateTagDialog({
   }, [name_en, name_ru, name_am, categoryId, subcategoryId, open]);
 
   const latinInCyrillic = useMemo(
-    () => name_ru.trim().length >= 2 && latin.test(name_ru) && !cyrillic.test(name_ru),
+    () =>
+      name_ru.trim().length >= 2 &&
+      latin.test(name_ru) &&
+      !cyrillic.test(name_ru),
     [name_ru]
   );
   const latinInArmenian = useMemo(
-    () => name_am.trim().length >= 2 && latin.test(name_am) && !armenian.test(name_am),
+    () =>
+      name_am.trim().length >= 2 &&
+      latin.test(name_am) &&
+      !armenian.test(name_am),
     [name_am]
   );
 
@@ -207,7 +213,8 @@ export function CreateTagDialog({
       setError("error" in res ? res.error.message : t("tagCreateError"));
     } catch (e) {
       if (e instanceof ApiClientError && e.code === "NEAR_MATCH") {
-        const details = (e.details as { candidates?: DedupCandidate[] } | undefined) ?? {};
+        const details =
+          (e.details as { candidates?: DedupCandidate[] } | undefined) ?? {};
         setCandidates(details.candidates ?? []);
         setShowCandidates(true);
       } else {
@@ -236,7 +243,8 @@ export function CreateTagDialog({
     onOpenChange(false);
   };
 
-  const canSubmit = (name_en.trim() || name_ru.trim() || name_am.trim()) && !submitting;
+  const canSubmit =
+    (name_en.trim() || name_ru.trim() || name_am.trim()) && !submitting;
   const tagLabel = (c: DedupCandidate): string => {
     if (locale === "ru") return c.name_ru || c.name_en;
     if (locale === "am") return c.name_am || c.name_en;
@@ -248,13 +256,15 @@ export function CreateTagDialog({
       <DialogContent className="sm:max-w-lg">
         <DialogHeader>
           <DialogTitle>{t("createTagDialogTitle")}</DialogTitle>
-          <DialogDescription>{t("createTagDialogDescription")}</DialogDescription>
+          <DialogDescription>
+            {t("createTagDialogDescription")}
+          </DialogDescription>
         </DialogHeader>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           {/* Suggestions surface (live + after a 409) */}
           {candidates.length > 0 && (
-            <div className="rounded-md border bg-muted/40 p-3 space-y-2">
+            <div className="bg-muted/40 space-y-2 rounded-md border p-3">
               <p className="text-sm font-medium">
                 {showCandidates ? t("nearMatchFound") : t("didYouMean")}
               </p>
@@ -263,7 +273,7 @@ export function CreateTagDialog({
                   <Badge
                     key={c.id}
                     variant="secondary"
-                    className="cursor-pointer hover:bg-primary hover:text-primary-foreground transition-colors py-1.5 px-3"
+                    className="hover:bg-primary hover:text-primary-foreground cursor-pointer px-3 py-1.5 transition-colors"
                     onClick={() => pickCandidate(c)}
                     title={t("useThisInstead")}
                   >
@@ -293,7 +303,7 @@ export function CreateTagDialog({
                 placeholder={t("nameInLanguagePlaceholder")}
               />
               {latinInCyrillic && (
-                <p className="text-xs text-amber-700 flex items-center gap-1.5">
+                <p className="flex items-center gap-1.5 text-xs text-amber-700">
                   <AlertCircle className="h-3.5 w-3.5" />
                   {t("latinInCyrillicWarning")}
                 </p>
@@ -308,7 +318,7 @@ export function CreateTagDialog({
                 placeholder={t("nameInLanguagePlaceholder")}
               />
               {latinInArmenian && (
-                <p className="text-xs text-amber-700 flex items-center gap-1.5">
+                <p className="flex items-center gap-1.5 text-xs text-amber-700">
                   <AlertCircle className="h-3.5 w-3.5" />
                   {t("latinInArmenianWarning")}
                 </p>
@@ -320,7 +330,10 @@ export function CreateTagDialog({
             type="button"
             variant="outline"
             size="sm"
-            disabled={translating || !(name_en.trim() || name_ru.trim() || name_am.trim())}
+            disabled={
+              translating ||
+              !(name_en.trim() || name_ru.trim() || name_am.trim())
+            }
             onClick={handleAutoFill}
             className="w-full"
           >
@@ -338,24 +351,30 @@ export function CreateTagDialog({
           </Button>
 
           {transliterationPreview && (
-            <div className="rounded-md border bg-background p-2 text-xs">
-              <span className="text-muted-foreground">{t("latinFormForSearch")}: </span>
+            <div className="bg-background rounded-md border p-2 text-xs">
+              <span className="text-muted-foreground">
+                {t("latinFormForSearch")}:{" "}
+              </span>
               <span className="font-mono">{transliterationPreview}</span>
-              <p className="mt-1 text-[10px] text-muted-foreground italic">
+              <p className="text-muted-foreground mt-1 text-[10px] italic">
                 {t("latinFormHint")}
               </p>
             </div>
           )}
 
           {error && (
-            <p className="text-sm text-destructive flex items-center gap-1.5">
+            <p className="text-destructive flex items-center gap-1.5 text-sm">
               <AlertCircle className="h-4 w-4" />
               {error}
             </p>
           )}
 
           <DialogFooter className="gap-2">
-            <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => onOpenChange(false)}
+            >
               {commonT("cancel")}
             </Button>
             {showCandidates ? (
@@ -365,11 +384,19 @@ export function CreateTagDialog({
                 disabled={submitting}
                 variant="default"
               >
-                {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : t("createAnyway")}
+                {submitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  t("createAnyway")
+                )}
               </Button>
             ) : (
               <Button type="submit" disabled={!canSubmit}>
-                {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : t("createNewTag")}
+                {submitting ? (
+                  <Loader2 className="h-4 w-4 animate-spin" />
+                ) : (
+                  t("createNewTag")
+                )}
               </Button>
             )}
           </DialogFooter>

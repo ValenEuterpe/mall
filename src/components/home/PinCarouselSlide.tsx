@@ -50,8 +50,8 @@ export const PinCarouselSlide = memo(function PinCarouselSlide({
 
         <div className="flex min-w-0 flex-1 flex-col justify-center">
           <p className="line-clamp-2 text-sm font-medium">{pin.name}</p>
-          {pin.price !== undefined && (
-            pin.hasDiscount && pin.effectivePrice != null ? (
+          {pin.price !== undefined &&
+            (pin.hasDiscount && pin.effectivePrice != null ? (
               <div className="flex items-baseline gap-1.5">
                 <p className="text-destructive text-sm font-semibold">
                   {pin.effectivePrice.toLocaleString()} ֏
@@ -64,8 +64,7 @@ export const PinCarouselSlide = memo(function PinCarouselSlide({
               <p className="text-accent-foreground text-sm font-semibold">
                 {pin.price.toLocaleString()} ֏
               </p>
-            )
-          )}
+            ))}
         </div>
       </div>
 

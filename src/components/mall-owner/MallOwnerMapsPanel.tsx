@@ -5,7 +5,7 @@ import { InteractiveMapEditor } from "./InteractiveMapEditor";
 
 /**
  * MallOwnerMapsPanel - Map management panel for mall owners
- * 
+ *
  * This component provides a full-featured map editor that allows mall owners to:
  * - Configure mall location (lat/lng)
  * - Add buildings and outdoor venues

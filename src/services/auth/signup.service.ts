@@ -89,7 +89,10 @@ export async function sendUserVerificationEmail(
     const tokenResult = await createEmailVerificationToken(email);
 
     if (!tokenResult.success) {
-      logger.error("Failed to create verification token", { recipient: maskEmail(email), error: tokenResult.error });
+      logger.error("Failed to create verification token", {
+        recipient: maskEmail(email),
+        error: tokenResult.error,
+      });
       return false;
     }
 
@@ -97,7 +100,10 @@ export async function sendUserVerificationEmail(
     dispatch(() => sendVerificationEmail(email, verifyUrl));
     return true;
   } catch (error) {
-    logger.error("Error sending verification email", { recipient: maskEmail(email), error });
+    logger.error("Error sending verification email", {
+      recipient: maskEmail(email),
+      error,
+    });
     return false;
   }
 }

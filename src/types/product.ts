@@ -103,9 +103,6 @@ export function getStockStatus(quantity: number): StockStatusInfo {
   };
 }
 
-export function formatPrice(
-  price: number,
-  locale: string
-): string {
+export function formatPrice(price: number, locale: string): string {
   return formatAmdPrice(price, locale);
 }

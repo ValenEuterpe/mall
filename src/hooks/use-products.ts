@@ -52,12 +52,10 @@ export interface ProductListItem {
   sku: string | null;
   isFeatured: boolean;
   hasDiscount: boolean;
-  discount:
-    | {
-        type: string;
-        value: unknown;
-      }
-    | null;
+  discount: {
+    type: string;
+    value: unknown;
+  } | null;
   shop: ProductShopRef;
   category: ProductCategoryRef | null;
   subcategory: ProductCategoryRef | null;
@@ -123,14 +121,12 @@ export interface ProductDetail {
     effectivePrice: number;
     currency: string;
     hasDiscount: boolean;
-    discountInfo:
-      | {
-          type: string;
-          value: unknown;
-          validFrom: string | null;
-          validUntil: string | null;
-        }
-      | null;
+    discountInfo: {
+      type: string;
+      value: unknown;
+      validFrom: string | null;
+      validUntil: string | null;
+    } | null;
     tiers: Array<{
       minQuantity: number;
       maxQuantity: number | null;
@@ -154,16 +150,14 @@ export interface ProductDetail {
       venue: string | null;
       svgId: string | null;
     };
-    seller:
-      | {
-          id: string;
-          businessName: string | null;
-          phone: string | null;
-          socialLinks: Record<string, unknown> | null;
-          logoUrl: string | null;
-          description: string | null;
-        }
-      | null;
+    seller: {
+      id: string;
+      businessName: string | null;
+      phone: string | null;
+      socialLinks: Record<string, unknown> | null;
+      logoUrl: string | null;
+      description: string | null;
+    } | null;
     contacts: Array<{ type: string; value: string; label: string | null }>;
     openingHours: Record<string, unknown> | null;
   };
@@ -214,11 +208,14 @@ function buildQueryParams(
   if (filters.search?.trim()) params.q = filters.search.trim();
   if (filters.categoryId) params.categoryId = filters.categoryId;
   if (filters.subcategoryId) params.subcategoryId = filters.subcategoryId;
-  if (filters.minPrice !== undefined && filters.minPrice >= 0) params.minPrice = String(filters.minPrice);
-  if (filters.maxPrice !== undefined && filters.maxPrice >= 0) params.maxPrice = String(filters.maxPrice);
+  if (filters.minPrice !== undefined && filters.minPrice >= 0)
+    params.minPrice = String(filters.minPrice);
+  if (filters.maxPrice !== undefined && filters.maxPrice >= 0)
+    params.maxPrice = String(filters.maxPrice);
   if (filters.inStock !== undefined) params.inStock = String(filters.inStock);
   if (filters.shopId) params.shopId = filters.shopId;
-  if (filters.isFeatured !== undefined) params.isFeatured = String(filters.isFeatured);
+  if (filters.isFeatured !== undefined)
+    params.isFeatured = String(filters.isFeatured);
   if (filters.brand?.trim()) params.brand = filters.brand.trim();
 
   if (sort) {
@@ -229,7 +226,10 @@ function buildQueryParams(
   return params;
 }
 
-function createFiltersKey(filters: ProductFilters, sort?: ProductSorting): string {
+function createFiltersKey(
+  filters: ProductFilters,
+  sort?: ProductSorting
+): string {
   return JSON.stringify({ filters, sort });
 }
 
@@ -237,7 +237,9 @@ function createFiltersKey(filters: ProductFilters, sort?: ProductSorting): strin
 // useProducts
 // ============================================================================
 
-export function useProducts(options: UseProductsOptions = {}): UseProductsReturn {
+export function useProducts(
+  options: UseProductsOptions = {}
+): UseProductsReturn {
   const locale = useLocale();
   const {
     initialPage = 1,
@@ -305,14 +307,23 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
       }));
 
       try {
-        const params = buildQueryParams(pagination.page, pagination.limit, stableFilters, stableSort);
+        const params = buildQueryParams(
+          pagination.page,
+          pagination.limit,
+          stableFilters,
+          stableSort
+        );
         params.locale = locale;
 
         // baseUrl is already `/api/v1`, so we call `"/products"`
-        const response = await apiClient.get<ProductListItem[]>("/products", params, {
-          signal: abortControllerRef.current.signal,
-          showErrorToast: false,
-        });
+        const response = await apiClient.get<ProductListItem[]>(
+          "/products",
+          params,
+          {
+            signal: abortControllerRef.current.signal,
+            showErrorToast: false,
+          }
+        );
 
         if (!isMountedRef.current) return;
 
@@ -340,7 +351,14 @@ export function useProducts(options: UseProductsOptions = {}): UseProductsReturn
         }));
       }
     },
-    [enabled, pagination.page, pagination.limit, stableFilters, stableSort, locale]
+    [
+      enabled,
+      pagination.page,
+      pagination.limit,
+      stableFilters,
+      stableSort,
+      locale,
+    ]
   );
 
   useEffect(() => {
@@ -425,8 +443,8 @@ export function useProduct(
         `/products/${id}`,
         { locale },
         {
-        signal: abortControllerRef.current.signal,
-        showErrorToast: false,
+          signal: abortControllerRef.current.signal,
+          showErrorToast: false,
         }
       );
 

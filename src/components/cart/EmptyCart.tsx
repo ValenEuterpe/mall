@@ -11,7 +11,9 @@ interface EmptyCartProps {
   isAuthenticated?: boolean;
 }
 
-export function EmptyCart({ isAuthenticated = true }: EmptyCartProps): React.ReactElement {
+export function EmptyCart({
+  isAuthenticated = true,
+}: EmptyCartProps): React.ReactElement {
   const t = useTranslations("cart");
 
   if (!isAuthenticated) {

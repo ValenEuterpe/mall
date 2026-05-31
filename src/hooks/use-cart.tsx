@@ -12,7 +12,11 @@ import React, {
 
 import { useAuth } from "@/hooks/use-auth";
 import type { CartItem, CartProduct, CartState } from "@/lib/cart/types";
-import { clearCartStorage, loadCartFromStorage, saveCartToStorage } from "@/lib/cart/storage";
+import {
+  clearCartStorage,
+  loadCartFromStorage,
+  saveCartToStorage,
+} from "@/lib/cart/storage";
 
 interface CartContextValue {
   items: CartItem[];
@@ -40,7 +44,10 @@ export interface CartProviderProps {
   userId?: string;
 }
 
-export function CartProvider({ children, userId }: CartProviderProps): React.ReactElement {
+export function CartProvider({
+  children,
+  userId,
+}: CartProviderProps): React.ReactElement {
   const [state, setState] = useState<CartState>({
     items: [],
     isHydrated: false,
@@ -64,33 +71,38 @@ export function CartProvider({ children, userId }: CartProviderProps): React.Rea
     if (state.isHydrated) saveCartToStorage(state.items, userId);
   }, [state.items, state.isHydrated, userId]);
 
-  const addItem = useCallback((product: CartProduct, quantity: number = 1): void => {
-    if (quantity < 1) {
-      console.warn("[Cart] Cannot add item with quantity less than 1");
-      return;
-    }
-
-    setState((prev) => {
-      const existingIndex = prev.items.findIndex((item) => item.id === product.id);
-
-      if (existingIndex !== -1) {
-        const updatedItems = [...prev.items];
-        updatedItems[existingIndex] = {
-          ...updatedItems[existingIndex],
-          quantity: updatedItems[existingIndex].quantity + quantity,
-        };
-        return { ...prev, items: updatedItems };
+  const addItem = useCallback(
+    (product: CartProduct, quantity: number = 1): void => {
+      if (quantity < 1) {
+        console.warn("[Cart] Cannot add item with quantity less than 1");
+        return;
       }
 
-      const newItem: CartItem = {
-        ...product,
-        quantity,
-        addedAt: Date.now(),
-      };
+      setState((prev) => {
+        const existingIndex = prev.items.findIndex(
+          (item) => item.id === product.id
+        );
 
-      return { ...prev, items: [...prev.items, newItem] };
-    });
-  }, []);
+        if (existingIndex !== -1) {
+          const updatedItems = [...prev.items];
+          updatedItems[existingIndex] = {
+            ...updatedItems[existingIndex],
+            quantity: updatedItems[existingIndex].quantity + quantity,
+          };
+          return { ...prev, items: updatedItems };
+        }
+
+        const newItem: CartItem = {
+          ...product,
+          quantity,
+          addedAt: Date.now(),
+        };
+
+        return { ...prev, items: [...prev.items, newItem] };
+      });
+    },
+    []
+  );
 
   const removeItem = useCallback((productId: string): void => {
     setState((prev) => ({
@@ -99,26 +111,31 @@ export function CartProvider({ children, userId }: CartProviderProps): React.Rea
     }));
   }, []);
 
-  const updateQuantity = useCallback((productId: string, quantity: number): void => {
-    if (quantity < 0) {
-      console.warn("[Cart] Cannot set quantity less than 0");
-      return;
-    }
-
-    setState((prev) => {
-      if (quantity === 0) {
-        return {
-          ...prev,
-          items: prev.items.filter((item) => item.id !== productId),
-        };
+  const updateQuantity = useCallback(
+    (productId: string, quantity: number): void => {
+      if (quantity < 0) {
+        console.warn("[Cart] Cannot set quantity less than 0");
+        return;
       }
 
-      return {
-        ...prev,
-        items: prev.items.map((item) => (item.id === productId ? { ...item, quantity } : item)),
-      };
-    });
-  }, []);
+      setState((prev) => {
+        if (quantity === 0) {
+          return {
+            ...prev,
+            items: prev.items.filter((item) => item.id !== productId),
+          };
+        }
+
+        return {
+          ...prev,
+          items: prev.items.map((item) =>
+            item.id === productId ? { ...item, quantity } : item
+          ),
+        };
+      });
+    },
+    []
+  );
 
   const incrementQuantity = useCallback((productId: string): void => {
     setState((prev) => ({
@@ -133,7 +150,11 @@ export function CartProvider({ children, userId }: CartProviderProps): React.Rea
     setState((prev) => ({
       ...prev,
       items: prev.items
-        .map((item) => (item.id === productId ? { ...item, quantity: item.quantity - 1 } : item))
+        .map((item) =>
+          item.id === productId
+            ? { ...item, quantity: item.quantity - 1 }
+            : item
+        )
         .filter((item) => item.quantity > 0),
     }));
   }, []);
@@ -144,12 +165,14 @@ export function CartProvider({ children, userId }: CartProviderProps): React.Rea
   }, [userId]);
 
   const isInCart = useCallback(
-    (productId: string): boolean => state.items.some((item) => item.id === productId),
+    (productId: string): boolean =>
+      state.items.some((item) => item.id === productId),
     [state.items]
   );
 
   const getItem = useCallback(
-    (productId: string): CartItem | undefined => state.items.find((item) => item.id === productId),
+    (productId: string): CartItem | undefined =>
+      state.items.find((item) => item.id === productId),
     [state.items]
   );
 
@@ -173,7 +196,11 @@ export function CartProvider({ children, userId }: CartProviderProps): React.Rea
   );
 
   const totalPrice = useMemo(
-    () => state.items.reduce((total, item) => total + item.price * item.quantity, 0),
+    () =>
+      state.items.reduce(
+        (total, item) => total + item.price * item.quantity,
+        0
+      ),
     [state.items]
   );
 
@@ -212,7 +239,9 @@ export function CartProvider({ children, userId }: CartProviderProps): React.Rea
     ]
   );
 
-  return <CartContext.Provider value={contextValue}>{children}</CartContext.Provider>;
+  return (
+    <CartContext.Provider value={contextValue}>{children}</CartContext.Provider>
+  );
 }
 
 export function useCart(): CartContextValue {
@@ -229,7 +258,11 @@ export function useIsInCart(productId: string): boolean {
   return useCart().isInCart(productId);
 }
 
-export function useCartTotals(): { itemCount: number; totalQuantity: number; totalPrice: number } {
+export function useCartTotals(): {
+  itemCount: number;
+  totalQuantity: number;
+  totalPrice: number;
+} {
   const { itemCount, totalQuantity, totalPrice } = useCart();
   return { itemCount, totalQuantity, totalPrice };
 }
@@ -238,7 +271,11 @@ export function useCartTotals(): { itemCount: number; totalQuantity: number; tot
  * Cart provider that reads the current user ID from AuthProvider.
  * Must be rendered inside AuthProvider.
  */
-export function AuthAwareCartProvider({ children }: { children: ReactNode }): React.ReactElement {
+export function AuthAwareCartProvider({
+  children,
+}: {
+  children: ReactNode;
+}): React.ReactElement {
   const { user } = useAuth();
   return <CartProvider userId={user?.id}>{children}</CartProvider>;
 }

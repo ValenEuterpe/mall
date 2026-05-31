@@ -1,8 +1,15 @@
 import { NextRequest, NextResponse } from "next/server";
 
-import { createErrorResponse, createSuccessResponse, methodNotAllowed } from "@/app/response";
+import {
+  createErrorResponse,
+  createSuccessResponse,
+  methodNotAllowed,
+} from "@/app/response";
 import prisma from "@/lib/db/prisma";
-import { enforceRateLimit, publicReadRateLimiter } from "@/lib/utils/rate-limit";
+import {
+  enforceRateLimit,
+  publicReadRateLimiter,
+} from "@/lib/utils/rate-limit";
 import { productsBatchRequestSchema } from "./schemas";
 
 export async function POST(request: NextRequest): Promise<NextResponse> {
@@ -67,9 +74,11 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       let effectivePrice = Number(p.basePrice);
       if (activeDiscount) {
         if (activeDiscount.discountType === "percentage") {
-          effectivePrice = effectivePrice * (1 - Number(activeDiscount.discountValue) / 100);
+          effectivePrice =
+            effectivePrice * (1 - Number(activeDiscount.discountValue) / 100);
         } else if (activeDiscount.discountType === "fixed") {
-          effectivePrice = effectivePrice - Number(activeDiscount.discountValue);
+          effectivePrice =
+            effectivePrice - Number(activeDiscount.discountValue);
         }
         effectivePrice = Math.max(0, effectivePrice);
       }
@@ -82,7 +91,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         effectivePrice,
         hasDiscount: !!activeDiscount,
         discount: activeDiscount
-          ? { type: activeDiscount.discountType, value: Number(activeDiscount.discountValue) }
+          ? {
+              type: activeDiscount.discountType,
+              value: Number(activeDiscount.discountValue),
+            }
           : null,
         shop: p.shop,
       };

@@ -1,6 +1,6 @@
 /**
  * Translation Module
- * 
+ *
  * Provides AI-powered translation services using Google Gemini.
  */
 
@@ -13,4 +13,4 @@ export {
   type TranslationResult,
   type BatchTranslationInput,
   type BatchTranslationResult,
-} from './gemini';
+} from "./gemini";

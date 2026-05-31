@@ -1,117 +1,592 @@
 {
   "food": [
-    { "key": "snacks", "name_en": "Snacks", "name_ru": "Снеки", "name_am": "Խորտիկներ" },
-    { "key": "dairy", "name_en": "Dairy", "name_ru": "Молочные", "name_am": "Կաթնամթերք" },
-    { "key": "bakery", "name_en": "Bakery", "name_ru": "Выпечка", "name_am": "Հացաբուլկեղեն" },
-    { "key": "frozen", "name_en": "Frozen", "name_ru": "Замороженные", "name_am": "Սառեցված" },
-    { "key": "beverages", "name_en": "Beverages", "name_ru": "Напитки", "name_am": "Ըմպելիքներ" },
-    { "key": "beer", "name_en": "Beer", "name_ru": "Пиво", "name_am": "Գարեջուր" },
+    {
+      "key": "snacks",
+      "name_en": "Snacks",
+      "name_ru": "Снеки",
+      "name_am": "Խորտիկներ"
+    },
+    {
+      "key": "dairy",
+      "name_en": "Dairy",
+      "name_ru": "Молочные",
+      "name_am": "Կաթնամթերք"
+    },
+    {
+      "key": "bakery",
+      "name_en": "Bakery",
+      "name_ru": "Выпечка",
+      "name_am": "Հացաբուլկեղեն"
+    },
+    {
+      "key": "frozen",
+      "name_en": "Frozen",
+      "name_ru": "Замороженные",
+      "name_am": "Սառեցված"
+    },
+    {
+      "key": "beverages",
+      "name_en": "Beverages",
+      "name_ru": "Напитки",
+      "name_am": "Ըմպելիքներ"
+    },
+    {
+      "key": "beer",
+      "name_en": "Beer",
+      "name_ru": "Пиво",
+      "name_am": "Գարեջուր"
+    },
     { "key": "wine", "name_en": "Wine", "name_ru": "Вино", "name_am": "Գինի" },
-    { "key": "spirits", "name_en": "Spirits", "name_ru": "Крепкий алкоголь", "name_am": "Ալկոհոլ" },
-    { "key": "soft_drinks", "name_en": "Soft drinks", "name_ru": "Газировка", "name_am": "Զովացուցիչ ըմպելիք" },
-    { "key": "water", "name_en": "Water", "name_ru": "Вода", "name_am": "Ջուր" },
-    { "key": "coffee", "name_en": "Coffee", "name_ru": "Кофе", "name_am": "Սուրճ" },
+    {
+      "key": "spirits",
+      "name_en": "Spirits",
+      "name_ru": "Крепкий алкоголь",
+      "name_am": "Ալկոհոլ"
+    },
+    {
+      "key": "soft_drinks",
+      "name_en": "Soft drinks",
+      "name_ru": "Газировка",
+      "name_am": "Զովացուցիչ ըմպելիք"
+    },
+    {
+      "key": "water",
+      "name_en": "Water",
+      "name_ru": "Вода",
+      "name_am": "Ջուր"
+    },
+    {
+      "key": "coffee",
+      "name_en": "Coffee",
+      "name_ru": "Кофе",
+      "name_am": "Սուրճ"
+    },
     { "key": "tea", "name_en": "Tea", "name_ru": "Чай", "name_am": "Թեյ" },
-    { "key": "fruits", "name_en": "Fruits", "name_ru": "Фрукты", "name_am": "Մրգեր" },
-    { "key": "vegetables", "name_en": "Vegetables", "name_ru": "Овощи", "name_am": "Բանջարեղեն" },
+    {
+      "key": "fruits",
+      "name_en": "Fruits",
+      "name_ru": "Фрукты",
+      "name_am": "Մրգեր"
+    },
+    {
+      "key": "vegetables",
+      "name_en": "Vegetables",
+      "name_ru": "Овощи",
+      "name_am": "Բանջարեղեն"
+    },
     { "key": "meat", "name_en": "Meat", "name_ru": "Мясо", "name_am": "Միս" },
     { "key": "fish", "name_en": "Fish", "name_ru": "Рыба", "name_am": "Ձուկ" },
-    { "key": "organic", "name_en": "Organic", "name_ru": "Органик", "name_am": "Օրգանական" },
-    { "key": "gluten_free", "name_en": "Gluten-free", "name_ru": "Без глютена", "name_am": "Գլյուտենի կտորից զերծ" }
+    {
+      "key": "organic",
+      "name_en": "Organic",
+      "name_ru": "Органик",
+      "name_am": "Օրգանական"
+    },
+    {
+      "key": "gluten_free",
+      "name_en": "Gluten-free",
+      "name_ru": "Без глютена",
+      "name_am": "Գլյուտենի կտորից զերծ"
+    }
   ],
   "clothing": [
-    { "key": "tshirts", "name_en": "T-shirts", "name_ru": "Футболки", "name_am": "Շապիկներ" },
-    { "key": "shirts", "name_en": "Shirts", "name_ru": "Рубашки", "name_am": "Վերնաշապիկներ" },
-    { "key": "hoodies", "name_en": "Hoodies", "name_ru": "Худи", "name_am": "Հուդիներ" },
-    { "key": "jackets", "name_en": "Jackets", "name_ru": "Куртки", "name_am": "Բաճկոններ" },
-    { "key": "coats", "name_en": "Coats", "name_ru": "Пальто", "name_am": "Վերարկուներ" },
-    { "key": "jeans", "name_en": "Jeans", "name_ru": "Джинсы", "name_am": "Ջինսեր" },
-    { "key": "joggers", "name_en": "Joggers", "name_ru": "Джоггеры", "name_am": "Ջոգերներ" },
-    { "key": "sweatpants", "name_en": "Sweatpants", "name_ru": "Спортивные брюки", "name_am": "Մարզաշորեր" },
-    { "key": "shorts", "name_en": "Shorts", "name_ru": "Шорты", "name_am": "Շորտեր" },
-    { "key": "leggings", "name_en": "Leggings", "name_ru": "Леггинсы", "name_am": "Լեգինսներ" },
-    { "key": "dresses", "name_en": "Dresses", "name_ru": "Платья", "name_am": "Զգեստներ" },
-    { "key": "skirts", "name_en": "Skirts", "name_ru": "Юбки", "name_am": "Կիսաշրջազգեստներ" },
-    { "key": "sneakers", "name_en": "Sneakers", "name_ru": "Кроссовки", "name_am": "Սպորտային կոշիկներ" },
-    { "key": "boots", "name_en": "Boots", "name_ru": "Ботинки", "name_am": "Բոթաս" },
-    { "key": "underwear", "name_en": "Underwear", "name_ru": "Бельё", "name_am": "Ներքնազգեստ" },
-    { "key": "socks", "name_en": "Socks", "name_ru": "Носки", "name_am": "Գուլպաներ" },
-    { "key": "sportswear", "name_en": "Sportswear", "name_ru": "Спортивная одежда", "name_am": "Մարզահագուստ" },
-    { "key": "kids", "name_en": "Kids", "name_ru": "Детское", "name_am": "Մանկական" },
-    { "key": "mens", "name_en": "Men's", "name_ru": "Мужское", "name_am": "Տղամարդկանց" },
-    { "key": "womens", "name_en": "Women's", "name_ru": "Женское", "name_am": "Կանանց" }
+    {
+      "key": "tshirts",
+      "name_en": "T-shirts",
+      "name_ru": "Футболки",
+      "name_am": "Շապիկներ"
+    },
+    {
+      "key": "shirts",
+      "name_en": "Shirts",
+      "name_ru": "Рубашки",
+      "name_am": "Վերնաշապիկներ"
+    },
+    {
+      "key": "hoodies",
+      "name_en": "Hoodies",
+      "name_ru": "Худи",
+      "name_am": "Հուդիներ"
+    },
+    {
+      "key": "jackets",
+      "name_en": "Jackets",
+      "name_ru": "Куртки",
+      "name_am": "Բաճկոններ"
+    },
+    {
+      "key": "coats",
+      "name_en": "Coats",
+      "name_ru": "Пальто",
+      "name_am": "Վերարկուներ"
+    },
+    {
+      "key": "jeans",
+      "name_en": "Jeans",
+      "name_ru": "Джинсы",
+      "name_am": "Ջինսեր"
+    },
+    {
+      "key": "joggers",
+      "name_en": "Joggers",
+      "name_ru": "Джоггеры",
+      "name_am": "Ջոգերներ"
+    },
+    {
+      "key": "sweatpants",
+      "name_en": "Sweatpants",
+      "name_ru": "Спортивные брюки",
+      "name_am": "Մարզաշորեր"
+    },
+    {
+      "key": "shorts",
+      "name_en": "Shorts",
+      "name_ru": "Шорты",
+      "name_am": "Շորտեր"
+    },
+    {
+      "key": "leggings",
+      "name_en": "Leggings",
+      "name_ru": "Леггинсы",
+      "name_am": "Լեգինսներ"
+    },
+    {
+      "key": "dresses",
+      "name_en": "Dresses",
+      "name_ru": "Платья",
+      "name_am": "Զգեստներ"
+    },
+    {
+      "key": "skirts",
+      "name_en": "Skirts",
+      "name_ru": "Юбки",
+      "name_am": "Կիսաշրջազգեստներ"
+    },
+    {
+      "key": "sneakers",
+      "name_en": "Sneakers",
+      "name_ru": "Кроссовки",
+      "name_am": "Սպորտային կոշիկներ"
+    },
+    {
+      "key": "boots",
+      "name_en": "Boots",
+      "name_ru": "Ботинки",
+      "name_am": "Բոթաս"
+    },
+    {
+      "key": "underwear",
+      "name_en": "Underwear",
+      "name_ru": "Бельё",
+      "name_am": "Ներքնազգեստ"
+    },
+    {
+      "key": "socks",
+      "name_en": "Socks",
+      "name_ru": "Носки",
+      "name_am": "Գուլպաներ"
+    },
+    {
+      "key": "sportswear",
+      "name_en": "Sportswear",
+      "name_ru": "Спортивная одежда",
+      "name_am": "Մարզահագուստ"
+    },
+    {
+      "key": "kids",
+      "name_en": "Kids",
+      "name_ru": "Детское",
+      "name_am": "Մանկական"
+    },
+    {
+      "key": "mens",
+      "name_en": "Men's",
+      "name_ru": "Мужское",
+      "name_am": "Տղամարդկանց"
+    },
+    {
+      "key": "womens",
+      "name_en": "Women's",
+      "name_ru": "Женское",
+      "name_am": "Կանանց"
+    }
   ],
   "electronics": [
-    { "key": "smartphone", "name_en": "Smartphone", "name_ru": "Смартфон", "name_am": "Սմարթֆոն" },
-    { "key": "laptop", "name_en": "Laptop", "name_ru": "Ноутбук", "name_am": "Նոթբուք" },
-    { "key": "tablet", "name_en": "Tablet", "name_ru": "Планшет", "name_am": "Պլանշետ" },
-    { "key": "tv", "name_en": "TV", "name_ru": "Телевизор", "name_am": "Հեռուստացույց" },
-    { "key": "headphones", "name_en": "Headphones", "name_ru": "Наушники", "name_am": "Ականջակալներ" },
-    { "key": "speaker", "name_en": "Speaker", "name_ru": "Колонка", "name_am": "Բարձրախոս" },
-    { "key": "camera", "name_en": "Camera", "name_ru": "Камера", "name_am": "Տեսախցիկ" },
-    { "key": "smartwatch", "name_en": "Smartwatch", "name_ru": "Смарт-часы", "name_am": "Խելացի ժամացույց" },
-    { "key": "gaming", "name_en": "Gaming", "name_ru": "Игры", "name_am": "Գեյմինգ" },
-    { "key": "accessories", "name_en": "Accessories", "name_ru": "Аксессуары", "name_am": "Աքսեսուարներ" },
-    { "key": "cable", "name_en": "Cable", "name_ru": "Кабель", "name_am": "Մալուխ" },
-    { "key": "charger", "name_en": "Charger", "name_ru": "Зарядное", "name_am": "Լիցքավորիչ" },
-    { "key": "power_bank", "name_en": "Power bank", "name_ru": "Повербанк", "name_am": "Փաուերբանկ" },
-    { "key": "android", "name_en": "Android", "name_ru": "Андроид", "name_am": "Անդրոիդ" },
+    {
+      "key": "smartphone",
+      "name_en": "Smartphone",
+      "name_ru": "Смартфон",
+      "name_am": "Սմարթֆոն"
+    },
+    {
+      "key": "laptop",
+      "name_en": "Laptop",
+      "name_ru": "Ноутбук",
+      "name_am": "Նոթբուք"
+    },
+    {
+      "key": "tablet",
+      "name_en": "Tablet",
+      "name_ru": "Планшет",
+      "name_am": "Պլանշետ"
+    },
+    {
+      "key": "tv",
+      "name_en": "TV",
+      "name_ru": "Телевизор",
+      "name_am": "Հեռուստացույց"
+    },
+    {
+      "key": "headphones",
+      "name_en": "Headphones",
+      "name_ru": "Наушники",
+      "name_am": "Ականջակալներ"
+    },
+    {
+      "key": "speaker",
+      "name_en": "Speaker",
+      "name_ru": "Колонка",
+      "name_am": "Բարձրախոս"
+    },
+    {
+      "key": "camera",
+      "name_en": "Camera",
+      "name_ru": "Камера",
+      "name_am": "Տեսախցիկ"
+    },
+    {
+      "key": "smartwatch",
+      "name_en": "Smartwatch",
+      "name_ru": "Смарт-часы",
+      "name_am": "Խելացի ժամացույց"
+    },
+    {
+      "key": "gaming",
+      "name_en": "Gaming",
+      "name_ru": "Игры",
+      "name_am": "Գեյմինգ"
+    },
+    {
+      "key": "accessories",
+      "name_en": "Accessories",
+      "name_ru": "Аксессуары",
+      "name_am": "Աքսեսուարներ"
+    },
+    {
+      "key": "cable",
+      "name_en": "Cable",
+      "name_ru": "Кабель",
+      "name_am": "Մալուխ"
+    },
+    {
+      "key": "charger",
+      "name_en": "Charger",
+      "name_ru": "Зарядное",
+      "name_am": "Լիցքավորիչ"
+    },
+    {
+      "key": "power_bank",
+      "name_en": "Power bank",
+      "name_ru": "Повербанк",
+      "name_am": "Փաուերբանկ"
+    },
+    {
+      "key": "android",
+      "name_en": "Android",
+      "name_ru": "Андроид",
+      "name_am": "Անդրոիդ"
+    },
     { "key": "ios", "name_en": "iOS", "name_ru": "iOS", "name_am": "iOS" }
   ],
   "household": [
-    { "key": "cleaning", "name_en": "Cleaning", "name_ru": "Уборка", "name_am": "Մաքրում" },
-    { "key": "laundry", "name_en": "Laundry", "name_ru": "Стирка", "name_am": "Լվացք" },
-    { "key": "kitchen", "name_en": "Kitchen", "name_ru": "Кухня", "name_am": "Խոհանոց" },
-    { "key": "cookware", "name_en": "Cookware", "name_ru": "Посуда", "name_am": "Խոհանոցային սպասք" },
-    { "key": "tableware", "name_en": "Tableware", "name_ru": "Столовые приборы", "name_am": "Սեղանի սպասք" },
-    { "key": "storage", "name_en": "Storage", "name_ru": "Хранение", "name_am": "Պահեստավորում" },
-    { "key": "bathroom", "name_en": "Bathroom", "name_ru": "Ванная", "name_am": "Լոգարան" },
-    { "key": "bedding", "name_en": "Bedding", "name_ru": "Постельное", "name_am": "Անկողնային" },
-    { "key": "lighting", "name_en": "Lighting", "name_ru": "Освещение", "name_am": "Լուսավորություն" },
-    { "key": "decor", "name_en": "Decor", "name_ru": "Декор", "name_am": "Դեկոր" },
-    { "key": "tools", "name_en": "Tools", "name_ru": "Инструменты", "name_am": "Գործիքներ" },
-    { "key": "garden", "name_en": "Garden", "name_ru": "Сад", "name_am": "Այգի" }
+    {
+      "key": "cleaning",
+      "name_en": "Cleaning",
+      "name_ru": "Уборка",
+      "name_am": "Մաքրում"
+    },
+    {
+      "key": "laundry",
+      "name_en": "Laundry",
+      "name_ru": "Стирка",
+      "name_am": "Լվացք"
+    },
+    {
+      "key": "kitchen",
+      "name_en": "Kitchen",
+      "name_ru": "Кухня",
+      "name_am": "Խոհանոց"
+    },
+    {
+      "key": "cookware",
+      "name_en": "Cookware",
+      "name_ru": "Посуда",
+      "name_am": "Խոհանոցային սպասք"
+    },
+    {
+      "key": "tableware",
+      "name_en": "Tableware",
+      "name_ru": "Столовые приборы",
+      "name_am": "Սեղանի սպասք"
+    },
+    {
+      "key": "storage",
+      "name_en": "Storage",
+      "name_ru": "Хранение",
+      "name_am": "Պահեստավորում"
+    },
+    {
+      "key": "bathroom",
+      "name_en": "Bathroom",
+      "name_ru": "Ванная",
+      "name_am": "Լոգարան"
+    },
+    {
+      "key": "bedding",
+      "name_en": "Bedding",
+      "name_ru": "Постельное",
+      "name_am": "Անկողնային"
+    },
+    {
+      "key": "lighting",
+      "name_en": "Lighting",
+      "name_ru": "Освещение",
+      "name_am": "Լուսավորություն"
+    },
+    {
+      "key": "decor",
+      "name_en": "Decor",
+      "name_ru": "Декор",
+      "name_am": "Դեկոր"
+    },
+    {
+      "key": "tools",
+      "name_en": "Tools",
+      "name_ru": "Инструменты",
+      "name_am": "Գործիքներ"
+    },
+    {
+      "key": "garden",
+      "name_en": "Garden",
+      "name_ru": "Сад",
+      "name_am": "Այգի"
+    }
   ],
   "health_beauty": [
-    { "key": "skincare", "name_en": "Skincare", "name_ru": "Уход за кожей", "name_am": "Մաշկի խնամք" },
-    { "key": "makeup", "name_en": "Makeup", "name_ru": "Макияж", "name_am": "Մակիյաժ" },
-    { "key": "haircare", "name_en": "Haircare", "name_ru": "Уход за волосами", "name_am": "Մազերի խնամք" },
-    { "key": "fragrance", "name_en": "Fragrance", "name_ru": "Парфюм", "name_am": "Օծանելիք" },
-    { "key": "shampoo", "name_en": "Shampoo", "name_ru": "Шампунь", "name_am": "Շամպուն" },
+    {
+      "key": "skincare",
+      "name_en": "Skincare",
+      "name_ru": "Уход за кожей",
+      "name_am": "Մաշկի խնամք"
+    },
+    {
+      "key": "makeup",
+      "name_en": "Makeup",
+      "name_ru": "Макияж",
+      "name_am": "Մակիյաժ"
+    },
+    {
+      "key": "haircare",
+      "name_en": "Haircare",
+      "name_ru": "Уход за волосами",
+      "name_am": "Մազերի խնամք"
+    },
+    {
+      "key": "fragrance",
+      "name_en": "Fragrance",
+      "name_ru": "Парфюм",
+      "name_am": "Օծանելիք"
+    },
+    {
+      "key": "shampoo",
+      "name_en": "Shampoo",
+      "name_ru": "Шампунь",
+      "name_am": "Շամպուն"
+    },
     { "key": "soap", "name_en": "Soap", "name_ru": "Мыло", "name_am": "Օճառ" },
-    { "key": "toothpaste", "name_en": "Toothpaste", "name_ru": "Зубная паста", "name_am": "Ատամի մածուկ" },
-    { "key": "vitamins", "name_en": "Vitamins", "name_ru": "Витамины", "name_am": "Վիտամիններ" },
-    { "key": "supplements", "name_en": "Supplements", "name_ru": "БАДы", "name_am": "Հավելումներ" },
-    { "key": "first_aid", "name_en": "First aid", "name_ru": "Аптечка", "name_am": "Առաջին օգնություն" },
-    { "key": "baby_care", "name_en": "Baby care", "name_ru": "Уход за младенцем", "name_am": "Մանկական խնամք" },
-    { "key": "men", "name_en": "Men", "name_ru": "Мужское", "name_am": "Տղամարդկանց" },
-    { "key": "women", "name_en": "Women", "name_ru": "Женское", "name_am": "Կանանց" }
+    {
+      "key": "toothpaste",
+      "name_en": "Toothpaste",
+      "name_ru": "Зубная паста",
+      "name_am": "Ատամի մածուկ"
+    },
+    {
+      "key": "vitamins",
+      "name_en": "Vitamins",
+      "name_ru": "Витамины",
+      "name_am": "Վիտամիններ"
+    },
+    {
+      "key": "supplements",
+      "name_en": "Supplements",
+      "name_ru": "БАДы",
+      "name_am": "Հավելումներ"
+    },
+    {
+      "key": "first_aid",
+      "name_en": "First aid",
+      "name_ru": "Аптечка",
+      "name_am": "Առաջին օգնություն"
+    },
+    {
+      "key": "baby_care",
+      "name_en": "Baby care",
+      "name_ru": "Уход за младенцем",
+      "name_am": "Մանկական խնամք"
+    },
+    {
+      "key": "men",
+      "name_en": "Men",
+      "name_ru": "Мужское",
+      "name_am": "Տղամարդկանց"
+    },
+    {
+      "key": "women",
+      "name_en": "Women",
+      "name_ru": "Женское",
+      "name_am": "Կանանց"
+    }
   ],
   "stationery": [
-    { "key": "pens", "name_en": "Pens", "name_ru": "Ручки", "name_am": "Գրիչներ" },
-    { "key": "pencils", "name_en": "Pencils", "name_ru": "Карандаши", "name_am": "Մատիտներ" },
-    { "key": "notebooks", "name_en": "Notebooks", "name_ru": "Тетради", "name_am": "Տետրեր" },
-    { "key": "paper", "name_en": "Paper", "name_ru": "Бумага", "name_am": "Թուղթ" },
-    { "key": "folders", "name_en": "Folders", "name_ru": "Папки", "name_am": "Թղթապանակներ" },
-    { "key": "art_supplies", "name_en": "Art supplies", "name_ru": "Художественные принадлежности", "name_am": "Արվեստի պարագաներ" },
-    { "key": "office", "name_en": "Office", "name_ru": "Офис", "name_am": "Գրասենյակային" },
-    { "key": "school", "name_en": "School", "name_ru": "Школьное", "name_am": "Դպրոցական" },
-    { "key": "calculator", "name_en": "Calculator", "name_ru": "Калькулятор", "name_am": "Հաշվիչ" },
-    { "key": "scissors", "name_en": "Scissors", "name_ru": "Ножницы", "name_am": "Մկրատներ" }
+    {
+      "key": "pens",
+      "name_en": "Pens",
+      "name_ru": "Ручки",
+      "name_am": "Գրիչներ"
+    },
+    {
+      "key": "pencils",
+      "name_en": "Pencils",
+      "name_ru": "Карандаши",
+      "name_am": "Մատիտներ"
+    },
+    {
+      "key": "notebooks",
+      "name_en": "Notebooks",
+      "name_ru": "Тетради",
+      "name_am": "Տետրեր"
+    },
+    {
+      "key": "paper",
+      "name_en": "Paper",
+      "name_ru": "Бумага",
+      "name_am": "Թուղթ"
+    },
+    {
+      "key": "folders",
+      "name_en": "Folders",
+      "name_ru": "Папки",
+      "name_am": "Թղթապանակներ"
+    },
+    {
+      "key": "art_supplies",
+      "name_en": "Art supplies",
+      "name_ru": "Художественные принадлежности",
+      "name_am": "Արվեստի պարագաներ"
+    },
+    {
+      "key": "office",
+      "name_en": "Office",
+      "name_ru": "Офис",
+      "name_am": "Գրասենյակային"
+    },
+    {
+      "key": "school",
+      "name_en": "School",
+      "name_ru": "Школьное",
+      "name_am": "Դպրոցական"
+    },
+    {
+      "key": "calculator",
+      "name_en": "Calculator",
+      "name_ru": "Калькулятор",
+      "name_am": "Հաշվիչ"
+    },
+    {
+      "key": "scissors",
+      "name_en": "Scissors",
+      "name_ru": "Ножницы",
+      "name_am": "Մկրատներ"
+    }
   ],
   "toys_games": [
-    { "key": "board_games", "name_en": "Board games", "name_ru": "Настольные игры", "name_am": "Սեղանի խաղեր" },
-    { "key": "puzzles", "name_en": "Puzzles", "name_ru": "Пазлы", "name_am": "Փազլներ" },
-    { "key": "plush", "name_en": "Plush", "name_ru": "Мягкие игрушки", "name_am": "Փափուկ խաղալիքներ" },
-    { "key": "action_figures", "name_en": "Action figures", "name_ru": "Фигурки", "name_am": "Արձանիկներ" },
-    { "key": "dolls", "name_en": "Dolls", "name_ru": "Куклы", "name_am": "Տիկնիկներ" },
-    { "key": "building_blocks", "name_en": "Building blocks", "name_ru": "Конструкторы", "name_am": "Կառուցողականներ" },
-    { "key": "rc_toys", "name_en": "RC toys", "name_ru": "Радиоуправляемые", "name_am": "Ռադիոկառավարվող" },
-    { "key": "outdoor_play", "name_en": "Outdoor play", "name_ru": "Игры на улице", "name_am": "Բացօթյա խաղեր" },
-    { "key": "card_games", "name_en": "Card games", "name_ru": "Карточные игры", "name_am": "Թղթախաղեր" },
-    { "key": "educational", "name_en": "Educational", "name_ru": "Развивающие", "name_am": "Կրթական" },
-    { "key": "infant", "name_en": "Infant", "name_ru": "Для младенцев", "name_am": "Մանկական" },
-    { "key": "boys", "name_en": "Boys", "name_ru": "Для мальчиков", "name_am": "Տղաների" },
-    { "key": "girls", "name_en": "Girls", "name_ru": "Для девочек", "name_am": "Աղջիկների" }
+    {
+      "key": "board_games",
+      "name_en": "Board games",
+      "name_ru": "Настольные игры",
+      "name_am": "Սեղանի խաղեր"
+    },
+    {
+      "key": "puzzles",
+      "name_en": "Puzzles",
+      "name_ru": "Пазлы",
+      "name_am": "Փազլներ"
+    },
+    {
+      "key": "plush",
+      "name_en": "Plush",
+      "name_ru": "Мягкие игрушки",
+      "name_am": "Փափուկ խաղալիքներ"
+    },
+    {
+      "key": "action_figures",
+      "name_en": "Action figures",
+      "name_ru": "Фигурки",
+      "name_am": "Արձանիկներ"
+    },
+    {
+      "key": "dolls",
+      "name_en": "Dolls",
+      "name_ru": "Куклы",
+      "name_am": "Տիկնիկներ"
+    },
+    {
+      "key": "building_blocks",
+      "name_en": "Building blocks",
+      "name_ru": "Конструкторы",
+      "name_am": "Կառուցողականներ"
+    },
+    {
+      "key": "rc_toys",
+      "name_en": "RC toys",
+      "name_ru": "Радиоуправляемые",
+      "name_am": "Ռադիոկառավարվող"
+    },
+    {
+      "key": "outdoor_play",
+      "name_en": "Outdoor play",
+      "name_ru": "Игры на улице",
+      "name_am": "Բացօթյա խաղեր"
+    },
+    {
+      "key": "card_games",
+      "name_en": "Card games",
+      "name_ru": "Карточные игры",
+      "name_am": "Թղթախաղեր"
+    },
+    {
+      "key": "educational",
+      "name_en": "Educational",
+      "name_ru": "Развивающие",
+      "name_am": "Կրթական"
+    },
+    {
+      "key": "infant",
+      "name_en": "Infant",
+      "name_ru": "Для младенцев",
+      "name_am": "Մանկական"
+    },
+    {
+      "key": "boys",
+      "name_en": "Boys",
+      "name_ru": "Для мальчиков",
+      "name_am": "Տղաների"
+    },
+    {
+      "key": "girls",
+      "name_en": "Girls",
+      "name_ru": "Для девочек",
+      "name_am": "Աղջիկների"
+    }
   ]
 }

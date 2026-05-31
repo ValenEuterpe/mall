@@ -1,8 +1,8 @@
 /**
  * Translation API Endpoint
- * 
+ *
  * POST /api/v1/translate
- * 
+ *
  * Translates text or product fields to all supported languages using Gemini AI.
  * Requires SELLER or MALL_OWNER role.
  */
@@ -16,7 +16,10 @@ import {
   translateBatch,
   isTranslationAvailable,
 } from "@/lib/translation";
-import { enforceRateLimit, translationRateLimiter } from "@/lib/utils/rate-limit";
+import {
+  enforceRateLimit,
+  translationRateLimiter,
+} from "@/lib/utils/rate-limit";
 
 // Error response helper
 function errorResponse(
@@ -59,12 +62,16 @@ const requestSchema = z.discriminatedUnion("type", [
 
 /**
  * POST /api/v1/translate
- * 
+ *
  * Translate text or product fields to all supported languages.
  */
 export const POST = withAuth(
   async (request: NextRequest, { user }) => {
-    const limited = enforceRateLimit(request, translationRateLimiter, user.userId);
+    const limited = enforceRateLimit(
+      request,
+      translationRateLimiter,
+      user.userId
+    );
     if (limited) return limited.response;
 
     // Check if translation is available
@@ -75,9 +82,9 @@ export const POST = withAuth(
         503
       );
     }
-    
+
     const body = await request.json();
-    
+
     const parsed = requestSchema.safeParse(body);
     if (!parsed.success) {
       return errorResponse(
@@ -87,14 +94,14 @@ export const POST = withAuth(
         parsed.error.flatten().fieldErrors
       );
     }
-    
+
     const data = parsed.data;
-    
+
     try {
       if (data.type === "text") {
         // Simple text translation
         const result = await translateText(data.text);
-        
+
         return successResponse({
           type: "text",
           translations: {
@@ -111,7 +118,7 @@ export const POST = withAuth(
           description: data.description,
           detailDescription: data.detailDescription,
         });
-        
+
         return successResponse({
           type: "product",
           name: result.name,
@@ -128,7 +135,7 @@ export const POST = withAuth(
       );
     }
   },
-  { 
+  {
     roles: ["SELLER", "MALL_OWNER"],
   }
 );

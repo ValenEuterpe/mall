@@ -74,7 +74,8 @@ async function updateAboutHandler(req: NextRequest): Promise<NextResponse> {
   if (cleaned.logoUrl === "") cleaned.logoUrl = null;
 
   // Build socialLinks for Prisma Json field
-  let socialLinksValue: Prisma.InputJsonValue | typeof Prisma.JsonNull = Prisma.JsonNull;
+  let socialLinksValue: Prisma.InputJsonValue | typeof Prisma.JsonNull =
+    Prisma.JsonNull;
   if (cleaned.socialLinks) {
     const links = cleaned.socialLinks;
     const instagram = links.instagram || undefined;

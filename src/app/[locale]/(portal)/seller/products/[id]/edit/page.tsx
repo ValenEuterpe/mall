@@ -21,9 +21,8 @@ export default function EditProductPage() {
   const router = useRouter();
   const productId = params.id as string;
 
-  const [initialData, setInitialData] = useState<Partial<ProductFormData> | null>(
-    null
-  );
+  const [initialData, setInitialData] =
+    useState<Partial<ProductFormData> | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [deleteOpen, setDeleteOpen] = useState(false);
@@ -73,9 +72,9 @@ export default function EditProductPage() {
             tagIds: product.tagIds || [],
             images: product.images || [],
             isActive: product.isActive,
-            status: (product.status === "PUBLISHED"
-              ? "PUBLISHED"
-              : "DRAFT") as "DRAFT" | "PUBLISHED",
+            status: (product.status === "PUBLISHED" ? "PUBLISHED" : "DRAFT") as
+              | "DRAFT"
+              | "PUBLISHED",
           });
         } else {
           setError(t("form.loadError"));

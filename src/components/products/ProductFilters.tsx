@@ -2,7 +2,14 @@
 
 import React, { memo, useCallback, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
-import { Check, ChevronDown, ChevronUp, RotateCcw, SlidersHorizontal, X } from "lucide-react";
+import {
+  Check,
+  ChevronDown,
+  ChevronUp,
+  RotateCcw,
+  SlidersHorizontal,
+  X,
+} from "lucide-react";
 
 import { Button } from "@/components/ui/button";
 import { Slider } from "@/components/ui/slider";
@@ -12,9 +19,23 @@ import { Separator } from "@/components/ui/separator";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
-import { useCategories, type Category, type Subcategory } from "@/hooks/use-categories";
+import {
+  Collapsible,
+  CollapsibleContent,
+  CollapsibleTrigger,
+} from "@/components/ui/collapsible";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
+import {
+  useCategories,
+  type Category,
+  type Subcategory,
+} from "@/hooks/use-categories";
 import { useDebounce } from "@/hooks/use-debounce";
 import { cn } from "@/lib/utils";
 
@@ -88,7 +109,7 @@ const FilterSection = memo(function FilterSection({
           type="button"
           className={cn(
             "flex w-full items-center justify-between py-2",
-            "text-sm font-medium hover:text-primary transition-colors"
+            "hover:text-primary text-sm font-medium transition-colors"
           )}
         >
           <span className="flex items-center gap-2">
@@ -100,9 +121,9 @@ const FilterSection = memo(function FilterSection({
             )}
           </span>
           {isOpen ? (
-            <ChevronUp className="h-4 w-4 text-muted-foreground" />
+            <ChevronUp className="text-muted-foreground h-4 w-4" />
           ) : (
-            <ChevronDown className="h-4 w-4 text-muted-foreground" />
+            <ChevronDown className="text-muted-foreground h-4 w-4" />
           )}
         </button>
       </CollapsibleTrigger>
@@ -130,15 +151,17 @@ const CategoryItem = memo(function CategoryItem({
       <label
         htmlFor={`category-${category.id}`}
         className={cn(
-          "flex-1 text-sm cursor-pointer transition-colors",
+          "flex-1 cursor-pointer text-sm transition-colors",
           "hover:text-primary",
-          isSelected && "font-medium text-primary"
+          isSelected && "text-primary font-medium"
         )}
       >
         {category.name}
       </label>
       {category.productCount > 0 && (
-        <span className="text-xs text-muted-foreground">({category.productCount})</span>
+        <span className="text-muted-foreground text-xs">
+          ({category.productCount})
+        </span>
       )}
     </div>
   );
@@ -158,14 +181,16 @@ const SubcategoryItem = memo(function SubcategoryItem({
       <Checkbox
         id={`subcategory-${subcategory.id}`}
         checked={isSelected}
-        onCheckedChange={(checked) => onSelect(subcategory.id, checked as boolean)}
+        onCheckedChange={(checked) =>
+          onSelect(subcategory.id, checked as boolean)
+        }
       />
       <label
         htmlFor={`subcategory-${subcategory.id}`}
         className={cn(
-          "flex-1 text-sm cursor-pointer transition-colors",
+          "flex-1 cursor-pointer text-sm transition-colors",
           "hover:text-primary",
-          isSelected && "font-medium text-primary"
+          isSelected && "text-primary font-medium"
         )}
       >
         {subcategory.name}
@@ -204,9 +229,9 @@ const PriceRangeSlider = memo(function PriceRangeSlider({
         />
       </div>
       <div className="flex items-center justify-between text-sm">
-        <div className="rounded-md border bg-muted px-3 py-1">${value[0]}</div>
+        <div className="bg-muted rounded-md border px-3 py-1">${value[0]}</div>
         <span className="text-muted-foreground">{t("to")}</span>
-        <div className="rounded-md border bg-muted px-3 py-1">${value[1]}</div>
+        <div className="bg-muted rounded-md border px-3 py-1">${value[1]}</div>
       </div>
     </div>
   );
@@ -229,7 +254,8 @@ const ActiveFilters = memo(function ActiveFilters({
     let count = 0;
     if (filters.categoryId) count++;
     if (filters.subcategoryId) count++;
-    if (filters.minPrice !== undefined || filters.maxPrice !== undefined) count++;
+    if (filters.minPrice !== undefined || filters.maxPrice !== undefined)
+      count++;
     if (filters.inStock) count++;
     if (filters.brands?.length) count += filters.brands.length;
     return count;
@@ -245,12 +271,14 @@ const ActiveFilters = memo(function ActiveFilters({
   return (
     <div className="space-y-2">
       <div className="flex items-center justify-between">
-        <span className="text-sm font-medium">{t("activeFilters", { count: activeCount })}</span>
+        <span className="text-sm font-medium">
+          {t("activeFilters", { count: activeCount })}
+        </span>
         <Button
           variant="ghost"
           size="sm"
           onClick={onClear}
-          className="h-auto p-0 text-xs text-muted-foreground hover:text-foreground"
+          className="text-muted-foreground hover:text-foreground h-auto p-0 text-xs"
           type="button"
         >
           {t("clearAll")}
@@ -260,7 +288,11 @@ const ActiveFilters = memo(function ActiveFilters({
         {selectedCategory && (
           <Badge variant="secondary" className="gap-1">
             {selectedCategory.name}
-            <button onClick={() => onRemove("categoryId")} className="ml-1" type="button">
+            <button
+              onClick={() => onRemove("categoryId")}
+              className="ml-1"
+              type="button"
+            >
               <X className="h-3 w-3" />
             </button>
           </Badge>
@@ -268,7 +300,11 @@ const ActiveFilters = memo(function ActiveFilters({
         {selectedSubcategory && (
           <Badge variant="secondary" className="gap-1">
             {selectedSubcategory.name}
-            <button onClick={() => onRemove("subcategoryId")} className="ml-1" type="button">
+            <button
+              onClick={() => onRemove("subcategoryId")}
+              className="ml-1"
+              type="button"
+            >
               <X className="h-3 w-3" />
             </button>
           </Badge>
@@ -291,7 +327,11 @@ const ActiveFilters = memo(function ActiveFilters({
         {filters.inStock && (
           <Badge variant="secondary" className="gap-1">
             {t("inStockBadge")}
-            <button onClick={() => onRemove("inStock")} className="ml-1" type="button">
+            <button
+              onClick={() => onRemove("inStock")}
+              className="ml-1"
+              type="button"
+            >
               <X className="h-3 w-3" />
             </button>
           </Badge>
@@ -348,7 +388,8 @@ const FilterContent = memo(function FilterContent({
   const t = useTranslations("products.filters");
   const { categories, isLoading: categoriesLoading } = useCategories();
 
-  const [localFilters, setLocalFilters] = useState<ProductFiltersState>(initialFilters);
+  const [localFilters, setLocalFilters] =
+    useState<ProductFiltersState>(initialFilters);
   const [priceValue, setPriceValue] = useState<[number, number]>([
     initialFilters.minPrice ?? priceRange.min,
     initialFilters.maxPrice ?? priceRange.max,
@@ -359,25 +400,33 @@ const FilterContent = memo(function FilterContent({
   useEffect(() => {
     setLocalFilters((prev) => ({
       ...prev,
-      minPrice: debouncedPrice[0] === priceRange.min ? undefined : debouncedPrice[0],
-      maxPrice: debouncedPrice[1] === priceRange.max ? undefined : debouncedPrice[1],
+      minPrice:
+        debouncedPrice[0] === priceRange.min ? undefined : debouncedPrice[0],
+      maxPrice:
+        debouncedPrice[1] === priceRange.max ? undefined : debouncedPrice[1],
     }));
   }, [debouncedPrice, priceRange.min, priceRange.max]);
 
-  const handleCategoryChange = useCallback((categoryId: string, selected: boolean) => {
-    setLocalFilters((prev) => ({
-      ...prev,
-      categoryId: selected ? categoryId : undefined,
-      subcategoryId: undefined,
-    }));
-  }, []);
+  const handleCategoryChange = useCallback(
+    (categoryId: string, selected: boolean) => {
+      setLocalFilters((prev) => ({
+        ...prev,
+        categoryId: selected ? categoryId : undefined,
+        subcategoryId: undefined,
+      }));
+    },
+    []
+  );
 
-  const handleSubcategoryChange = useCallback((subcategoryId: string, selected: boolean) => {
-    setLocalFilters((prev) => ({
-      ...prev,
-      subcategoryId: selected ? subcategoryId : undefined,
-    }));
-  }, []);
+  const handleSubcategoryChange = useCallback(
+    (subcategoryId: string, selected: boolean) => {
+      setLocalFilters((prev) => ({
+        ...prev,
+        subcategoryId: selected ? subcategoryId : undefined,
+      }));
+    },
+    []
+  );
 
   const handleInStockChange = useCallback((checked: boolean) => {
     setLocalFilters((prev) => ({
@@ -421,7 +470,10 @@ const FilterContent = memo(function FilterContent({
         onClear={handleReset}
       />
 
-      <FilterSection title={t("category")} count={localFilters.categoryId ? 1 : 0}>
+      <FilterSection
+        title={t("category")}
+        count={localFilters.categoryId ? 1 : 0}
+      >
         {categoriesLoading ? (
           <FiltersSkeleton />
         ) : (
@@ -435,18 +487,19 @@ const FilterContent = memo(function FilterContent({
                     onSelect={handleCategoryChange}
                   />
 
-                  {localFilters.categoryId === category.id && category.subcategories.length > 0 && (
-                    <div className="space-y-2 pt-1">
-                      {category.subcategories.map((sub) => (
-                        <SubcategoryItem
-                          key={sub.id}
-                          subcategory={sub}
-                          isSelected={localFilters.subcategoryId === sub.id}
-                          onSelect={handleSubcategoryChange}
-                        />
-                      ))}
-                    </div>
-                  )}
+                  {localFilters.categoryId === category.id &&
+                    category.subcategories.length > 0 && (
+                      <div className="space-y-2 pt-1">
+                        {category.subcategories.map((sub) => (
+                          <SubcategoryItem
+                            key={sub.id}
+                            subcategory={sub}
+                            isSelected={localFilters.subcategoryId === sub.id}
+                            onSelect={handleSubcategoryChange}
+                          />
+                        ))}
+                      </div>
+                    )}
                 </div>
               ))}
             </div>
@@ -458,7 +511,11 @@ const FilterContent = memo(function FilterContent({
 
       <FilterSection
         title={t("priceRange")}
-        count={priceValue[0] !== priceRange.min || priceValue[1] !== priceRange.max ? 1 : 0}
+        count={
+          priceValue[0] !== priceRange.min || priceValue[1] !== priceRange.max
+            ? 1
+            : 0
+        }
       >
         <PriceRangeSlider
           value={priceValue}
@@ -476,11 +533,13 @@ const FilterContent = memo(function FilterContent({
           <Checkbox
             id="inStock"
             checked={localFilters.inStock || false}
-            onCheckedChange={(checked) => handleInStockChange(checked as boolean)}
+            onCheckedChange={(checked) =>
+              handleInStockChange(checked as boolean)
+            }
           />
           <label
             htmlFor="inStock"
-            className="text-sm cursor-pointer hover:text-primary transition-colors"
+            className="hover:text-primary cursor-pointer text-sm transition-colors"
           >
             {t("inStockOnly")}
           </label>
@@ -490,7 +549,10 @@ const FilterContent = memo(function FilterContent({
       {brands.length > 0 && (
         <>
           <Separator />
-          <FilterSection title={t("brands")} count={localFilters.brands?.length}>
+          <FilterSection
+            title={t("brands")}
+            count={localFilters.brands?.length}
+          >
             <ScrollArea className="h-32 pr-4">
               <div className="space-y-2">
                 {brands.map((brand) => (
@@ -507,7 +569,10 @@ const FilterContent = memo(function FilterContent({
                         }));
                       }}
                     />
-                    <label htmlFor={`brand-${brand}`} className="text-sm cursor-pointer">
+                    <label
+                      htmlFor={`brand-${brand}`}
+                      className="cursor-pointer text-sm"
+                    >
                       {brand}
                     </label>
                   </div>
@@ -540,7 +605,11 @@ const FilterContent = memo(function FilterContent({
 // Main Component with Desktop/Mobile Support
 // ============================================================================
 
-export function ProductFilters({ mobileSheet = true, className, ...props }: ProductFiltersProps) {
+export function ProductFilters({
+  mobileSheet = true,
+  className,
+  ...props
+}: ProductFiltersProps) {
   const t = useTranslations("products.filters");
   const [isOpen, setIsOpen] = useState(false);
 
@@ -574,7 +643,11 @@ export function ProductFilters({ mobileSheet = true, className, ...props }: Prod
           </SheetTitle>
         </SheetHeader>
         <ScrollArea className="h-[calc(100vh-8rem)] py-4">
-          <FilterContent {...props} showApplyButton onApply={() => setIsOpen(false)} />
+          <FilterContent
+            {...props}
+            showApplyButton
+            onApply={() => setIsOpen(false)}
+          />
         </ScrollArea>
       </SheetContent>
     </Sheet>

@@ -8,7 +8,10 @@ import type { AuthenticatedUser } from "@/types/auth";
 
 async function removeFavoriteHandler(
   request: NextRequest,
-  { params, user }: { params: Promise<{ productId: string }>; user: AuthenticatedUser }
+  {
+    params,
+    user,
+  }: { params: Promise<{ productId: string }>; user: AuthenticatedUser }
 ): Promise<NextResponse> {
   const { productId } = await params;
 

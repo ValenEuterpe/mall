@@ -10,7 +10,12 @@ import { z } from "zod";
 
 const createVenueSchema = z.object({
   name: z.string().min(1).max(200),
-  code: z.string().min(1).max(20).regex(/^V\d+$/i, "Code must be in format V1, V2, etc.").optional(),
+  code: z
+    .string()
+    .min(1)
+    .max(20)
+    .regex(/^V\d+$/i, "Code must be in format V1, V2, etc.")
+    .optional(),
   latitude: z.number().min(-90).max(90),
   longitude: z.number().min(-180).max(180),
 });
@@ -105,7 +110,8 @@ async function createVenueHandler(req: NextRequest): Promise<NextResponse> {
         return match ? parseInt(match[1], 10) : 0;
       })
       .filter((n) => n > 0);
-    const nextNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+    const nextNumber =
+      existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
     venueCode = `V${nextNumber}`;
   }
 

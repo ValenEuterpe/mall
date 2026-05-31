@@ -69,7 +69,10 @@ export function buildNavigationGraph(
   floorConnectorCost: number = 50
 ): NavigationGraph {
   const vertices = new Map<string, NavigationVertex>();
-  const adjacencyList = new Map<string, Array<{ id: string; weight: number }>>();
+  const adjacencyList = new Map<
+    string,
+    Array<{ id: string; weight: number }>
+  >();
 
   // First pass: Add all vertices
   for (const floor of floors) {
@@ -212,7 +215,11 @@ export function getEdgesForFloor(
   building: string | null,
   floor: string
 ): Array<{ from: NavigationVertex; to: NavigationVertex; weight: number }> {
-  const result: Array<{ from: NavigationVertex; to: NavigationVertex; weight: number }> = [];
+  const result: Array<{
+    from: NavigationVertex;
+    to: NavigationVertex;
+    weight: number;
+  }> = [];
   const seenEdges = new Set<string>();
 
   for (const [fromId, neighbors] of graph.adjacencyList) {

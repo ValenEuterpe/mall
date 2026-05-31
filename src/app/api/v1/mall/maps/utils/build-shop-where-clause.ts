@@ -5,34 +5,34 @@ import { Prisma } from "@/prisma/generated/client";
  * All location parameters are optional - if not provided, that filter is not applied.
  */
 export function buildShopWhereClause(
-    venue?: string,
-    floor?: string,
-    building?: string,
-    includeVacant: boolean = true
+  venue?: string,
+  floor?: string,
+  building?: string,
+  includeVacant: boolean = true
 ): Prisma.ShopWhereInput {
-    const where: Prisma.ShopWhereInput = {
-        isActive: true,
-    };
+  const where: Prisma.ShopWhereInput = {
+    isActive: true,
+  };
 
-    // Filter by venue if provided
-    if (venue) {
-        where.venue = venue;
-    }
+  // Filter by venue if provided
+  if (venue) {
+    where.venue = venue;
+  }
 
-    // Filter by floor if provided
-    if (floor) {
-        where.floor = floor;
-    }
+  // Filter by floor if provided
+  if (floor) {
+    where.floor = floor;
+  }
 
-    // Filter by building if provided
-    if (building) {
-        where.building = building;
-    }
+  // Filter by building if provided
+  if (building) {
+    where.building = building;
+  }
 
-    // Filter out vacant shops if requested
-    if (!includeVacant) {
-        where.sellerId = { not: null };
-    }
+  // Filter out vacant shops if requested
+  if (!includeVacant) {
+    where.sellerId = { not: null };
+  }
 
-    return where;
+  return where;
 }

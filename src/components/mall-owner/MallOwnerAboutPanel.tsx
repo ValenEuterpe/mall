@@ -104,12 +104,9 @@ export function MallOwnerAboutPanel(): React.ReactElement {
     fetchAbout();
   }, [fetchAbout]);
 
-  const handleChange = useCallback(
-    (field: keyof FormState, value: string) => {
-      setForm((prev) => ({ ...prev, [field]: value }));
-    },
-    []
-  );
+  const handleChange = useCallback((field: keyof FormState, value: string) => {
+    setForm((prev) => ({ ...prev, [field]: value }));
+  }, []);
 
   const handleLogoUpload = useCallback(
     async (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -170,7 +167,7 @@ export function MallOwnerAboutPanel(): React.ReactElement {
   if (isLoading) {
     return (
       <div className="flex items-center justify-center py-12">
-        <Loader2 className="h-6 w-6 animate-spin text-muted-foreground" />
+        <Loader2 className="text-muted-foreground h-6 w-6 animate-spin" />
       </div>
     );
   }
@@ -280,7 +277,7 @@ export function MallOwnerAboutPanel(): React.ReactElement {
           <div>
             <Label
               htmlFor="logo-upload"
-              className="flex cursor-pointer items-center gap-2 rounded-lg border border-dashed px-4 py-3 text-sm text-muted-foreground hover:border-primary hover:text-foreground transition-colors"
+              className="text-muted-foreground hover:border-primary hover:text-foreground flex cursor-pointer items-center gap-2 rounded-lg border border-dashed px-4 py-3 text-sm transition-colors"
             >
               {isUploading ? (
                 <Loader2 className="h-4 w-4 animate-spin" />

@@ -11,15 +11,15 @@ import { PaginatedResult } from "./types";
  * @returns Paginated result object
  */
 export function createPaginatedResult<T>(
-    data: T[],
-    page: number,
-    limit: number,
-    total: number
+  data: T[],
+  page: number,
+  limit: number,
+  total: number
 ): PaginatedResult<T> {
-    return {
-        data,
-        meta: getPaginationMeta(page, limit, total),
-    };
+  return {
+    data,
+    meta: getPaginationMeta(page, limit, total),
+  };
 }
 
 /**
@@ -30,14 +30,14 @@ export function createPaginatedResult<T>(
  * @returns Object with first and last valid page numbers
  */
 export function getPageRange(
-    total: number,
-    limit: number
+  total: number,
+  limit: number
 ): { firstPage: number; lastPage: number } {
-    const totalPages = Math.ceil(total / limit);
-    return {
-        firstPage: 1,
-        lastPage: Math.max(1, totalPages),
-    };
+  const totalPages = Math.ceil(total / limit);
+  return {
+    firstPage: 1,
+    lastPage: Math.max(1, totalPages),
+  };
 }
 
 /**
@@ -49,12 +49,12 @@ export function getPageRange(
  * @returns True if page is valid
  */
 export function isValidPage(
-    page: number,
-    total: number,
-    limit: number
+  page: number,
+  total: number,
+  limit: number
 ): boolean {
-    const { lastPage } = getPageRange(total, limit);
-    return page >= 1 && page <= lastPage;
+  const { lastPage } = getPageRange(total, limit);
+  return page >= 1 && page <= lastPage;
 }
 
 /**
@@ -66,50 +66,50 @@ export function isValidPage(
  * @returns Array of page numbers to display
  */
 export function generatePageNumbers(
-    currentPage: number,
-    totalPages: number,
-    maxVisible: number = 5
+  currentPage: number,
+  totalPages: number,
+  maxVisible: number = 5
 ): (number | "ellipsis")[] {
-    if (totalPages <= maxVisible) {
-        return Array.from({ length: totalPages }, (_, i) => i + 1);
+  if (totalPages <= maxVisible) {
+    return Array.from({ length: totalPages }, (_, i) => i + 1);
+  }
+
+  const pages: (number | "ellipsis")[] = [];
+  const halfVisible = Math.floor(maxVisible / 2);
+
+  let startPage = Math.max(1, currentPage - halfVisible);
+  let endPage = Math.min(totalPages, currentPage + halfVisible);
+
+  // Adjust if we're near the beginning
+  if (currentPage <= halfVisible) {
+    endPage = Math.min(totalPages, maxVisible - 1);
+  }
+
+  // Adjust if we're near the end
+  if (currentPage > totalPages - halfVisible) {
+    startPage = Math.max(1, totalPages - maxVisible + 2);
+  }
+
+  // Always show first page
+  if (startPage > 1) {
+    pages.push(1);
+    if (startPage > 2) {
+      pages.push("ellipsis");
     }
+  }
 
-    const pages: (number | "ellipsis")[] = [];
-    const halfVisible = Math.floor(maxVisible / 2);
+  // Add middle pages
+  for (let i = startPage; i <= endPage; i++) {
+    pages.push(i);
+  }
 
-    let startPage = Math.max(1, currentPage - halfVisible);
-    let endPage = Math.min(totalPages, currentPage + halfVisible);
-
-    // Adjust if we're near the beginning
-    if (currentPage <= halfVisible) {
-        endPage = Math.min(totalPages, maxVisible - 1);
+  // Always show last page
+  if (endPage < totalPages) {
+    if (endPage < totalPages - 1) {
+      pages.push("ellipsis");
     }
+    pages.push(totalPages);
+  }
 
-    // Adjust if we're near the end
-    if (currentPage > totalPages - halfVisible) {
-        startPage = Math.max(1, totalPages - maxVisible + 2);
-    }
-
-    // Always show first page
-    if (startPage > 1) {
-        pages.push(1);
-        if (startPage > 2) {
-            pages.push("ellipsis");
-        }
-    }
-
-    // Add middle pages
-    for (let i = startPage; i <= endPage; i++) {
-        pages.push(i);
-    }
-
-    // Always show last page
-    if (endPage < totalPages) {
-        if (endPage < totalPages - 1) {
-            pages.push("ellipsis");
-        }
-        pages.push(totalPages);
-    }
-
-    return pages;
+  return pages;
 }

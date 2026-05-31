@@ -14,7 +14,9 @@ type CollapsibleContextValue = {
   setOpen: (open: boolean) => void;
 };
 
-const CollapsibleContext = React.createContext<CollapsibleContextValue | null>(null);
+const CollapsibleContext = React.createContext<CollapsibleContextValue | null>(
+  null
+);
 
 export function Collapsible({
   open,
@@ -40,7 +42,11 @@ export function Collapsible({
     [isControlled, onOpenChange]
   );
 
-  return <CollapsibleContext.Provider value={{ open: currentOpen, setOpen }}>{children}</CollapsibleContext.Provider>;
+  return (
+    <CollapsibleContext.Provider value={{ open: currentOpen, setOpen }}>
+      {children}
+    </CollapsibleContext.Provider>
+  );
 }
 
 export function CollapsibleTrigger({
@@ -51,7 +57,8 @@ export function CollapsibleTrigger({
   asChild?: boolean;
 }) {
   const ctx = React.useContext(CollapsibleContext);
-  if (!ctx) throw new Error("CollapsibleTrigger must be used within Collapsible");
+  if (!ctx)
+    throw new Error("CollapsibleTrigger must be used within Collapsible");
 
   type ClickableProps = { onClick?: React.MouseEventHandler };
   const childProps = children.props as ClickableProps;
@@ -61,10 +68,9 @@ export function CollapsibleTrigger({
   };
 
   if (asChild) {
-    return React.cloneElement(
-      children as React.ReactElement<ClickableProps>,
-      { onClick }
-    );
+    return React.cloneElement(children as React.ReactElement<ClickableProps>, {
+      onClick,
+    });
   }
 
   return (
@@ -82,7 +88,8 @@ export function CollapsibleContent({
   className?: string;
 }) {
   const ctx = React.useContext(CollapsibleContext);
-  if (!ctx) throw new Error("CollapsibleContent must be used within Collapsible");
+  if (!ctx)
+    throw new Error("CollapsibleContent must be used within Collapsible");
   if (!ctx.open) return null;
   return <div className={className}>{children}</div>;
 }

@@ -217,9 +217,7 @@ export function useMultiMapData(
               ...b,
               currentFloor: floor,
               svgMarkup,
-              center: geo
-                ? [geo.latitude, geo.longitude]
-                : b.center,
+              center: geo ? [geo.latitude, geo.longitude] : b.center,
               rotation: geo?.rotation ?? b.rotation,
               scale: geo?.scale ?? b.scale,
               shops: res.data.shops,

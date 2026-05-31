@@ -22,7 +22,10 @@ async function createSubcategoryHandler(
     return NextResponse.json(
       {
         success: false,
-        error: { code: "CATEGORY_NOT_FOUND", message: "Parent category not found" },
+        error: {
+          code: "CATEGORY_NOT_FOUND",
+          message: "Parent category not found",
+        },
       },
       { status: 404 }
     );

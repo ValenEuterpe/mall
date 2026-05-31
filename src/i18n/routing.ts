@@ -30,8 +30,9 @@ export function isLocale(value: string): value is Locale {
  * When we later introduce a `pathnames` map (localized URLs), switch to the
  * appropriate next-intl navigation factory for pathnames.
  */
-export const { Link, usePathname, useRouter, redirect, permanentRedirect } = createNavigation({
-  locales: routing.locales,
-  defaultLocale: routing.defaultLocale,
-  localePrefix: routing.localePrefix,
-});
+export const { Link, usePathname, useRouter, redirect, permanentRedirect } =
+  createNavigation({
+    locales: routing.locales,
+    defaultLocale: routing.defaultLocale,
+    localePrefix: routing.localePrefix,
+  });

@@ -66,9 +66,20 @@ const categoriesCache = new Map<
 
 type CategoriesApiResponse =
   | { categories: Category[]; total: number; locale: string }
-  | { items: Array<{ id: string; key: string; name: string; type: "category" | "subcategory"; parentKey?: string }>; total: number };
+  | {
+      items: Array<{
+        id: string;
+        key: string;
+        name: string;
+        type: "category" | "subcategory";
+        parentKey?: string;
+      }>;
+      total: number;
+    };
 
-export function useCategories(options: UseCategoriesOptions = {}): UseCategoriesReturn {
+export function useCategories(
+  options: UseCategoriesOptions = {}
+): UseCategoriesReturn {
   const {
     enabled = true,
     staleTime = DEFAULT_STALE_TIME,
@@ -143,10 +154,14 @@ export function useCategories(options: UseCategoriesOptions = {}): UseCategories
           flat: flat ? "true" : "false",
         };
 
-        const response = await apiClient.get<CategoriesApiResponse>("/categories", params, {
-          signal: abortControllerRef.current.signal,
-          showErrorToast: false,
-        });
+        const response = await apiClient.get<CategoriesApiResponse>(
+          "/categories",
+          params,
+          {
+            signal: abortControllerRef.current.signal,
+            showErrorToast: false,
+          }
+        );
 
         if (!isMountedRef.current) return;
 
@@ -160,13 +175,22 @@ export function useCategories(options: UseCategoriesOptions = {}): UseCategories
               fetchedAt: now,
             });
 
-            setState({ categories, isLoading: false, error: null, lastFetchedAt: now });
+            setState({
+              categories,
+              isLoading: false,
+              error: null,
+              lastFetchedAt: now,
+            });
           } else {
             // flat response - not supported by these hooks (it loses the tree)
-            throw new Error("Categories API returned flat response; set flat=false to use useCategories().");
+            throw new Error(
+              "Categories API returned flat response; set flat=false to use useCategories()."
+            );
           }
         } else {
-          throw new Error(response.error.message || "Failed to fetch categories");
+          throw new Error(
+            response.error.message || "Failed to fetch categories"
+          );
         }
       } catch (error) {
         if (!isMountedRef.current) return;
@@ -197,12 +221,14 @@ export function useCategories(options: UseCategoriesOptions = {}): UseCategories
   }, [fetchCategories]);
 
   const getCategoryById = useCallback(
-    (id: string): Category | undefined => state.categories.find((c) => c.id === id),
+    (id: string): Category | undefined =>
+      state.categories.find((c) => c.id === id),
     [state.categories]
   );
 
   const getCategoryByKey = useCallback(
-    (key: string): Category | undefined => state.categories.find((c) => c.key === key),
+    (key: string): Category | undefined =>
+      state.categories.find((c) => c.key === key),
     [state.categories]
   );
 
@@ -253,7 +279,13 @@ export function useCategory(
 } {
   const { enabled = true } = options;
 
-  const { categories: _categories, isLoading, error, getCategoryById, getCategoryByKey } = useCategories({
+  const {
+    categories: _categories,
+    isLoading,
+    error,
+    getCategoryById,
+    getCategoryByKey,
+  } = useCategories({
     enabled: enabled && Boolean(idOrKey),
   });
 
@@ -323,7 +355,9 @@ export async function prefetchCategories(locale: string): Promise<void> {
   const cacheKey = `${locale}-includeEmpty:false-flat:false`;
 
   try {
-    const response = await apiClient.get<CategoriesApiResponse>("/categories", { locale });
+    const response = await apiClient.get<CategoriesApiResponse>("/categories", {
+      locale,
+    });
 
     if (response.success && "categories" in response.data) {
       categoriesCache.set(cacheKey, {

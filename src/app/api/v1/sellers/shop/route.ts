@@ -47,7 +47,10 @@ export const GET = withAuth(
 
     if (!shop) {
       return NextResponse.json(
-        { success: false, error: { code: "NOT_FOUND", message: "No shop assigned" } },
+        {
+          success: false,
+          error: { code: "NOT_FOUND", message: "No shop assigned" },
+        },
         { status: 404 }
       );
     }
@@ -64,13 +67,24 @@ export const PATCH = withAuth(
       body = await request.json();
     } catch {
       return NextResponse.json(
-        { success: false, error: { code: "INVALID_JSON", message: "Invalid JSON in request body" } },
+        {
+          success: false,
+          error: {
+            code: "INVALID_JSON",
+            message: "Invalid JSON in request body",
+          },
+        },
         { status: 400 }
       );
     }
 
     const parsed = shopUpdateSchema
-      .pick({ shopName: true, description: true, imageUrl: true, contacts: true })
+      .pick({
+        shopName: true,
+        description: true,
+        imageUrl: true,
+        contacts: true,
+      })
       .safeParse(body);
 
     if (!parsed.success) {
@@ -90,7 +104,10 @@ export const PATCH = withAuth(
     const shop = await getSellerShop(user.userId);
     if (!shop) {
       return NextResponse.json(
-        { success: false, error: { code: "NOT_FOUND", message: "No shop assigned" } },
+        {
+          success: false,
+          error: { code: "NOT_FOUND", message: "No shop assigned" },
+        },
         { status: 404 }
       );
     }

@@ -1,9 +1,9 @@
 /**
  * SVG Parser Utility
- * 
+ *
  * Extracts shop element IDs from SVG content following the pattern:
  * V{venue}B{building}F{floor}S{shop}
- * 
+ *
  * Examples:
  * - V1B1F1S1 = Venue 1, Building 1, Floor 1, Shop 1
  * - V2S5 = Venue 2, Shop 5 (outdoor kiosk)
@@ -45,7 +45,7 @@ export function parseShopId(id: string): ParsedShopId | null {
   if (!match) return null;
 
   const [, venueMatch, buildingMatch, floorMatch, shopMatch] = match;
-  
+
   // Shop number is required
   if (!shopMatch) return null;
 
@@ -63,15 +63,15 @@ export function parseShopId(id: string): ParsedShopId | null {
  */
 export function extractElementIds(svgContent: string): string[] {
   const ids: string[] = [];
-  
+
   // Match id="..." or id='...' attributes
   const idPattern = /\bid=["']([^"']+)["']/gi;
   let match;
-  
+
   while ((match = idPattern.exec(svgContent)) !== null) {
     ids.push(match[1]);
   }
-  
+
   return ids;
 }
 
@@ -102,22 +102,31 @@ export function parseSvgForShopIds(svgContent: string): SvgParseResult {
 /**
  * Filter shop IDs by building code
  */
-export function filterByBuilding(shopIds: ParsedShopId[], buildingNumber: number): ParsedShopId[] {
-  return shopIds.filter(s => s.building === buildingNumber);
+export function filterByBuilding(
+  shopIds: ParsedShopId[],
+  buildingNumber: number
+): ParsedShopId[] {
+  return shopIds.filter((s) => s.building === buildingNumber);
 }
 
 /**
  * Filter shop IDs by floor
  */
-export function filterByFloor(shopIds: ParsedShopId[], floorNumber: number): ParsedShopId[] {
-  return shopIds.filter(s => s.floor === floorNumber);
+export function filterByFloor(
+  shopIds: ParsedShopId[],
+  floorNumber: number
+): ParsedShopId[] {
+  return shopIds.filter((s) => s.floor === floorNumber);
 }
 
 /**
  * Filter shop IDs by venue code
  */
-export function filterByVenue(shopIds: ParsedShopId[], venueNumber: number): ParsedShopId[] {
-  return shopIds.filter(s => s.venue === venueNumber);
+export function filterByVenue(
+  shopIds: ParsedShopId[],
+  venueNumber: number
+): ParsedShopId[] {
+  return shopIds.filter((s) => s.venue === venueNumber);
 }
 
 /**
@@ -129,7 +138,7 @@ export function generateShopSvgId(params: {
   floor?: number;
   shop: number;
 }): string {
-  let id = '';
+  let id = "";
   if (params.venue !== undefined) id += `V${params.venue}`;
   if (params.building !== undefined) id += `B${params.building}`;
   if (params.floor !== undefined) id += `F${params.floor}`;
@@ -140,25 +149,28 @@ export function generateShopSvgId(params: {
 /**
  * Validate that an SVG string is well-formed
  */
-export function validateSvgContent(svgContent: string): { valid: boolean; error?: string } {
+export function validateSvgContent(svgContent: string): {
+  valid: boolean;
+  error?: string;
+} {
   // Check for SVG root element
   if (!/<svg[^>]*>/i.test(svgContent)) {
-    return { valid: false, error: 'Missing <svg> root element' };
+    return { valid: false, error: "Missing <svg> root element" };
   }
 
   // Check for closing tag
   if (!/<\/svg>/i.test(svgContent)) {
-    return { valid: false, error: 'Missing closing </svg> tag' };
+    return { valid: false, error: "Missing closing </svg> tag" };
   }
 
   // Basic XSS prevention - disallow script tags
   if (/<script/i.test(svgContent)) {
-    return { valid: false, error: 'Script tags are not allowed in SVG' };
+    return { valid: false, error: "Script tags are not allowed in SVG" };
   }
 
   // Disallow event handlers
   if (/\bon\w+\s*=/i.test(svgContent)) {
-    return { valid: false, error: 'Event handlers are not allowed in SVG' };
+    return { valid: false, error: "Event handlers are not allowed in SVG" };
   }
 
   return { valid: true };

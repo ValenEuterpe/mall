@@ -94,10 +94,7 @@ async function deleteSubcategoryHandler(
 
   const totalProducts =
     existing._count.products +
-    existing.subSubcategories.reduce(
-      (sum, ss) => sum + ss._count.products,
-      0
-    );
+    existing.subSubcategories.reduce((sum, ss) => sum + ss._count.products, 0);
 
   if (totalProducts > 0) {
     return NextResponse.json(

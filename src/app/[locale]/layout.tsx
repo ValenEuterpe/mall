@@ -25,7 +25,8 @@ export async function generateMetadata({
 
   const t = await getTranslations({ locale, namespace: "metadata" });
 
-  const baseUrl = process.env.NEXT_PUBLIC_APP_URL || "https://wholesalemarket.com";
+  const baseUrl =
+    process.env.NEXT_PUBLIC_APP_URL || "https://wholesalemarket.com";
 
   return {
     metadataBase: new URL(baseUrl),
@@ -34,7 +35,9 @@ export async function generateMetadata({
       template: `%s | ${t("siteName")}`,
     },
     description: t("description"),
-    keywords: t("keywords").split(",").map((k) => k.trim()),
+    keywords: t("keywords")
+      .split(",")
+      .map((k) => k.trim()),
     authors: [{ name: t("siteName") }],
     creator: t("siteName"),
     publisher: t("siteName"),
@@ -69,7 +72,12 @@ export default async function LocaleLayout({
   const messages = await getMessages({ locale });
 
   return (
-    <ThemeProvider attribute="class" defaultTheme="system" enableSystem disableTransitionOnChange>
+    <ThemeProvider
+      attribute="class"
+      defaultTheme="system"
+      enableSystem
+      disableTransitionOnChange
+    >
       <PageErrorBoundary>
         <NextIntlClientProvider messages={messages} locale={locale}>
           <AuthProvider>
@@ -77,12 +85,15 @@ export default async function LocaleLayout({
               <AuthAwareMapSelectionProvider>
                 <a
                   href="#main-content"
-                  className="sr-only focus:not-sr-only focus:absolute focus:left-4 focus:top-4 focus:z-50 focus:rounded-md focus:bg-primary focus:px-4 focus:py-2 focus:text-primary-foreground"
+                  className="focus:bg-primary focus:text-primary-foreground sr-only focus:not-sr-only focus:absolute focus:top-4 focus:left-4 focus:z-50 focus:rounded-md focus:px-4 focus:py-2"
                 >
                   Skip to content
                 </a>
 
-                <div id="main-content" className="relative flex min-h-screen flex-col">
+                <div
+                  id="main-content"
+                  className="relative flex min-h-screen flex-col"
+                >
                   {children}
                 </div>
 

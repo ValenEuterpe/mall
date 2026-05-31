@@ -1,6 +1,7 @@
 import { z } from "zod";
 
-export const productRowSchema = z.object({
+export const productRowSchema = z
+  .object({
     name: z.union([z.string(), z.number(), z.null()]).optional(),
     description: z.union([z.string(), z.number(), z.null()]).optional(),
     price: z.union([z.string(), z.number(), z.null()]).optional(),
@@ -10,4 +11,5 @@ export const productRowSchema = z.object({
     sku: z.union([z.string(), z.number(), z.null()]).optional(),
     category: z.union([z.string(), z.number(), z.null()]).optional(),
     status: z.union([z.string(), z.null()]).optional(),
-}).passthrough();
+  })
+  .passthrough();

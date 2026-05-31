@@ -101,10 +101,7 @@ async function deleteCategoryHandler(
       (sum, sub) =>
         sum +
         sub._count.products +
-        sub.subSubcategories.reduce(
-          (s, ss) => s + ss._count.products,
-          0
-        ),
+        sub.subSubcategories.reduce((s, ss) => s + ss._count.products, 0),
       0
     );
 

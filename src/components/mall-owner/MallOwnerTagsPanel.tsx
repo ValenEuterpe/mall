@@ -89,7 +89,9 @@ export function MallOwnerTagsPanel(): React.ReactElement {
   const [submitting, setSubmitting] = useState(false);
   const [selectedCategoryId, setSelectedCategoryId] = useState<string>("all");
   const [searchQuery, setSearchQuery] = useState("");
-  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>({});
+  const [expandedGroups, setExpandedGroups] = useState<Record<string, boolean>>(
+    {}
+  );
 
   const [addDialogOpen, setAddDialogOpen] = useState(false);
   const [editDialogOpen, setEditDialogOpen] = useState(false);
@@ -117,10 +119,11 @@ export function MallOwnerTagsPanel(): React.ReactElement {
   const fetchTags = useCallback(async () => {
     setLoading(true);
     try {
-      const url = selectedCategoryId !== "all" 
-        ? `/api/v1/mall-owner/tags?categoryId=${selectedCategoryId}`
-        : "/api/v1/mall-owner/tags";
-      
+      const url =
+        selectedCategoryId !== "all"
+          ? `/api/v1/mall-owner/tags?categoryId=${selectedCategoryId}`
+          : "/api/v1/mall-owner/tags";
+
       const res = await mallApiFetch(url);
       const body = await res.json();
       if (body.success) {
@@ -169,10 +172,13 @@ export function MallOwnerTagsPanel(): React.ReactElement {
     if (!selectedTag) return;
     setSubmitting(true);
     try {
-      const res = await mallApiFetch(`/api/v1/mall-owner/tags/${selectedTag.id}`, {
-        method: "PATCH",
-        body: JSON.stringify(data),
-      });
+      const res = await mallApiFetch(
+        `/api/v1/mall-owner/tags/${selectedTag.id}`,
+        {
+          method: "PATCH",
+          body: JSON.stringify(data),
+        }
+      );
       const body = await res.json();
       if (body.success) {
         toast.success(t("updateSuccess"));
@@ -191,9 +197,12 @@ export function MallOwnerTagsPanel(): React.ReactElement {
   const handleDeleteTag = async () => {
     setSubmitting(true);
     try {
-      const res = await mallApiFetch(`/api/v1/mall-owner/tags/${deleteDialog.id}`, {
-        method: "DELETE",
-      });
+      const res = await mallApiFetch(
+        `/api/v1/mall-owner/tags/${deleteDialog.id}`,
+        {
+          method: "DELETE",
+        }
+      );
       const body = await res.json();
       if (body.success) {
         toast.success(t("deleteSuccess"));
@@ -216,15 +225,20 @@ export function MallOwnerTagsPanel(): React.ReactElement {
     }
     setSubmitting(true);
     try {
-      const res = await mallApiFetch(`/api/v1/mall-owner/tags/seed?categoryId=${selectedCategoryId}`, {
-        method: "POST",
-      });
+      const res = await mallApiFetch(
+        `/api/v1/mall-owner/tags/seed?categoryId=${selectedCategoryId}`,
+        {
+          method: "POST",
+        }
+      );
       const body = await res.json();
       if (body.success) {
-        toast.success(t("seedSuccess", { 
-          inserted: body.data.inserted, 
-          skipped: body.data.skipped 
-        }));
+        toast.success(
+          t("seedSuccess", {
+            inserted: body.data.inserted,
+            skipped: body.data.skipped,
+          })
+        );
         fetchTags();
       } else {
         toast.error(body.error?.message || t("seedError"));
@@ -237,23 +251,28 @@ export function MallOwnerTagsPanel(): React.ReactElement {
   };
 
   const filteredTags = React.useMemo(() => {
-    return tags.filter(tag => 
-      tag.name_en.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      tag.key.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      (tag.name_ru && tag.name_ru.toLowerCase().includes(searchQuery.toLowerCase()))
+    return tags.filter(
+      (tag) =>
+        tag.name_en.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        tag.key.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (tag.name_ru &&
+          tag.name_ru.toLowerCase().includes(searchQuery.toLowerCase()))
     );
   }, [tags, searchQuery]);
 
   const groupedTags = React.useMemo(() => {
-    const groups: Record<string, { id: string; name: string; tags: TagData[] }> = {};
-    
-    filteredTags.forEach(tag => {
+    const groups: Record<
+      string,
+      { id: string; name: string; tags: TagData[] }
+    > = {};
+
+    filteredTags.forEach((tag) => {
       const subId = tag.subcategoryId || "none";
       if (!groups[subId]) {
-        groups[subId] = { 
+        groups[subId] = {
           id: subId,
-          name: tag.subcategory?.name_en || t("subcategoryNone"), 
-          tags: [] 
+          name: tag.subcategory?.name_en || t("subcategoryNone"),
+          tags: [],
         };
       }
       groups[subId].tags.push(tag);
@@ -270,17 +289,18 @@ export function MallOwnerTagsPanel(): React.ReactElement {
   useEffect(() => {
     // Expand all groups by default when searching or changing category
     const initialExpanded: Record<string, boolean> = {};
-    groupedTags.forEach(g => {
+    groupedTags.forEach((g) => {
       initialExpanded[g.id] = true;
     });
     setExpandedGroups(initialExpanded);
   }, [groupedTags]);
 
   const toggleGroup = (id: string) => {
-    setExpandedGroups(prev => ({ ...prev, [id]: !prev[id] }));
+    setExpandedGroups((prev) => ({ ...prev, [id]: !prev[id] }));
   };
 
-  const selectedCategoryName = categories.find(c => c.id === selectedCategoryId)?.name_en || "";
+  const selectedCategoryName =
+    categories.find((c) => c.id === selectedCategoryId)?.name_en || "";
 
   return (
     <div className="space-y-6">
@@ -296,17 +316,19 @@ export function MallOwnerTagsPanel(): React.ReactElement {
             </p>
           </div>
           <div className="flex items-center gap-2">
-            <Button 
-              variant="outline" 
-              onClick={handleSeedTags} 
+            <Button
+              variant="outline"
+              onClick={handleSeedTags}
               disabled={submitting || selectedCategoryId === "all"}
               title={t("seedButtonTooltip")}
             >
-              <RefreshCw className={`mr-2 h-4 w-4 ${submitting ? "animate-spin" : ""}`} />
+              <RefreshCw
+                className={`mr-2 h-4 w-4 ${submitting ? "animate-spin" : ""}`}
+              />
               {t("seedButton")}
             </Button>
-            <Button 
-              onClick={() => setAddDialogOpen(true)} 
+            <Button
+              onClick={() => setAddDialogOpen(true)}
               disabled={selectedCategoryId === "all"}
             >
               <Plus className="mr-2 h-4 w-4" />
@@ -357,22 +379,25 @@ export function MallOwnerTagsPanel(): React.ReactElement {
               <TagIcon className="text-muted-foreground mx-auto h-12 w-12 opacity-20" />
               <h3 className="mt-4 text-lg font-medium">{t("noTagsFound")}</h3>
               <p className="text-muted-foreground mt-2">
-                {selectedCategoryId === "all" 
-                  ? t("selectCategoryToStart") 
+                {selectedCategoryId === "all"
+                  ? t("selectCategoryToStart")
                   : t("noTagsInCategory")}
               </p>
             </div>
           ) : (
             <div className="space-y-4">
               {groupedTags.map((group) => (
-                <div key={group.id} className="border rounded-md overflow-hidden">
+                <div
+                  key={group.id}
+                  className="overflow-hidden rounded-md border"
+                >
                   <button
                     onClick={() => toggleGroup(group.id)}
-                    className="w-full flex items-center justify-between px-4 py-2 bg-muted/30 hover:bg-muted/50 transition-colors font-medium text-sm"
+                    className="bg-muted/30 hover:bg-muted/50 flex w-full items-center justify-between px-4 py-2 text-sm font-medium transition-colors"
                   >
                     <div className="flex items-center gap-2">
                       <span>{group.name}</span>
-                      <Badge variant="outline" className="text-[10px] py-0 h-4">
+                      <Badge variant="outline" className="h-4 py-0 text-[10px]">
                         {group.tags.length}
                       </Badge>
                     </div>
@@ -380,7 +405,7 @@ export function MallOwnerTagsPanel(): React.ReactElement {
                       {expandedGroups[group.id] ? "−" : "+"}
                     </div>
                   </button>
-                  
+
                   {expandedGroups[group.id] && (
                     <div className="overflow-x-auto">
                       <table className="w-full text-left text-sm">
@@ -393,30 +418,48 @@ export function MallOwnerTagsPanel(): React.ReactElement {
                         </thead>
                         <tbody className="divide-y">
                           {group.tags.map((tag) => (
-                            <tr key={tag.id} className="hover:bg-muted/10 transition-colors">
+                            <tr
+                              key={tag.id}
+                              className="hover:bg-muted/10 transition-colors"
+                            >
                               <td className="px-4 py-2">
                                 <div className="flex flex-col">
                                   <div className="flex items-center gap-2">
-                                    <span className="font-medium">{tag.name_en}</span>
-                                    <Badge variant="secondary" className="text-[10px] py-0 h-4">
-                                      {t("usageCount", { count: tag._count.products })}
+                                    <span className="font-medium">
+                                      {tag.name_en}
+                                    </span>
+                                    <Badge
+                                      variant="secondary"
+                                      className="h-4 py-0 text-[10px]"
+                                    >
+                                      {t("usageCount", {
+                                        count: tag._count.products,
+                                      })}
                                     </Badge>
                                   </div>
-                                  <div className="text-muted-foreground text-xs">{tag.name_ru}</div>
+                                  <div className="text-muted-foreground text-xs">
+                                    {tag.name_ru}
+                                  </div>
                                   {tag.createdBySeller && (
-                                    <div className="text-[10px] text-muted-foreground mt-0.5 italic">
-                                      {t("createdBySeller", { name: tag.createdBySeller.businessName })}
+                                    <div className="text-muted-foreground mt-0.5 text-[10px] italic">
+                                      {t("createdBySeller", {
+                                        name: tag.createdBySeller.businessName,
+                                      })}
                                     </div>
                                   )}
-                                  {!tag.createdBySeller && !tag.key.startsWith("seed-") && (
-                                    <div className="text-[10px] text-muted-foreground mt-0.5 italic">
-                                      {t("seededTag")}
-                                    </div>
-                                  )}
+                                  {!tag.createdBySeller &&
+                                    !tag.key.startsWith("seed-") && (
+                                      <div className="text-muted-foreground mt-0.5 text-[10px] italic">
+                                        {t("seededTag")}
+                                      </div>
+                                    )}
                                 </div>
                               </td>
                               <td className="px-4 py-2">
-                                <Badge variant="outline" className="font-mono text-[10px]">
+                                <Badge
+                                  variant="outline"
+                                  className="font-mono text-[10px]"
+                                >
                                   {tag.key}
                                 </Badge>
                               </td>
@@ -437,12 +480,14 @@ export function MallOwnerTagsPanel(): React.ReactElement {
                                     variant="ghost"
                                     size="icon"
                                     className="text-destructive hover:text-destructive h-7 w-7"
-                                    onClick={() => setDeleteDialog({
-                                      open: true,
-                                      id: tag.id,
-                                      name: tag.name_en,
-                                      count: tag._count.products,
-                                    })}
+                                    onClick={() =>
+                                      setDeleteDialog({
+                                        open: true,
+                                        id: tag.id,
+                                        name: tag.name_en,
+                                        count: tag._count.products,
+                                      })
+                                    }
                                   >
                                     <Trash2 className="h-3.5 w-3.5" />
                                   </Button>
@@ -486,15 +531,20 @@ export function MallOwnerTagsPanel(): React.ReactElement {
           <DialogHeader>
             <DialogTitle>{t("deleteConfirmTitle")}</DialogTitle>
             <DialogDescription>
-              {deleteDialog.count > 0 
-                ? t("deleteWithUsageDescription", { name: deleteDialog.name, count: deleteDialog.count })
+              {deleteDialog.count > 0
+                ? t("deleteWithUsageDescription", {
+                    name: deleteDialog.name,
+                    count: deleteDialog.count,
+                  })
                 : t("deleteConfirmDescription", { name: deleteDialog.name })}
             </DialogDescription>
           </DialogHeader>
           <div className="flex justify-end gap-2">
             <Button
               variant="outline"
-              onClick={() => setDeleteDialog({ open: false, id: "", name: "", count: 0 })}
+              onClick={() =>
+                setDeleteDialog({ open: false, id: "", name: "", count: 0 })
+              }
             >
               {commonT("cancel")}
             </Button>

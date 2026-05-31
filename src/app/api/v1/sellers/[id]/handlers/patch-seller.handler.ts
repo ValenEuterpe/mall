@@ -145,7 +145,9 @@ export async function patchSellerHandler(
 
         case "reassign": {
           if (!shopId) {
-            throw new ValidationError("New shop ID is required for reassignment");
+            throw new ValidationError(
+              "New shop ID is required for reassignment"
+            );
           }
 
           const newShop = await prisma.shop.findUnique({

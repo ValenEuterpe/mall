@@ -68,7 +68,9 @@ export function EditTagDialog({
   const [nameAm, setNameAm] = useState("");
   const [subcategoryId, setSubcategoryId] = useState<string | null>(null);
   const [sortOrder, setSortOrder] = useState(0);
-  const [subcategories, setSubcategories] = useState<Array<{ id: string; name_en: string }>>([]);
+  const [subcategories, setSubcategories] = useState<
+    Array<{ id: string; name_en: string }>
+  >([]);
   const [translating, setTranslating] = useState(false);
   const [transliterationPreview, setTransliterationPreview] = useState("");
 
@@ -84,12 +86,14 @@ export function EditTagDialog({
 
   useEffect(() => {
     if (!open || !initialData?.categoryId) return;
-    
+
     const fetchSubcategories = async () => {
       try {
         const res = await apiClient.get<any[]>(`/mall/categories`);
         if (res.success) {
-          const category = res.data.find((c) => c.id === initialData.categoryId);
+          const category = res.data.find(
+            (c) => c.id === initialData.categoryId
+          );
           if (category) {
             setSubcategories(category.subcategories || []);
           }
@@ -128,11 +132,13 @@ export function EditTagDialog({
   }, [transliterationSource]);
 
   const latinInCyrillic = useMemo(
-    () => nameRu.trim().length >= 2 && latin.test(nameRu) && !cyrillic.test(nameRu),
+    () =>
+      nameRu.trim().length >= 2 && latin.test(nameRu) && !cyrillic.test(nameRu),
     [nameRu]
   );
   const latinInArmenian = useMemo(
-    () => nameAm.trim().length >= 2 && latin.test(nameAm) && !armenian.test(nameAm),
+    () =>
+      nameAm.trim().length >= 2 && latin.test(nameAm) && !armenian.test(nameAm),
     [nameAm]
   );
 
@@ -184,10 +190,14 @@ export function EditTagDialog({
           <div className="grid grid-cols-1 gap-4">
             {subcategories.length > 0 && (
               <div className="space-y-2">
-                <Label htmlFor="edit-tag-subcategory">{t("subcategoryNone")}</Label>
+                <Label htmlFor="edit-tag-subcategory">
+                  {t("subcategoryNone")}
+                </Label>
                 <Select
                   value={subcategoryId || "none"}
-                  onValueChange={(v) => setSubcategoryId(v === "none" ? null : v)}
+                  onValueChange={(v) =>
+                    setSubcategoryId(v === "none" ? null : v)
+                  }
                 >
                   <SelectTrigger id="edit-tag-subcategory">
                     <SelectValue placeholder={t("subcategoryNone")} />
@@ -222,7 +232,7 @@ export function EditTagDialog({
                 required
               />
               {latinInCyrillic && (
-                <p className="text-xs text-amber-700 flex items-center gap-1.5">
+                <p className="flex items-center gap-1.5 text-xs text-amber-700">
                   <AlertCircle className="h-3.5 w-3.5" />
                   {sellerT("latinInCyrillicWarning")}
                 </p>
@@ -236,7 +246,7 @@ export function EditTagDialog({
                 onChange={(e) => setNameAm(e.target.value)}
               />
               {latinInArmenian && (
-                <p className="text-xs text-amber-700 flex items-center gap-1.5">
+                <p className="flex items-center gap-1.5 text-xs text-amber-700">
                   <AlertCircle className="h-3.5 w-3.5" />
                   {sellerT("latinInArmenianWarning")}
                 </p>
@@ -247,7 +257,10 @@ export function EditTagDialog({
               type="button"
               variant="outline"
               size="sm"
-              disabled={translating || !(nameEn.trim() || nameRu.trim() || nameAm.trim())}
+              disabled={
+                translating ||
+                !(nameEn.trim() || nameRu.trim() || nameAm.trim())
+              }
               onClick={handleAutoFill}
               className="w-full"
             >
@@ -265,8 +278,10 @@ export function EditTagDialog({
             </Button>
 
             {transliterationPreview && (
-              <div className="rounded-md border bg-background p-2 text-xs">
-                <span className="text-muted-foreground">{sellerT("latinFormForSearch")}: </span>
+              <div className="bg-background rounded-md border p-2 text-xs">
+                <span className="text-muted-foreground">
+                  {sellerT("latinFormForSearch")}:{" "}
+                </span>
                 <span className="font-mono">{transliterationPreview}</span>
               </div>
             )}
@@ -290,11 +305,12 @@ export function EditTagDialog({
             >
               {commonT("cancel")}
             </Button>
-            <Button
-              type="submit"
-              disabled={submitting || !nameEn || !nameRu}
-            >
-              {submitting ? <Loader2 className="h-4 w-4 animate-spin" /> : t("updateTag")}
+            <Button type="submit" disabled={submitting || !nameEn || !nameRu}>
+              {submitting ? (
+                <Loader2 className="h-4 w-4 animate-spin" />
+              ) : (
+                t("updateTag")
+              )}
             </Button>
           </DialogFooter>
         </form>

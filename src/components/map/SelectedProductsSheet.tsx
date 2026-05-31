@@ -3,7 +3,13 @@
 import React, { memo, useEffect, useMemo, useState } from "react";
 import { useTranslations } from "next-intl";
 
-import { Sheet, SheetContent, SheetHeader, SheetTitle, SheetTrigger } from "@/components/ui/sheet";
+import {
+  Sheet,
+  SheetContent,
+  SheetHeader,
+  SheetTitle,
+  SheetTrigger,
+} from "@/components/ui/sheet";
 import { Button } from "@/components/ui/button";
 import { Card } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -17,7 +23,12 @@ type BatchProduct = {
   name: string;
   images: string[];
   basePrice: number;
-  shop: { id: string; fullCode: string; shopName: string | null; svgId: string | null };
+  shop: {
+    id: string;
+    fullCode: string;
+    shopName: string | null;
+    svgId: string | null;
+  };
 };
 
 export const SelectedProductsSheet = memo(function SelectedProductsSheet() {
@@ -42,9 +53,12 @@ export const SelectedProductsSheet = memo(function SelectedProductsSheet() {
       try {
         setLoading(true);
 
-        const res = await apiClient.post<{ products: BatchProduct[] }>("/products/batch", {
-          ids: productIds,
-        });
+        const res = await apiClient.post<{ products: BatchProduct[] }>(
+          "/products/batch",
+          {
+            ids: productIds,
+          }
+        );
 
         if (!res.success) throw new Error(res.error.message);
 
@@ -76,7 +90,7 @@ export const SelectedProductsSheet = memo(function SelectedProductsSheet() {
 
         <div className="mt-4 space-y-3">
           <div className="flex items-center justify-between">
-            <div className="text-sm text-muted-foreground">
+            <div className="text-muted-foreground text-sm">
               {productIds.length === 0
                 ? t("selection.empty")
                 : t("selection.itemsCount", { count: productIds.length })}
@@ -99,7 +113,7 @@ export const SelectedProductsSheet = memo(function SelectedProductsSheet() {
           )}
 
           {!loading && productIds.length === 0 && (
-            <div className="rounded-md border bg-muted/30 p-4 text-sm text-muted-foreground">
+            <div className="bg-muted/30 text-muted-foreground rounded-md border p-4 text-sm">
               {t("selection.empty")}
             </div>
           )}
@@ -108,20 +122,34 @@ export const SelectedProductsSheet = memo(function SelectedProductsSheet() {
             <div className="space-y-2">
               {products.map((p) => (
                 <Card key={p.id} className="flex items-center gap-3 p-2">
-                  <div className="h-14 w-14 overflow-hidden rounded-md bg-muted">
-                    <img src={p.images?.[0] || ""} alt={p.name} className="h-full w-full object-cover" />
+                  <div className="bg-muted h-14 w-14 overflow-hidden rounded-md">
+                    <img
+                      src={p.images?.[0] || ""}
+                      alt={p.name}
+                      className="h-full w-full object-cover"
+                    />
                   </div>
 
                   <div className="min-w-0 flex-1">
                     <Link href={`/products/${p.id}`} className="block">
-                      <p className="line-clamp-1 text-sm font-medium">{p.name}</p>
+                      <p className="line-clamp-1 text-sm font-medium">
+                        {p.name}
+                      </p>
                     </Link>
-                    <Link href={`/shops/${p.shop.fullCode}`} className="block text-xs text-muted-foreground">
-                      {p.shop.shopName || formatShopLocation(p.shop.fullCode, tCommon)}
+                    <Link
+                      href={`/shops/${p.shop.fullCode}`}
+                      className="text-muted-foreground block text-xs"
+                    >
+                      {p.shop.shopName ||
+                        formatShopLocation(p.shop.fullCode, tCommon)}
                     </Link>
                   </div>
 
-                  <Button variant="ghost" size="sm" onClick={() => removeProduct(p.id)}>
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    onClick={() => removeProduct(p.id)}
+                  >
                     {t("selection.remove")}
                   </Button>
                 </Card>

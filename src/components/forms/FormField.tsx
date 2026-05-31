@@ -212,10 +212,13 @@ function FieldWrapper({
     <div className={cn("space-y-2", className)}>
       {label && (
         <div className="flex items-center gap-1.5">
-          <Label htmlFor={id} className={cn(hideLabel && "sr-only", error && "text-destructive")}>
+          <Label
+            htmlFor={id}
+            className={cn(hideLabel && "sr-only", error && "text-destructive")}
+          >
             {label}
             {required && (
-              <span className="ml-1 text-destructive" aria-hidden="true">
+              <span className="text-destructive ml-1" aria-hidden="true">
                 *
               </span>
             )}
@@ -225,7 +228,7 @@ function FieldWrapper({
               <PopoverTrigger asChild>
                 <button
                   type="button"
-                  className="text-muted-foreground transition-colors hover:text-foreground"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
                   aria-label="Help"
                 >
                   <HelpCircle className="h-4 w-4" />
@@ -241,10 +244,15 @@ function FieldWrapper({
 
       {children}
 
-      {description && !error && <p className="text-sm text-muted-foreground">{description}</p>}
+      {description && !error && (
+        <p className="text-muted-foreground text-sm">{description}</p>
+      )}
 
       {error && (
-        <p className="flex items-center gap-1.5 text-sm text-destructive" role="alert">
+        <p
+          className="text-destructive flex items-center gap-1.5 text-sm"
+          role="alert"
+        >
           <AlertCircle className="h-4 w-4 flex-shrink-0" />
           {error}
         </p>
@@ -257,7 +265,10 @@ function FieldWrapper({
 // Utility Functions
 // ============================================================================
 
-function getNestedError(errors: FieldErrors<FieldValues>, path: string): string | undefined {
+function getNestedError(
+  errors: FieldErrors<FieldValues>,
+  path: string
+): string | undefined {
   const keys = path.split(".");
   let current: any = errors;
 
@@ -358,7 +369,9 @@ export function FormField(props: FormFieldProps) {
     const inputType = isPassword ? (showPassword ? "text" : "password") : type;
 
     const charCount = typeof value === "string" ? value.length : 0;
-    const hasAdornments = Boolean(startIcon || endIcon || prefix || suffix || isPassword);
+    const hasAdornments = Boolean(
+      startIcon || endIcon || prefix || suffix || isPassword
+    );
 
     const inputElement = (
       <Input
@@ -399,23 +412,23 @@ export function FormField(props: FormFieldProps) {
         {hasAdornments ? (
           <div className="relative">
             {startIcon && (
-              <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              <div className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 -translate-y-1/2">
                 {startIcon}
               </div>
             )}
             {prefix && (
-              <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              <div className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm">
                 {prefix}
               </div>
             )}
             {inputElement}
             {suffix && (
-              <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              <div className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm">
                 {suffix}
               </div>
             )}
             {endIcon && !isPassword && (
-              <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">
+              <div className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 -translate-y-1/2">
                 {endIcon}
               </div>
             )}
@@ -424,14 +437,14 @@ export function FormField(props: FormFieldProps) {
                 type="button"
                 variant="ghost"
                 size="sm"
-                className="absolute right-0 top-0 h-full px-3 hover:bg-transparent"
+                className="absolute top-0 right-0 h-full px-3 hover:bg-transparent"
                 onClick={() => setShowPassword((v) => !v)}
                 aria-label={showPassword ? "Hide password" : "Show password"}
               >
                 {showPassword ? (
-                  <EyeOff className="h-4 w-4 text-muted-foreground" />
+                  <EyeOff className="text-muted-foreground h-4 w-4" />
                 ) : (
-                  <Eye className="h-4 w-4 text-muted-foreground" />
+                  <Eye className="text-muted-foreground h-4 w-4" />
                 )}
               </Button>
             )}
@@ -441,7 +454,7 @@ export function FormField(props: FormFieldProps) {
         )}
 
         {showCharacterCount && maxLength && (
-          <p className="text-right text-xs text-muted-foreground">
+          <p className="text-muted-foreground text-right text-xs">
             {charCount}/{maxLength}
           </p>
         )}
@@ -493,13 +506,13 @@ export function FormField(props: FormFieldProps) {
         {hasAdornments ? (
           <div className="relative">
             {prefix && (
-              <div className="pointer-events-none absolute left-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              <div className="text-muted-foreground pointer-events-none absolute top-1/2 left-3 -translate-y-1/2 text-sm">
                 {prefix}
               </div>
             )}
             {inputElement}
             {suffix && (
-              <div className="pointer-events-none absolute right-3 top-1/2 -translate-y-1/2 text-sm text-muted-foreground">
+              <div className="text-muted-foreground pointer-events-none absolute top-1/2 right-3 -translate-y-1/2 text-sm">
                 {suffix}
               </div>
             )}
@@ -516,8 +529,12 @@ export function FormField(props: FormFieldProps) {
   // ============================================================================
 
   if (props.type === "textarea") {
-    const { rows = 4, maxLength, showCharacterCount, autoResize } =
-      props as TextareaFieldProps;
+    const {
+      rows = 4,
+      maxLength,
+      showCharacterCount,
+      autoResize,
+    } = props as TextareaFieldProps;
 
     const charCount = typeof value === "string" ? value.length : 0;
 
@@ -562,7 +579,9 @@ export function FormField(props: FormFieldProps) {
           <p
             className={cn(
               "text-right text-xs",
-              charCount > maxLength * 0.9 ? "text-destructive" : "text-muted-foreground"
+              charCount > maxLength * 0.9
+                ? "text-destructive"
+                : "text-muted-foreground"
             )}
           >
             {charCount}/{maxLength}
@@ -603,14 +622,22 @@ export function FormField(props: FormFieldProps) {
             >
               <SelectTrigger
                 id={id}
-                className={cn(error && "border-destructive focus:ring-destructive", inputClassName)}
+                className={cn(
+                  error && "border-destructive focus:ring-destructive",
+                  inputClassName
+                )}
                 aria-invalid={!!error}
               >
-                <SelectValue placeholder={placeholder || tCommon("selectAnOption")} />
+                <SelectValue
+                  placeholder={placeholder || tCommon("selectAnOption")}
+                />
               </SelectTrigger>
               <SelectContent>
                 {clearable && field.value && (
-                  <SelectItem value="__clear__" className="text-muted-foreground">
+                  <SelectItem
+                    value="__clear__"
+                    className="text-muted-foreground"
+                  >
                     {tCommon("clearSelection")}
                   </SelectItem>
                 )}
@@ -688,7 +715,9 @@ export function FormField(props: FormFieldProps) {
                     )}
                   >
                     {checkboxLabel}
-                    {required && <span className="ml-1 text-destructive">*</span>}
+                    {required && (
+                      <span className="text-destructive ml-1">*</span>
+                    )}
                   </Label>
                 </div>
               )}
@@ -726,7 +755,9 @@ export function FormField(props: FormFieldProps) {
               onValueChange={field.onChange}
               disabled={disabled}
               className={cn(
-                direction === "horizontal" ? "flex flex-wrap gap-4" : "flex flex-col gap-2"
+                direction === "horizontal"
+                  ? "flex flex-wrap gap-4"
+                  : "flex flex-col gap-2"
               )}
               aria-invalid={!!error}
             >
@@ -742,7 +773,8 @@ export function FormField(props: FormFieldProps) {
                     htmlFor={`${id}-${option.value}`}
                     className={cn(
                       "cursor-pointer font-normal",
-                      (disabled || option.disabled) && "cursor-not-allowed opacity-70"
+                      (disabled || option.disabled) &&
+                        "cursor-not-allowed opacity-70"
                     )}
                   >
                     {option.label}

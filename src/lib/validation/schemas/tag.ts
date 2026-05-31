@@ -29,8 +29,16 @@ export const tagSellerCreateSchema = z
     force: z.boolean().optional(),
   })
   .refine(
-    (v) => Boolean((v.name_en && v.name_en.trim()) || (v.name_ru && v.name_ru.trim()) || (v.name_am && v.name_am.trim())),
-    { message: "At least one of name_en, name_ru, or name_am is required", path: ["name_en"] }
+    (v) =>
+      Boolean(
+        (v.name_en && v.name_en.trim()) ||
+        (v.name_ru && v.name_ru.trim()) ||
+        (v.name_am && v.name_am.trim())
+      ),
+    {
+      message: "At least one of name_en, name_ru, or name_am is required",
+      path: ["name_en"],
+    }
   );
 
 /**

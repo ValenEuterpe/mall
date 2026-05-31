@@ -15,27 +15,29 @@ const jwtConfig = AUTH_CONFIG.jwt;
 /**
  * Generate access token (short-lived)
  */
-export function generateAccessToken(payload: Omit<AccessTokenPayload, "iat" | "exp">): string {
-    return jwt.sign(payload, env.JWT_ACCESS_SECRET, {
-        expiresIn: env.JWT_ACCESS_EXPIRY as jwt.SignOptions["expiresIn"],
-        issuer: jwtConfig.issuer,
-        audience: jwtConfig.accessAudience,
-    });
+export function generateAccessToken(
+  payload: Omit<AccessTokenPayload, "iat" | "exp">
+): string {
+  return jwt.sign(payload, env.JWT_ACCESS_SECRET, {
+    expiresIn: env.JWT_ACCESS_EXPIRY as jwt.SignOptions["expiresIn"],
+    issuer: jwtConfig.issuer,
+    audience: jwtConfig.accessAudience,
+  });
 }
 
 /**
  * Verify access token
  */
 export function verifyAccessToken(token: string): AccessTokenPayload | null {
-    try {
-        const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET, {
-            issuer: jwtConfig.issuer,
-            audience: jwtConfig.accessAudience,
-        }) as AccessTokenPayload;
-        return decoded;
-    } catch {
-        return null;
-    }
+  try {
+    const decoded = jwt.verify(token, env.JWT_ACCESS_SECRET, {
+      issuer: jwtConfig.issuer,
+      audience: jwtConfig.accessAudience,
+    }) as AccessTokenPayload;
+    return decoded;
+  } catch {
+    return null;
+  }
 }
 
 // ============================================================================
@@ -46,28 +48,28 @@ export function verifyAccessToken(token: string): AccessTokenPayload | null {
  * Generate refresh token (long-lived)
  */
 export function generateRefreshToken(
-    payload: Omit<RefreshTokenPayload, "iat" | "exp">
+  payload: Omit<RefreshTokenPayload, "iat" | "exp">
 ): string {
-    return jwt.sign(payload, env.JWT_REFRESH_SECRET, {
-        expiresIn: env.JWT_REFRESH_EXPIRY as jwt.SignOptions["expiresIn"],
-        issuer: jwtConfig.issuer,
-        audience: jwtConfig.refreshAudience,
-    });
+  return jwt.sign(payload, env.JWT_REFRESH_SECRET, {
+    expiresIn: env.JWT_REFRESH_EXPIRY as jwt.SignOptions["expiresIn"],
+    issuer: jwtConfig.issuer,
+    audience: jwtConfig.refreshAudience,
+  });
 }
 
 /**
  * Verify refresh token
  */
 export function verifyRefreshToken(token: string): RefreshTokenPayload | null {
-    try {
-        const decoded = jwt.verify(token, env.JWT_REFRESH_SECRET, {
-            issuer: jwtConfig.issuer,
-            audience: jwtConfig.refreshAudience,
-        }) as RefreshTokenPayload;
-        return decoded;
-    } catch {
-        return null;
-    }
+  try {
+    const decoded = jwt.verify(token, env.JWT_REFRESH_SECRET, {
+      issuer: jwtConfig.issuer,
+      audience: jwtConfig.refreshAudience,
+    }) as RefreshTokenPayload;
+    return decoded;
+  } catch {
+    return null;
+  }
 }
 
 // ============================================================================
@@ -78,19 +80,19 @@ export function verifyRefreshToken(token: string): RefreshTokenPayload | null {
  * Generate verification token (email, password reset, magic link)
  */
 export function generateVerificationToken(): string {
-    return nanoid(64);
+  return nanoid(64);
 }
 
 /**
  * Generate token family ID for refresh token rotation
  */
 export function generateTokenFamily(): string {
-    return nanoid(32);
+  return nanoid(32);
 }
 
 /**
  * Generate session token
  */
 export function generateSessionToken(): string {
-    return nanoid(64);
+  return nanoid(64);
 }

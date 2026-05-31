@@ -4,9 +4,7 @@ import { successResponse, createdResponse } from "@/lib/api/response";
 import prisma from "@/lib/db/prisma";
 import { createShopTypeSchema } from "./schemas";
 
-async function listShopTypesHandler(
-  _req: NextRequest
-): Promise<NextResponse> {
+async function listShopTypesHandler(_req: NextRequest): Promise<NextResponse> {
   const shopTypes = await prisma.shopType.findMany({
     orderBy: { sortOrder: "asc" },
     include: {
@@ -17,9 +15,7 @@ async function listShopTypesHandler(
   return successResponse(shopTypes);
 }
 
-async function createShopTypeHandler(
-  req: NextRequest
-): Promise<NextResponse> {
+async function createShopTypeHandler(req: NextRequest): Promise<NextResponse> {
   const body = await req.json();
   const validated = createShopTypeSchema.parse(body);
 

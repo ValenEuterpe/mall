@@ -23,12 +23,20 @@ function secureCompare(a: string, b: string): boolean {
   return result === 0;
 }
 
-function AccessDeniedView({ title, message, backLabel }: { title: string; message: string; backLabel: string }): React.ReactElement {
+function AccessDeniedView({
+  title,
+  message,
+  backLabel,
+}: {
+  title: string;
+  message: string;
+  backLabel: string;
+}): React.ReactElement {
   return (
-    <div className="flex min-h-screen items-center justify-center bg-background p-4">
+    <div className="bg-background flex min-h-screen items-center justify-center p-4">
       <div className="w-full max-w-md space-y-6 text-center">
-        <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-destructive/10">
-          <ShieldX className="h-8 w-8 text-destructive" />
+        <div className="bg-destructive/10 mx-auto flex h-16 w-16 items-center justify-center rounded-full">
+          <ShieldX className="text-destructive h-8 w-8" />
         </div>
 
         <Alert variant="destructive" className="text-left">
@@ -48,18 +56,24 @@ function AccessDeniedView({ title, message, backLabel }: { title: string; messag
   );
 }
 
-function AdminHeader({ title, modeLabel }: { title: string; modeLabel: string }): React.ReactElement {
+function AdminHeader({
+  title,
+  modeLabel,
+}: {
+  title: string;
+  modeLabel: string;
+}): React.ReactElement {
   return (
-    <header className="sticky top-0 z-50 border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+    <header className="bg-background/95 supports-[backdrop-filter]:bg-background/60 sticky top-0 z-50 border-b backdrop-blur">
       <div className="container flex h-14 items-center justify-between">
         <div className="flex items-center gap-2">
-          <div className="flex h-8 w-8 items-center justify-center rounded-md bg-primary">
-            <span className="text-sm font-bold text-primary-foreground">A</span>
+          <div className="bg-primary flex h-8 w-8 items-center justify-center rounded-md">
+            <span className="text-primary-foreground text-sm font-bold">A</span>
           </div>
           <span className="font-semibold">{title}</span>
         </div>
 
-        <div className="flex items-center gap-2 text-sm text-muted-foreground">
+        <div className="text-muted-foreground flex items-center gap-2 text-sm">
           <span className="inline-flex items-center gap-1 rounded-full bg-amber-500/10 px-2 py-1 text-xs font-medium text-amber-600">
             <span className="h-1.5 w-1.5 rounded-full bg-amber-500" />
             {modeLabel}
@@ -77,7 +91,10 @@ function AdminHeader({ title, modeLabel }: { title: string; modeLabel: string })
  * - Token validation is performed server-side (no client-side env exposure)
  * - The token must match `env.ADMIN_TOKEN`
  */
-export default async function AdminLayout({ children, params }: AdminLayoutProps): Promise<React.ReactElement> {
+export default async function AdminLayout({
+  children,
+  params,
+}: AdminLayoutProps): Promise<React.ReactElement> {
   const t = await getTranslations("adminPanel");
   const { adminToken } = await params;
 
@@ -106,26 +123,26 @@ export default async function AdminLayout({ children, params }: AdminLayoutProps
   }
 
   return (
-    <div className="min-h-screen bg-background">
+    <div className="bg-background min-h-screen">
       <AdminHeader title={t("header.title")} modeLabel={t("header.mode")} />
 
       <div className="container py-6">
         <nav className="mb-6 flex items-center gap-4 text-sm">
           <Link
             href={`/admin/${adminToken}/dashboard`}
-            className="text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
             {t("nav.dashboard")}
           </Link>
           <Link
             href={`/admin/${adminToken}/users`}
-            className="text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
             {t("nav.users")}
           </Link>
           <Link
             href={`/admin/${adminToken}/settings`}
-            className="text-muted-foreground transition-colors hover:text-foreground"
+            className="text-muted-foreground hover:text-foreground transition-colors"
           >
             {t("nav.settings")}
           </Link>

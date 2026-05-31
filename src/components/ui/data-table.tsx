@@ -123,7 +123,7 @@ export function DataTableColumnHeader<TData, TValue>({
     <Button
       variant="ghost"
       size="sm"
-      className={cn("-ml-3 h-8 data-[state=open]:bg-accent", className)}
+      className={cn("data-[state=open]:bg-accent -ml-3 h-8", className)}
       onClick={() => column.toggleSorting(column.getIsSorted() === "asc")}
     >
       <span>{title}</span>
@@ -147,7 +147,9 @@ export function getSelectionColumn<TData>(): ColumnDef<TData> {
           table.getIsAllPageRowsSelected() ||
           (table.getIsSomePageRowsSelected() && "indeterminate")
         }
-        onCheckedChange={(value) => table.toggleAllPageRowsSelected(Boolean(value))}
+        onCheckedChange={(value) =>
+          table.toggleAllPageRowsSelected(Boolean(value))
+        }
         aria-label="Select all"
         className="translate-y-[2px]"
       />
@@ -167,7 +169,13 @@ export function getSelectionColumn<TData>(): ColumnDef<TData> {
   };
 }
 
-function DataTableSkeleton({ columns, rows = 5 }: { columns: number; rows?: number }) {
+function DataTableSkeleton({
+  columns,
+  rows = 5,
+}: {
+  columns: number;
+  rows?: number;
+}) {
   return (
     <div className="rounded-md border">
       <Table>
@@ -232,13 +240,15 @@ function DataTableToolbar<TData>({
       <div className="flex flex-1 items-center gap-2">
         {enableSearch && (
           <div className="relative">
-            <Search className="absolute left-2.5 top-2.5 h-4 w-4 text-muted-foreground" />
+            <Search className="text-muted-foreground absolute top-2.5 left-2.5 h-4 w-4" />
             <Input
               placeholder={searchPlaceholder}
               value={filterValue}
               onChange={(event) => {
                 if (searchColumn) {
-                  table.getColumn(searchColumn)?.setFilterValue(event.target.value);
+                  table
+                    .getColumn(searchColumn)
+                    ?.setFilterValue(event.target.value);
                 } else {
                   table.setGlobalFilter(event.target.value);
                 }
@@ -249,7 +259,7 @@ function DataTableToolbar<TData>({
               <Button
                 variant="ghost"
                 size="sm"
-                className="absolute right-0 top-0 h-9 px-2"
+                className="absolute top-0 right-0 h-9 px-2"
                 onClick={() => {
                   if (searchColumn) {
                     table.getColumn(searchColumn)?.setFilterValue("");
@@ -296,7 +306,9 @@ function DataTableToolbar<TData>({
           <Button
             variant="outline"
             size="sm"
-            onClick={() => onExport(table.getFilteredRowModel().rows.map((r) => r.original))}
+            onClick={() =>
+              onExport(table.getFilteredRowModel().rows.map((r) => r.original))
+            }
           >
             <Download className="mr-2 h-4 w-4" />
             Export
@@ -316,13 +328,19 @@ function DataTableToolbar<TData>({
               <DropdownMenuSeparator />
               {table
                 .getAllColumns()
-                .filter((column) => typeof column.accessorFn !== "undefined" && column.getCanHide())
+                .filter(
+                  (column) =>
+                    typeof column.accessorFn !== "undefined" &&
+                    column.getCanHide()
+                )
                 .map((column) => (
                   <DropdownMenuCheckboxItem
                     key={column.id}
                     className="capitalize"
                     checked={column.getIsVisible()}
-                    onCheckedChange={(value) => column.toggleVisibility(Boolean(value))}
+                    onCheckedChange={(value) =>
+                      column.toggleVisibility(Boolean(value))
+                    }
                   >
                     {column.id.replace(/_/g, " ")}
                   </DropdownMenuCheckboxItem>
@@ -353,8 +371,12 @@ function DataTablePagination<TData>({
   const isServerSide = Boolean(onPageChange);
 
   const pageSize = table.getState().pagination.pageSize;
-  const pageCount = isServerSide ? Math.ceil((totalRows ?? 0) / pageSize) : table.getPageCount();
-  const pageIndex = isServerSide ? Math.max(0, (currentPage ?? 1) - 1) : table.getState().pagination.pageIndex;
+  const pageCount = isServerSide
+    ? Math.ceil((totalRows ?? 0) / pageSize)
+    : table.getPageCount();
+  const pageIndex = isServerSide
+    ? Math.max(0, (currentPage ?? 1) - 1)
+    : table.getState().pagination.pageIndex;
 
   const handlePageChange = (nextPageIndex: number) => {
     if (isServerSide) {
@@ -374,10 +396,12 @@ function DataTablePagination<TData>({
 
   return (
     <div className="flex flex-col gap-4 px-2 py-4 sm:flex-row sm:items-center sm:justify-between">
-      <div className="text-sm text-muted-foreground">
+      <div className="text-muted-foreground text-sm">
         {table.getFilteredSelectedRowModel().rows.length > 0 ? (
           <>
-            {table.getFilteredSelectedRowModel().rows.length} of {totalRows ?? table.getFilteredRowModel().rows.length} row(s) selected
+            {table.getFilteredSelectedRowModel().rows.length} of{" "}
+            {totalRows ?? table.getFilteredRowModel().rows.length} row(s)
+            selected
           </>
         ) : (
           <>
@@ -391,7 +415,10 @@ function DataTablePagination<TData>({
       <div className="flex items-center gap-4 sm:gap-6 lg:gap-8">
         <div className="flex items-center gap-2">
           <p className="hidden text-sm font-medium sm:block">Rows per page</p>
-          <Select value={`${pageSize}`} onValueChange={(value) => handlePageSizeChange(Number(value))}>
+          <Select
+            value={`${pageSize}`}
+            onValueChange={(value) => handlePageSizeChange(Number(value))}
+          >
             <SelectTrigger className="h-8 w-[70px]">
               <SelectValue placeholder={pageSize} />
             </SelectTrigger>
@@ -487,13 +514,18 @@ export function DataTable<TData, TValue>({
   className,
 }: DataTableProps<TData, TValue>) {
   const [sorting, setSorting] = React.useState<SortingState>([]);
-  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>([]);
-  const [columnVisibility, setColumnVisibility] = React.useState<VisibilityState>({});
+  const [columnFilters, setColumnFilters] = React.useState<ColumnFiltersState>(
+    []
+  );
+  const [columnVisibility, setColumnVisibility] =
+    React.useState<VisibilityState>({});
   const [rowSelection, setRowSelection] = React.useState<RowSelectionState>({});
   const [globalFilter, setGlobalFilter] = React.useState("");
 
   const tableColumns = React.useMemo(() => {
-    return enableRowSelection ? [getSelectionColumn<TData>(), ...columns] : columns;
+    return enableRowSelection
+      ? [getSelectionColumn<TData>(), ...columns]
+      : columns;
   }, [columns, enableRowSelection]);
 
   const isServerSidePagination = Boolean(onPageChange);
@@ -502,7 +534,10 @@ export function DataTable<TData, TValue>({
     data,
     columns: tableColumns,
     getCoreRowModel: getCoreRowModel(),
-    getPaginationRowModel: enablePagination && !isServerSidePagination ? getPaginationRowModel() : undefined,
+    getPaginationRowModel:
+      enablePagination && !isServerSidePagination
+        ? getPaginationRowModel()
+        : undefined,
     getSortedRowModel: getSortedRowModel(),
     getFilteredRowModel: getFilteredRowModel(),
     onSortingChange: setSorting,
@@ -518,12 +553,17 @@ export function DataTable<TData, TValue>({
       rowSelection,
       globalFilter,
       pagination: {
-        pageIndex: isServerSidePagination ? Math.max(0, (currentPage ?? 1) - 1) : 0,
+        pageIndex: isServerSidePagination
+          ? Math.max(0, (currentPage ?? 1) - 1)
+          : 0,
         pageSize,
       },
     },
     manualPagination: isServerSidePagination,
-    pageCount: isServerSidePagination && totalRows != null ? Math.ceil(totalRows / pageSize) : undefined,
+    pageCount:
+      isServerSidePagination && totalRows != null
+        ? Math.ceil(totalRows / pageSize)
+        : undefined,
   });
 
   const selectedRows = React.useMemo(
@@ -576,14 +616,25 @@ export function DataTable<TData, TValue>({
         style={maxHeight ? { maxHeight } : undefined}
       >
         <Table>
-          <TableHeader className={cn(stickyHeader && "sticky top-0 z-10 bg-background")}>
+          <TableHeader
+            className={cn(stickyHeader && "bg-background sticky top-0 z-10")}
+          >
             {table.getHeaderGroups().map((headerGroup) => (
               <TableRow key={headerGroup.id}>
                 {headerGroup.headers.map((header) => (
-                  <TableHead key={header.id} style={{ width: header.getSize() !== 150 ? header.getSize() : undefined }}>
+                  <TableHead
+                    key={header.id}
+                    style={{
+                      width:
+                        header.getSize() !== 150 ? header.getSize() : undefined,
+                    }}
+                  >
                     {header.isPlaceholder
                       ? null
-                      : flexRender(header.column.columnDef.header, header.getContext())}
+                      : flexRender(
+                          header.column.columnDef.header,
+                          header.getContext()
+                        )}
                   </TableHead>
                 ))}
               </TableRow>
@@ -596,14 +647,17 @@ export function DataTable<TData, TValue>({
                   key={row.id}
                   data-state={row.getIsSelected() && "selected"}
                   className={cn(
-                    onRowClick && "cursor-pointer hover:bg-muted/50",
+                    onRowClick && "hover:bg-muted/50 cursor-pointer",
                     rowClassName?.(row.original)
                   )}
                   onClick={() => onRowClick?.(row.original)}
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id}>
-                      {flexRender(cell.column.columnDef.cell, cell.getContext())}
+                      {flexRender(
+                        cell.column.columnDef.cell,
+                        cell.getContext()
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>

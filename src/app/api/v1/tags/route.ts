@@ -32,10 +32,7 @@ async function listTagsHandler(req: NextRequest) {
   const where: any = {};
   if (categoryId) where.categoryId = categoryId;
   if (subcategoryId) {
-    where.OR = [
-      { subcategoryId: subcategoryId },
-      { subcategoryId: null }
-    ];
+    where.OR = [{ subcategoryId: subcategoryId }, { subcategoryId: null }];
   }
 
   const tags = await prisma.tag.findMany({
@@ -73,7 +70,14 @@ async function findNearMatches(params: {
   name_am: string;
   transliteration: string;
 }): Promise<DedupCandidate[]> {
-  const { categoryId, subcategoryId, name_en, name_ru, name_am, transliteration } = params;
+  const {
+    categoryId,
+    subcategoryId,
+    name_en,
+    name_ru,
+    name_am,
+    transliteration,
+  } = params;
 
   // Subcategory-aware match: same subcategory OR category-level (NULL). If query has no subcategory, match anything in category.
   if (subcategoryId) {
@@ -150,7 +154,10 @@ async function createTagHandler(
   });
   if (!category) {
     return NextResponse.json(
-      { success: false, error: { code: "CATEGORY_NOT_FOUND", message: "Category not found" } },
+      {
+        success: false,
+        error: { code: "CATEGORY_NOT_FOUND", message: "Category not found" },
+      },
       { status: 404 }
     );
   }
@@ -163,7 +170,13 @@ async function createTagHandler(
     });
     if (!sub || sub.categoryId !== input.categoryId) {
       return NextResponse.json(
-        { success: false, error: { code: "INVALID_SUBCATEGORY", message: "Subcategory does not belong to category" } },
+        {
+          success: false,
+          error: {
+            code: "INVALID_SUBCATEGORY",
+            message: "Subcategory does not belong to category",
+          },
+        },
         { status: 400 }
       );
     }
@@ -198,16 +211,24 @@ async function createTagHandler(
 
   if (!name_en || !name_ru) {
     return NextResponse.json(
-      { success: false, error: { code: "TRANSLATION_FAILED", message: "Unable to populate required name fields" } },
+      {
+        success: false,
+        error: {
+          code: "TRANSLATION_FAILED",
+          message: "Unable to populate required name fields",
+        },
+      },
       { status: 400 }
     );
   }
 
   // Step 2: compute Latin transliteration
-  const transliterationText = buildTransliterations([name_ru, name_am]).join(" ") || null;
+  const transliterationText =
+    buildTransliterations([name_ru, name_am]).join(" ") || null;
 
   // Step 3: derive key if not provided
-  const key = input.key || slugFrom(name_en) || slugFrom(name_ru) || `tag-${Date.now()}`;
+  const key =
+    input.key || slugFrom(name_en) || slugFrom(name_ru) || `tag-${Date.now()}`;
 
   // Step 4: dedup check (skip when force=true)
   if (!input.force) {
@@ -265,7 +286,13 @@ async function createTagHandler(
   }
 
   return NextResponse.json(
-    { success: false, error: { code: "DUPLICATE_TAG", message: "Could not allocate a unique tag key" } },
+    {
+      success: false,
+      error: {
+        code: "DUPLICATE_TAG",
+        message: "Could not allocate a unique tag key",
+      },
+    },
     { status: 409 }
   );
 }

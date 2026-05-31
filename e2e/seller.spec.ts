@@ -32,21 +32,25 @@ test.describe("Seller portal", () => {
     await expect(form).toBeVisible();
 
     // Check for product name field
-    const nameInput = page.locator("input[name*='name'], input[placeholder*='product']").first();
+    const nameInput = page
+      .locator("input[name*='name'], input[placeholder*='product']")
+      .first();
     if (await nameInput.isVisible({ timeout: 5000 })) {
       await expect(nameInput).toBeVisible();
     }
   });
 
-  test.skip("seller product list is visible when authenticated", async ({ page }) => {
+  test.skip("seller product list is visible when authenticated", async ({
+    page,
+  }) => {
     // This test requires authentication
     await page.goto("/seller/products");
     await page.waitForLoadState("networkidle");
 
     // Check for product list/table
-    const productList = page.locator(
-      "[data-testid='product-list'], table, [role='grid'], .grid"
-    ).first();
+    const productList = page
+      .locator("[data-testid='product-list'], table, [role='grid'], .grid")
+      .first();
 
     if (await productList.isVisible({ timeout: 5000 })) {
       await expect(productList).toBeVisible();
@@ -58,33 +62,41 @@ test.describe("Seller portal", () => {
     await page.goto("/seller/products");
     await page.waitForLoadState("networkidle");
 
-    const editButton = page.locator(
-      "button[aria-label*='edit'], button[aria-label*='Edit'], [class*='edit-btn']"
-    ).first();
+    const editButton = page
+      .locator(
+        "button[aria-label*='edit'], button[aria-label*='Edit'], [class*='edit-btn']"
+      )
+      .first();
 
     if (await editButton.isVisible({ timeout: 5000 })) {
       await editButton.click();
-      const form = page.locator("form, [role='dialog'], [class*='modal']").first();
+      const form = page
+        .locator("form, [role='dialog'], [class*='modal']")
+        .first();
       await expect(form).toBeVisible({ timeout: 5000 });
     }
   });
 
-  test.skip("seller can delete a product with confirmation", async ({ page }) => {
+  test.skip("seller can delete a product with confirmation", async ({
+    page,
+  }) => {
     // This test requires authentication
     await page.goto("/seller/products");
     await page.waitForLoadState("networkidle");
 
-    const deleteButton = page.locator(
-      "button[aria-label*='delete'], button[aria-label*='remove']"
-    ).first();
+    const deleteButton = page
+      .locator("button[aria-label*='delete'], button[aria-label*='remove']")
+      .first();
 
     if (await deleteButton.isVisible({ timeout: 5000 })) {
       await deleteButton.click();
 
       // Look for confirmation dialog
-      const confirmDialog = page.locator(
-        "[role='alertdialog'], [role='dialog'], text=/confirm|delete|remove/i"
-      ).first();
+      const confirmDialog = page
+        .locator(
+          "[role='alertdialog'], [role='dialog'], text=/confirm|delete|remove/i"
+        )
+        .first();
 
       if (await confirmDialog.isVisible({ timeout: 5000 })) {
         await expect(confirmDialog).toBeVisible();

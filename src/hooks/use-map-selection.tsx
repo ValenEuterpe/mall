@@ -24,7 +24,9 @@ function readSessionProductIds(): string[] {
     if (!raw) return [];
     const parsed = JSON.parse(raw);
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter((x): x is string => typeof x === "string" && x.length > 0);
+    return parsed.filter(
+      (x): x is string => typeof x === "string" && x.length > 0
+    );
   } catch {
     return [];
   }
@@ -49,7 +51,9 @@ export type UseMapSelectionState = {
   syncError: string | null;
 };
 
-const MapSelectionContext = createContext<UseMapSelectionState | undefined>(undefined);
+const MapSelectionContext = createContext<UseMapSelectionState | undefined>(
+  undefined
+);
 MapSelectionContext.displayName = "MapSelectionContext";
 
 export interface MapSelectionProviderProps {
@@ -101,7 +105,9 @@ export function MapSelectionProvider({
         setIsSyncing(true);
         setSyncError(null);
 
-        const res = await apiClient.get<{ productIds: string[] }>("/map-selection");
+        const res = await apiClient.get<{ productIds: string[] }>(
+          "/map-selection"
+        );
 
         if (!res.success) {
           throw new Error(res.error.message);
@@ -111,7 +117,9 @@ export function MapSelectionProvider({
         const sessionProductIds = readSessionProductIds();
 
         // Merge (DB ∪ session), preserve order: DB first then new session items
-        const merged = Array.from(new Set([...dbProductIds, ...sessionProductIds]));
+        const merged = Array.from(
+          new Set([...dbProductIds, ...sessionProductIds])
+        );
 
         if (!cancelled) {
           setProductIds(merged);
@@ -121,14 +129,19 @@ export function MapSelectionProvider({
 
         // If session had extra items, immediately push merged up to DB (immediate sync)
         if (merged.length !== dbProductIds.length) {
-          const putRes = await apiClient.put<{ productIds: string[] }>("/map-selection", {
-            productIds: merged,
-          });
+          const putRes = await apiClient.put<{ productIds: string[] }>(
+            "/map-selection",
+            {
+              productIds: merged,
+            }
+          );
           if (!putRes.success) throw new Error(putRes.error.message);
         }
       } catch (e) {
         if (!cancelled) {
-          setSyncError(e instanceof Error ? e.message : "Failed to sync map selection");
+          setSyncError(
+            e instanceof Error ? e.message : "Failed to sync map selection"
+          );
         }
       } finally {
         if (!cancelled) setIsSyncing(false);
@@ -186,12 +199,17 @@ export function MapSelectionProvider({
         try {
           setIsSyncing(true);
           setSyncError(null);
-          const res = await apiClient.put<{ productIds: string[] }>("/map-selection", {
-            productIds: payload,
-          });
+          const res = await apiClient.put<{ productIds: string[] }>(
+            "/map-selection",
+            {
+              productIds: payload,
+            }
+          );
           if (!res.success) throw new Error(res.error.message);
         } catch (e) {
-          setSyncError(e instanceof Error ? e.message : "Failed to sync map selection");
+          setSyncError(
+            e instanceof Error ? e.message : "Failed to sync map selection"
+          );
         } finally {
           setIsSyncing(false);
         }
@@ -214,7 +232,9 @@ export function MapSelectionProvider({
   const addProduct = useCallback(
     (productId: string) => {
       if (!productId) return;
-      update((prev) => (prev.includes(productId) ? prev : [...prev, productId]));
+      update((prev) =>
+        prev.includes(productId) ? prev : [...prev, productId]
+      );
     },
     [update]
   );
@@ -231,7 +251,9 @@ export function MapSelectionProvider({
     (productId: string) => {
       if (!productId) return;
       update((prev) =>
-        prev.includes(productId) ? prev.filter((id) => id !== productId) : [...prev, productId]
+        prev.includes(productId)
+          ? prev.filter((id) => id !== productId)
+          : [...prev, productId]
       );
     },
     [update]
@@ -272,7 +294,9 @@ export function MapSelectionProvider({
   );
 
   return (
-    <MapSelectionContext.Provider value={contextValue}>{children}</MapSelectionContext.Provider>
+    <MapSelectionContext.Provider value={contextValue}>
+      {children}
+    </MapSelectionContext.Provider>
   );
 }
 
@@ -280,7 +304,9 @@ export function useMapSelection(): UseMapSelectionState {
   const context = useContext(MapSelectionContext);
 
   if (!context) {
-    throw new Error("useMapSelection must be used within a MapSelectionProvider");
+    throw new Error(
+      "useMapSelection must be used within a MapSelectionProvider"
+    );
   }
 
   return context;

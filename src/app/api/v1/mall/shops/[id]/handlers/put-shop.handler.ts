@@ -13,61 +13,59 @@ import { getExistingShop } from "../utils/get-existing-shop";
 import { SHOP_DETAIL_SELECT } from "../selects";
 
 export async function putShopHandler(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
-    const user = requireAuth(request, ["MALL_OWNER"]);
-    const { id } = await params;
+  const user = requireAuth(request, ["MALL_OWNER"]);
+  const { id } = await params;
 
-    validateShopId(id);
+  validateShopId(id);
 
-    // Verify shop exists first
-    const existingShop = await getExistingShop(id);
+  // Verify shop exists first
+  const existingShop = await getExistingShop(id);
 
-    // Validate and parse request body
-    const data = await validateBody(request, shopUpdateSchema);
-    // `contacts` is intentionally stripped from the rest spread (handled separately).
-    const { contacts: _contacts, ...shopFields } = data;
+  // Validate and parse request body
+  const data = await validateBody(request, shopUpdateSchema);
+  // `contacts` is intentionally stripped from the rest spread (handled separately).
+  const { contacts: _contacts, ...shopFields } = data;
 
-    // If fullCode is being changed, check for conflicts
-    if (shopFields.fullCode && shopFields.fullCode !== existingShop.fullCode) {
-        const codeConflict = await prisma.shop.findUnique({
-            where: { fullCode: data.fullCode },
-            select: { id: true },
-        });
+  // If fullCode is being changed, check for conflicts
+  if (shopFields.fullCode && shopFields.fullCode !== existingShop.fullCode) {
+    const codeConflict = await prisma.shop.findUnique({
+      where: { fullCode: data.fullCode },
+      select: { id: true },
+    });
 
-        if (codeConflict) {
-            throw new ConflictError(
-                `Shop code "${data.fullCode}" is already in use`
-            );
-        }
+    if (codeConflict) {
+      throw new ConflictError(`Shop code "${data.fullCode}" is already in use`);
     }
+  }
 
-    // Perform update
-    try {
-        const updatedShop = await prisma.shop.update({
-            where: { id },
-            data: {
-                ...shopFields,
-                updatedAt: new Date(),
-            },
-            select: SHOP_DETAIL_SELECT,
-        });
+  // Perform update
+  try {
+    const updatedShop = await prisma.shop.update({
+      where: { id },
+      data: {
+        ...shopFields,
+        updatedAt: new Date(),
+      },
+      select: SHOP_DETAIL_SELECT,
+    });
 
-        logger.info("Shop updated", {
-            shopId: id,
-            userId: user.userId,
-            changes: Object.keys(data),
-        });
+    logger.info("Shop updated", {
+      shopId: id,
+      userId: user.userId,
+      changes: Object.keys(data),
+    });
 
-        return successResponse(transformShopForDetail(updatedShop));
-    } catch (error) {
-        if (
-            error instanceof Prisma.PrismaClientKnownRequestError &&
-            error.code === "P2002"
-        ) {
-            throw new ConflictError("Shop code already exists");
-        }
-        throw error;
+    return successResponse(transformShopForDetail(updatedShop));
+  } catch (error) {
+    if (
+      error instanceof Prisma.PrismaClientKnownRequestError &&
+      error.code === "P2002"
+    ) {
+      throw new ConflictError("Shop code already exists");
     }
+    throw error;
+  }
 }

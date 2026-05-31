@@ -42,8 +42,12 @@ export default async function RootLayout({
   const locale = await getLocale();
 
   return (
-    <html lang={locale} suppressHydrationWarning className={`${inter.variable} ${jakarta.variable}`}>
-      <body className="min-h-screen bg-background font-sans antialiased selection:bg-primary/20 selection:text-primary">
+    <html
+      lang={locale}
+      suppressHydrationWarning
+      className={`${inter.variable} ${jakarta.variable}`}
+    >
+      <body className="bg-background selection:bg-primary/20 selection:text-primary min-h-screen font-sans antialiased">
         {children}
       </body>
     </html>

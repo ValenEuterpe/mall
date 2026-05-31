@@ -96,7 +96,8 @@ export function useWayfinding(): UseWayfindingReturn {
       setState((s) => ({
         ...s,
         isLoading: false,
-        error: err instanceof Error ? err.message : "Failed to load wayfinding data",
+        error:
+          err instanceof Error ? err.message : "Failed to load wayfinding data",
       }));
     }
   }, []);
@@ -171,7 +172,8 @@ export function useWayfinding(): UseWayfindingReturn {
         setState((s) => ({
           ...s,
           isLoading: false,
-          error: err instanceof Error ? err.message : "Failed to calculate route",
+          error:
+            err instanceof Error ? err.message : "Failed to calculate route",
           route: null,
         }));
       }
@@ -219,7 +221,12 @@ export function useWayfinding(): UseWayfindingReturn {
     if (state.isActive && state.entrances.length === 0 && !state.isLoading) {
       loadWayfindingData();
     }
-  }, [state.isActive, state.entrances.length, state.isLoading, loadWayfindingData]);
+  }, [
+    state.isActive,
+    state.entrances.length,
+    state.isLoading,
+    loadWayfindingData,
+  ]);
 
   return {
     ...state,

@@ -98,10 +98,18 @@ export async function getProductsHandler(
   // Expand tagIds along the canonical chain (one hop): a query for a canonical tag
   // should also match products tagged with its synonyms, and vice versa.
   if (filters.tagIds) {
-    const requested = filters.tagIds.split(",").map((s) => s.trim()).filter(Boolean);
+    const requested = filters.tagIds
+      .split(",")
+      .map((s) => s.trim())
+      .filter(Boolean);
     if (requested.length > 0) {
       const synonymRows = await prisma.tag.findMany({
-        where: { OR: [{ canonicalTagId: { in: requested } }, { id: { in: requested } }] },
+        where: {
+          OR: [
+            { canonicalTagId: { in: requested } },
+            { id: { in: requested } },
+          ],
+        },
         select: { id: true, canonicalTagId: true },
       });
       const expanded = new Set<string>(requested);
@@ -134,8 +142,10 @@ export async function getProductsHandler(
       const tokenizedQ = q.split(/\s+/).filter((w) => w.length >= 2);
       const prefix = `${q}%`;
 
-      const { sql: filterSql, params: filterParams } =
-        buildFilterSqlAndParams(filters, 4); // Start at $4 since $1=$tokenizedQ, $2=$q, $3=$prefix
+      const { sql: filterSql, params: filterParams } = buildFilterSqlAndParams(
+        filters,
+        4
+      ); // Start at $4 since $1=$tokenizedQ, $2=$q, $3=$prefix
 
       const searchSql = `
                 p."searchTokens" && $1::text[]

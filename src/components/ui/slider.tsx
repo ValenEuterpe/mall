@@ -4,7 +4,10 @@ import * as React from "react";
 
 import { cn } from "@/lib/utils";
 
-export interface SliderProps extends Omit<React.HTMLAttributes<HTMLDivElement>, "defaultValue" | "value"> {
+export interface SliderProps extends Omit<
+  React.HTMLAttributes<HTMLDivElement>,
+  "defaultValue" | "value"
+> {
   min?: number;
   max?: number;
   step?: number;
@@ -58,10 +61,10 @@ export function Slider({
     return (
       <div className={cn("relative w-full", className)} {...props}>
         {/* Track background */}
-        <div className="relative h-2 w-full rounded-full bg-muted">
+        <div className="bg-muted relative h-2 w-full rounded-full">
           {/* Active range highlight */}
           <div
-            className="absolute h-full rounded-full bg-primary"
+            className="bg-primary absolute h-full rounded-full"
             style={{ left: `${pctA}%`, width: `${pctB - pctA}%` }}
           />
         </div>
@@ -104,7 +107,7 @@ export function Slider({
 
   return (
     <div className={cn("relative w-full", className)} {...props}>
-      <div className="relative h-2 w-full rounded-full bg-muted" />
+      <div className="bg-muted relative h-2 w-full rounded-full" />
       <div className="relative -mt-2">
         <input
           type="range"
@@ -143,4 +146,3 @@ function normalize(values: number[], min: number, max: number) {
   const b = clamp(values[1] ?? max, min, max);
   return a <= b ? [a, b] : [b, a];
 }
-

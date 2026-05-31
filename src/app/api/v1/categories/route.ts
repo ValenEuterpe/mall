@@ -2,6 +2,6 @@ import { withMiddleware } from "@/lib/api/middleware";
 import { listCategoriesHandler } from "./handlers/list-categories.handler";
 
 export const GET = withMiddleware(listCategoriesHandler, {
-    requireAuth: false,
-    rateLimit: true,
+  requireAuth: false,
+  rateLimit: true,
 });

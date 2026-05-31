@@ -67,9 +67,10 @@ interface FloorSelectorState {
   visible: boolean;
 }
 
-function processSvgContent(
-  content: string
-): { content: string; aspectRatio: number } {
+function processSvgContent(content: string): {
+  content: string;
+  aspectRatio: number;
+} {
   const measureLayer = document.createElement("div");
   measureLayer.style.cssText =
     "position: absolute; visibility: hidden; pointer-events: none;";
@@ -436,10 +437,7 @@ export const LeafletMapView = memo(function LeafletMapView({
           next.set(b.buildingCode, {
             pos: {
               x: wrapperRect.left - containerRect.left,
-              y:
-                wrapperRect.top +
-                wrapperRect.height / 2 -
-                containerRect.top,
+              y: wrapperRect.top + wrapperRect.height / 2 - containerRect.top,
             },
             visible: prev.get(b.buildingCode)?.visible ?? false,
           });
@@ -455,9 +453,7 @@ export const LeafletMapView = memo(function LeafletMapView({
     let mapContainer: Element | null = null;
 
     for (const b of buildingsWithFloors) {
-      const wrapper = document.getElementById(
-        `svgwrapper-${b.buildingCode}`
-      );
+      const wrapper = document.getElementById(`svgwrapper-${b.buildingCode}`);
       if (wrapper) {
         const resizeObs = new ResizeObserver(updateAllPositions);
         resizeObs.observe(wrapper);
@@ -513,9 +509,7 @@ export const LeafletMapView = memo(function LeafletMapView({
     const cleanups: Array<() => void> = [];
 
     for (const b of buildingsWithFloors) {
-      const wrapper = document.getElementById(
-        `svgwrapper-${b.buildingCode}`
-      );
+      const wrapper = document.getElementById(`svgwrapper-${b.buildingCode}`);
       if (!wrapper) continue;
 
       const code = b.buildingCode;
@@ -959,7 +953,12 @@ export const LeafletMapView = memo(function LeafletMapView({
       {/* MULTI-BUILDING: Per-building floor selectors */}
       {isMultiBuilding &&
         buildings.map((b) => {
-          if (!b.floors || b.floors.length <= 1 || !b.currentFloor || !b.onFloorChange)
+          if (
+            !b.floors ||
+            b.floors.length <= 1 ||
+            !b.currentFloor ||
+            !b.onFloorChange
+          )
             return null;
           const state = floorSelectors.get(b.buildingCode);
           if (!state?.pos) return null;

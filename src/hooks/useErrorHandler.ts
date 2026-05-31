@@ -141,7 +141,7 @@ export function useErrorHandler(
   }, [clearError]);
 
   const withErrorHandling = useCallback(
-    async <T,>(fn: () => T | Promise<T>): Promise<T | undefined> => {
+    async <T>(fn: () => T | Promise<T>): Promise<T | undefined> => {
       try {
         clearError();
         return await fn();
@@ -154,7 +154,7 @@ export function useErrorHandler(
   );
 
   const executeAsync = useCallback(
-    async <T,>(
+    async <T>(
       fn: () => Promise<T>,
       execOptions?: { successMessage?: string }
     ): Promise<T | undefined> => {

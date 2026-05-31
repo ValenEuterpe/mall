@@ -10,7 +10,12 @@ import { z } from "zod";
 
 const updateBuildingSchema = z.object({
   name: z.string().min(1).max(200).optional(),
-  code: z.string().min(1).max(20).regex(/^B\d+$/i, "Code must be in format B1, B2, etc.").optional(),
+  code: z
+    .string()
+    .min(1)
+    .max(20)
+    .regex(/^B\d+$/i, "Code must be in format B1, B2, etc.")
+    .optional(),
   latitude: z.number().min(-90).max(90).optional(),
   longitude: z.number().min(-180).max(180).optional(),
   rotation: z.number().min(0).max(360).optional(),
@@ -131,7 +136,9 @@ async function updateBuildingHandler(
     },
   });
 
-  return successResponse(building, { message: "Building updated successfully" });
+  return successResponse(building, {
+    message: "Building updated successfully",
+  });
 }
 
 /**

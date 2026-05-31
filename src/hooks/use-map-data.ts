@@ -114,13 +114,12 @@ export function useMapData(options?: UseMapDataOptions): UseMapDataReturn {
           includeShops: "true",
           includeVacant: options?.includeVacant ? "true" : "false",
         };
-        if (buildingCodeRef.current) params.buildingCode = buildingCodeRef.current;
+        if (buildingCodeRef.current)
+          params.buildingCode = buildingCodeRef.current;
 
-        const res = await apiClient.get<MapGeoResponse>(
-          "/mall/maps",
-          params,
-          { showErrorToast: false }
-        );
+        const res = await apiClient.get<MapGeoResponse>("/mall/maps", params, {
+          showErrorToast: false,
+        });
 
         if (!res.success) throw new Error(res.error.message);
 

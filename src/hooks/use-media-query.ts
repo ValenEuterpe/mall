@@ -44,7 +44,10 @@ const DEFAULT_BREAKPOINTS: BreakpointConfig = {
 // useMediaQuery
 // ============================================================================
 
-export function useMediaQuery(query: string, options: UseMediaQueryOptions = {}): boolean {
+export function useMediaQuery(
+  query: string,
+  options: UseMediaQueryOptions = {}
+): boolean {
   const { defaultValue = false, ssr = true } = options;
 
   const [matches, setMatches] = useState<boolean>(() => {
@@ -84,7 +87,9 @@ export function useMediaQuery(query: string, options: UseMediaQueryOptions = {})
 // Breakpoint Hooks
 // ============================================================================
 
-export function useBreakpoint(breakpoints: BreakpointConfig = DEFAULT_BREAKPOINTS): Breakpoint {
+export function useBreakpoint(
+  breakpoints: BreakpointConfig = DEFAULT_BREAKPOINTS
+): Breakpoint {
   const [breakpoint, setBreakpoint] = useState<Breakpoint>("xs");
 
   useEffect(() => {
@@ -179,7 +184,9 @@ export function useOrientation(): "portrait" | "landscape" {
 }
 
 export function useIsHighDPI(): boolean {
-  return useMediaQuery("(-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)");
+  return useMediaQuery(
+    "(-webkit-min-device-pixel-ratio: 2), (min-resolution: 192dpi)"
+  );
 }
 
 // ============================================================================

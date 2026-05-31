@@ -1,6 +1,9 @@
 import { withMiddleware } from "@/lib/api/middleware";
 import { methodNotAllowed } from "@/lib/api/response";
-import { GET as getFavoritesHandler, POST as addFavoriteHandler } from "./handlers";
+import {
+  GET as getFavoritesHandler,
+  POST as addFavoriteHandler,
+} from "./handlers";
 
 export const GET = withMiddleware(getFavoritesHandler, {
   requireAuth: true,

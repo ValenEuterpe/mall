@@ -4,10 +4,15 @@ import { routing } from "./routing";
 
 type SupportedLocale = (typeof routing.locales)[number];
 
-async function loadMessages(locale: SupportedLocale): Promise<Record<string, any>> {
+async function loadMessages(
+  locale: SupportedLocale
+): Promise<Record<string, any>> {
   // Dynamic import keeps bundles split per locale.
   // eslint-disable-next-line @typescript-eslint/no-unsafe-member-access
-  return (await import(`../messages/${locale}.json`)).default as Record<string, any>;
+  return (await import(`../messages/${locale}.json`)).default as Record<
+    string,
+    any
+  >;
 }
 
 /**
@@ -20,7 +25,9 @@ async function loadMessages(locale: SupportedLocale): Promise<Record<string, any
  * - Falls back to `routing.defaultLocale` if locale is unsupported or missing
  */
 export default getRequestConfig(async ({ locale }) => {
-  const resolvedLocale: SupportedLocale = routing.locales.includes(locale as SupportedLocale)
+  const resolvedLocale: SupportedLocale = routing.locales.includes(
+    locale as SupportedLocale
+  )
     ? (locale as SupportedLocale)
     : routing.defaultLocale;
 
@@ -29,7 +36,10 @@ export default getRequestConfig(async ({ locale }) => {
   try {
     messages = await loadMessages(resolvedLocale);
   } catch (error) {
-    console.error(`Failed to load messages for locale ${resolvedLocale}:`, error);
+    console.error(
+      `Failed to load messages for locale ${resolvedLocale}:`,
+      error
+    );
     // Hard fallback to default locale bundle if a specific locale bundle fails to load.
     messages = await loadMessages(routing.defaultLocale);
   }

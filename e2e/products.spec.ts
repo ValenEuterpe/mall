@@ -21,7 +21,9 @@ test.describe("Product browsing", () => {
 
     if (await firstProduct.isVisible({ timeout: 5000 })) {
       // Check product name/title is visible
-      const productName = firstProduct.locator("h2, h3, [class*='title']").first();
+      const productName = firstProduct
+        .locator("h2, h3, [class*='title']")
+        .first();
       await expect(productName).toBeVisible();
     }
   });
@@ -40,9 +42,11 @@ test.describe("Product browsing", () => {
       await page.waitForLoadState("networkidle");
 
       // Check that we have results or a search URL
-      const hasResults = await page.locator(
-        "[data-testid='product-card'], .group.cursor-pointer"
-      ).first().isVisible({ timeout: 5000 }).catch(() => false);
+      const hasResults = await page
+        .locator("[data-testid='product-card'], .group.cursor-pointer")
+        .first()
+        .isVisible({ timeout: 5000 })
+        .catch(() => false);
 
       expect(hasResults || page.url().includes("q=")).toBeTruthy();
     }
@@ -78,9 +82,11 @@ test.describe("Product browsing", () => {
       await firstProduct.click();
       await page.waitForLoadState("networkidle");
 
-      const addToCartButton = page.locator(
-        "button:has-text('Add to Cart'), button:has-text('Add to'), [aria-label*='cart']"
-      ).first();
+      const addToCartButton = page
+        .locator(
+          "button:has-text('Add to Cart'), button:has-text('Add to'), [aria-label*='cart']"
+        )
+        .first();
 
       if (await addToCartButton.isVisible({ timeout: 5000 })) {
         await expect(addToCartButton).toBeEnabled();
@@ -92,9 +98,11 @@ test.describe("Product browsing", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    const categoryFilter = page.locator(
-      "[class*='filter'], [data-testid*='category'], button:has-text(/category|filter/i)"
-    ).first();
+    const categoryFilter = page
+      .locator(
+        "[class*='filter'], [data-testid*='category'], button:has-text(/category|filter/i)"
+      )
+      .first();
 
     if (await categoryFilter.isVisible({ timeout: 5000 })) {
       await expect(categoryFilter).toBeVisible();

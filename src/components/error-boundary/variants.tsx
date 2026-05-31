@@ -47,10 +47,10 @@ export function SectionErrorBoundary({
 }: SectionErrorBoundaryProps): ReactNode {
   const fallback = ({ retryRender }: FallbackProps) => (
     <div
-      className="flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed border-muted-foreground/25 bg-muted/50"
+      className="border-muted-foreground/25 bg-muted/50 flex flex-col items-center justify-center gap-4 rounded-lg border border-dashed"
       style={{ minHeight: fallbackHeight }}
     >
-      <div className="flex items-center gap-2 text-muted-foreground">
+      <div className="text-muted-foreground flex items-center gap-2">
         <AlertTriangle className="h-5 w-5" />
         <span>Failed to load {sectionName || "this section"}</span>
       </div>
@@ -62,7 +62,11 @@ export function SectionErrorBoundary({
   );
 
   return (
-    <ErrorBoundary variant="inline" componentName={sectionName} fallback={fallback}>
+    <ErrorBoundary
+      variant="inline"
+      componentName={sectionName}
+      fallback={fallback}
+    >
       {children}
     </ErrorBoundary>
   );
@@ -100,14 +104,14 @@ export function FormErrorBoundary({
   onReset,
 }: FormErrorBoundaryProps): ReactNode {
   const fallback = ({ retryRender, resetError }: FallbackProps) => (
-    <div className="space-y-4 rounded-lg border border-destructive/50 bg-destructive/10 p-6">
+    <div className="border-destructive/50 bg-destructive/10 space-y-4 rounded-lg border p-6">
       <div className="flex items-start gap-3">
-        <AlertTriangle className="mt-0.5 h-5 w-5 text-destructive" />
+        <AlertTriangle className="text-destructive mt-0.5 h-5 w-5" />
         <div>
-          <h3 className="font-medium text-destructive">Form Error</h3>
-          <p className="mt-1 text-sm text-muted-foreground">
-            An error occurred in {formName || "this form"}. Your data may not have been
-            saved.
+          <h3 className="text-destructive font-medium">Form Error</h3>
+          <p className="text-muted-foreground mt-1 text-sm">
+            An error occurred in {formName || "this form"}. Your data may not
+            have been saved.
           </p>
         </div>
       </div>
@@ -130,7 +134,11 @@ export function FormErrorBoundary({
   );
 
   return (
-    <ErrorBoundary componentName={formName} fallback={fallback} onReset={onReset}>
+    <ErrorBoundary
+      componentName={formName}
+      fallback={fallback}
+      onReset={onReset}
+    >
       {children}
     </ErrorBoundary>
   );
@@ -140,7 +148,9 @@ interface AsyncErrorBoundaryProps {
   children: ReactNode;
 }
 
-export function AsyncErrorBoundary({ children }: AsyncErrorBoundaryProps): ReactNode {
+export function AsyncErrorBoundary({
+  children,
+}: AsyncErrorBoundaryProps): ReactNode {
   return (
     <ErrorBoundary
       variant="inline"

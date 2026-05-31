@@ -4,7 +4,11 @@ import { createSuccessResponse } from "@/app/response";
 import prisma from "@/lib/db/prisma";
 import type { AuthenticatedUser } from "@/types/auth";
 import { FAVORITE_WITH_PRODUCT } from "../selects";
-import { parsePaginationQuery, getPaginationMeta, paginateQuery } from "@/lib/utils/pagination";
+import {
+  parsePaginationQuery,
+  getPaginationMeta,
+  paginateQuery,
+} from "@/lib/utils/pagination";
 
 export async function GET(
   request: NextRequest,
@@ -80,7 +84,11 @@ export async function GET(
     createdAt: fav.createdAt,
     product: {
       id: fav.product.id,
-      name: fav.product.name_en || fav.product.name_ru || fav.product.name_am || fav.product.name,
+      name:
+        fav.product.name_en ||
+        fav.product.name_ru ||
+        fav.product.name_am ||
+        fav.product.name,
       description: fav.product.description,
       basePrice: Number(fav.product.basePrice),
       stockQuantity: fav.product.stockQuantity,

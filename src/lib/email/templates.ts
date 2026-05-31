@@ -2,9 +2,9 @@
 
 import { BRAND_CONFIG } from "@/lib/config/email.config";
 import type {
-    EmailTemplate,
-    TemplateDataMap,
-    EmailTemplateType,
+  EmailTemplate,
+  TemplateDataMap,
+  EmailTemplateType,
 } from "@/types/email";
 
 // ============================================================================
@@ -15,26 +15,26 @@ import type {
  * Escape HTML special characters
  */
 export function escapeHtml(text: string): string {
-    const htmlEntities: Record<string, string> = {
-        "&": "&amp;",
-        "<": "&lt;",
-        ">": "&gt;",
-        '"': "&quot;",
-        "'": "&#39;",
-    };
-    return text.replace(/[&<>"']/g, (char) => htmlEntities[char] || char);
+  const htmlEntities: Record<string, string> = {
+    "&": "&amp;",
+    "<": "&lt;",
+    ">": "&gt;",
+    '"': "&quot;",
+    "'": "&#39;",
+  };
+  return text.replace(/[&<>"']/g, (char) => htmlEntities[char] || char);
 }
 
 /**
  * Strip HTML tags to create plain text version
  */
 export function stripHtml(html: string): string {
-    return html
-        .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
-        .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
-        .replace(/<[^>]+>/g, " ")
-        .replace(/\s+/g, " ")
-        .trim();
+  return html
+    .replace(/<style[^>]*>[\s\S]*?<\/style>/gi, "")
+    .replace(/<script[^>]*>[\s\S]*?<\/script>/gi, "")
+    .replace(/<[^>]+>/g, " ")
+    .replace(/\s+/g, " ")
+    .trim();
 }
 
 // ============================================================================
@@ -45,9 +45,9 @@ export function stripHtml(html: string): string {
  * Base email template wrapper
  */
 function baseTemplate(content: string, preheader?: string): string {
-    const year = new Date().getFullYear();
+  const year = new Date().getFullYear();
 
-    return `
+  return `
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -172,7 +172,7 @@ function baseTemplate(content: string, preheader?: string): string {
  * Create link fallback text
  */
 function linkFallback(url: string): string {
-    return `
+  return `
       <hr style="border: none; border-top: 1px solid #e5e7eb; margin: 24px 0;">
       <p class="text-muted" style="font-size: 12px;">
         If the button doesn't work, copy and paste this link into your browser:<br>
@@ -186,12 +186,12 @@ function linkFallback(url: string): string {
 // ============================================================================
 
 const templates: {
-    [K in EmailTemplateType]: (data: TemplateDataMap[K]) => EmailTemplate;
+  [K in EmailTemplateType]: (data: TemplateDataMap[K]) => EmailTemplate;
 } = {
-    verification: (data) => ({
-        subject: "Verify your email address",
-        html: baseTemplate(
-            `
+  verification: (data) => ({
+    subject: "Verify your email address",
+    html: baseTemplate(
+      `
             <h2>Welcome! Let's verify your email</h2>
             <p>Thanks for signing up. Please verify your email address by clicking the button below:</p>
             
@@ -203,14 +203,14 @@ const templates: {
             <p class="text-muted">If you didn't create an account with us, you can safely ignore this email.</p>
             ${linkFallback(data.verifyUrl)}
             `,
-            "Please verify your email address to complete your registration"
-        ),
-    }),
+      "Please verify your email address to complete your registration"
+    ),
+  }),
 
-    "password-reset": (data) => ({
-        subject: "Reset your password",
-        html: baseTemplate(
-            `
+  "password-reset": (data) => ({
+    subject: "Reset your password",
+    html: baseTemplate(
+      `
             <h2>Password Reset Request</h2>
             <p>We received a request to reset the password for your account. Click the button below to create a new password:</p>
             
@@ -226,14 +226,14 @@ const templates: {
             </div>
             ${linkFallback(data.resetUrl)}
             `,
-            "Reset your password - link expires in " + data.expiresIn
-        ),
-    }),
+      "Reset your password - link expires in " + data.expiresIn
+    ),
+  }),
 
-    "magic-link": (data) => ({
-        subject: "Your secure login link",
-        html: baseTemplate(
-            `
+  "magic-link": (data) => ({
+    subject: "Your secure login link",
+    html: baseTemplate(
+      `
             <h2>Mall Owner Login</h2>
             <p>Click the button below to securely access your dashboard:</p>
             
@@ -249,19 +249,19 @@ const templates: {
             </div>
             ${linkFallback(data.magicUrl)}
             `,
-            "Your secure login link - expires in " + data.expiresIn
-        ),
-    }),
+      "Your secure login link - expires in " + data.expiresIn
+    ),
+  }),
 
-    invitation: (data) => {
-        const inviterText = data.inviterName
-            ? `<strong>${escapeHtml(data.inviterName)}</strong> has invited you`
-            : "You've been invited";
+  invitation: (data) => {
+    const inviterText = data.inviterName
+      ? `<strong>${escapeHtml(data.inviterName)}</strong> has invited you`
+      : "You've been invited";
 
-        return {
-            subject: `You've been invited to join as a Seller`,
-            html: baseTemplate(
-                `
+    return {
+      subject: `You've been invited to join as a Seller`,
+      html: baseTemplate(
+        `
                 <h2>You're Invited!</h2>
                 <p>
                   ${inviterText} to join ${BRAND_CONFIG.name} as a <strong>Seller</strong>.
@@ -283,15 +283,15 @@ const templates: {
                 </ul>
                 ${linkFallback(data.setupUrl)}
                 `,
-                `You're invited to join ${BRAND_CONFIG.name} as a Seller`
-            ),
-        };
-    },
+        `You're invited to join ${BRAND_CONFIG.name} as a Seller`
+      ),
+    };
+  },
 
-    welcome: (data) => ({
-        subject: `Welcome to ${BRAND_CONFIG.name}!`,
-        html: baseTemplate(
-            `
+  welcome: (data) => ({
+    subject: `Welcome to ${BRAND_CONFIG.name}!`,
+    html: baseTemplate(
+      `
             <h2>Welcome aboard, ${escapeHtml(data.userName)}! 🎉</h2>
             <p>Your account has been successfully verified. We're excited to have you!</p>
             
@@ -308,18 +308,19 @@ const templates: {
             
             <p>If you have any questions, our support team is here to help!</p>
             `,
-            `Welcome to ${BRAND_CONFIG.name}! Your account is ready.`
-        ),
-    }),
+      `Welcome to ${BRAND_CONFIG.name}! Your account is ready.`
+    ),
+  }),
 
-    notification: (data) => ({
-        subject: data.title,
-        html: baseTemplate(
-            `
+  notification: (data) => ({
+    subject: data.title,
+    html: baseTemplate(
+      `
             <h2>${escapeHtml(data.title)}</h2>
             <p>${escapeHtml(data.message)}</p>
             
-            ${data.actionUrl && data.actionText
+            ${
+              data.actionUrl && data.actionText
                 ? `
             <div style="text-align: center;">
               <a href="${escapeHtml(data.actionUrl)}" class="button">${escapeHtml(data.actionText)}</a>
@@ -328,20 +329,20 @@ const templates: {
                 : ""
             }
             `,
-            data.message.substring(0, 100)
-        ),
-    }),
+      data.message.substring(0, 100)
+    ),
+  }),
 };
 
 /**
  * Get email template by type
  */
 export function getEmailTemplate<T extends EmailTemplateType>(
-    templateType: T,
-    data: TemplateDataMap[T]
+  templateType: T,
+  data: TemplateDataMap[T]
 ): EmailTemplate {
-    const templateFn = templates[templateType] as (
-        d: TemplateDataMap[T]
-    ) => EmailTemplate;
-    return templateFn(data);
+  const templateFn = templates[templateType] as (
+    d: TemplateDataMap[T]
+  ) => EmailTemplate;
+  return templateFn(data);
 }

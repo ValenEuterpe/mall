@@ -356,7 +356,9 @@ export default function AdminLoginPage(): React.ReactElement {
           return;
         }
 
-        const accountExtras = response.data.account as unknown as Record<string, unknown> | undefined;
+        const accountExtras = response.data.account as unknown as
+          | Record<string, unknown>
+          | undefined;
         const pickString = (key: string): string | null => {
           const v = accountExtras?.[key];
           return typeof v === "string" ? v : null;

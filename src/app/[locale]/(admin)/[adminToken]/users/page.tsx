@@ -5,8 +5,12 @@ export default async function AdminUsersPage(): Promise<React.ReactElement> {
 
   return (
     <div className="space-y-2">
-      <h1 className="text-2xl font-semibold tracking-tight">{t("pages.users.title")}</h1>
-      <p className="text-sm text-muted-foreground">{t("pages.users.comingSoon")}</p>
+      <h1 className="text-2xl font-semibold tracking-tight">
+        {t("pages.users.title")}
+      </h1>
+      <p className="text-muted-foreground text-sm">
+        {t("pages.users.comingSoon")}
+      </p>
     </div>
   );
 }

@@ -40,8 +40,10 @@ export default function MallOwnerLoginPage(): React.ReactElement {
     <div className="flex min-h-[80vh] items-center justify-center">
       <div className="mx-auto max-w-md space-y-6">
         <div className="space-y-2 text-center">
-          <h1 className="text-2xl font-semibold tracking-tight">{t("title")}</h1>
-          <p className="text-sm text-muted-foreground">{t("subtitle")}</p>
+          <h1 className="text-2xl font-semibold tracking-tight">
+            {t("title")}
+          </h1>
+          <p className="text-muted-foreground text-sm">{t("subtitle")}</p>
         </div>
 
         <form onSubmit={onSubmit} className="space-y-4">
@@ -59,11 +61,13 @@ export default function MallOwnerLoginPage(): React.ReactElement {
           </div>
 
           <Button type="submit" className="w-full" disabled={isSubmitting}>
-            {isSubmitting ? t("requestLink.submitting") : t("requestLink.submit")}
+            {isSubmitting
+              ? t("requestLink.submitting")
+              : t("requestLink.submit")}
           </Button>
         </form>
 
-        <div className="rounded-lg border bg-muted/30 p-4 text-sm text-muted-foreground">
+        <div className="bg-muted/30 text-muted-foreground rounded-lg border p-4 text-sm">
           {t("requestLink.note")}
         </div>
       </div>

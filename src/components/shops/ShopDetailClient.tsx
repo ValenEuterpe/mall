@@ -22,7 +22,10 @@ import { useMultiMapData } from "@/hooks/use-multi-map-data";
 import type { BuildingOverlay } from "@/components/home/LeafletMapView";
 import { useShopPopup } from "@/hooks/use-shop-popup";
 import { useMapPins } from "@/hooks/use-map-pins";
-import { useSidebarToggle, SIDEBAR_PANELS } from "@/contexts/sidebar-toggle-context";
+import {
+  useSidebarToggle,
+  SIDEBAR_PANELS,
+} from "@/contexts/sidebar-toggle-context";
 import { MobilePanelSheet } from "@/components/layout/MobilePanelSheet";
 import {
   UserProductCard,
@@ -216,12 +219,8 @@ export const ShopDetailClient = memo(function ShopDetailClient({
     [mapBuildings, setFloorForBuilding]
   );
 
-  const {
-    activeShopSvgId,
-    activeShop,
-    handleShopClick,
-    handleCloseShopPopup,
-  } = useShopPopup(allShopsBySvgId);
+  const { activeShopSvgId, activeShop, handleShopClick, handleCloseShopPopup } =
+    useShopPopup(allShopsBySvgId);
 
   const {
     productPins,
@@ -339,7 +338,18 @@ export const ShopDetailClient = memo(function ShopDetailClient({
     // the popup re-anchors every frame as the sheet animates in and Leaflet
     // mounts, so we can set the active shop immediately.
     handleShopClick(shop.svgId);
-  }, [shop?.svgId, buildingFromCode, floorFromCode, mapBuildings, setFloorForBuilding, handleShopClick, mapOpen, isMobile, toggleMap, setMapOpen]);
+  }, [
+    shop?.svgId,
+    buildingFromCode,
+    floorFromCode,
+    mapBuildings,
+    setFloorForBuilding,
+    handleShopClick,
+    mapOpen,
+    isMobile,
+    toggleMap,
+    setMapOpen,
+  ]);
 
   // ---- Derived ----
   const title =
@@ -721,7 +731,10 @@ export const ShopDetailClient = memo(function ShopDetailClient({
         onClose={handleCloseProductDetail}
         onAddToMap={() =>
           selectedProductId &&
-          mapPinsAddToMap({ id: selectedProductId, shop: { svgId: shop?.svgId } })
+          mapPinsAddToMap({
+            id: selectedProductId,
+            shop: { svgId: shop?.svgId },
+          })
         }
         onRemoveFromMap={handleRemoveSelectedFromMap}
         isOnMap={selectedProductId ? isSelected(selectedProductId) : false}

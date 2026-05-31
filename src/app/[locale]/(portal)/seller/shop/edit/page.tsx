@@ -24,15 +24,60 @@ import { Link } from "@/i18n/routing";
 
 // Social platform config
 const SOCIAL_PLATFORMS = [
-  { type: "TELEGRAM", label: "Telegram", icon: "/icons/social/Telegram.svg", placeholder: "https://t.me/yourshop" },
-  { type: "INSTAGRAM", label: "Instagram", icon: "/icons/social/Instagram.svg", placeholder: "https://instagram.com/yourshop" },
-  { type: "FACEBOOK", label: "Facebook", icon: "/icons/social/Facebook.svg", placeholder: "https://facebook.com/yourshop" },
-  { type: "VK", label: "VK", icon: "/icons/social/VK.svg", placeholder: "https://vk.com/yourshop" },
-  { type: "WHATSAPP", label: "WhatsApp", icon: "/icons/social/WhatsApp.svg", placeholder: "+1234567890" },
-  { type: "X_TWITTER", label: "X / Twitter", icon: "/icons/social/X_Twitter.svg", placeholder: "https://x.com/yourshop" },
-  { type: "TIKTOK", label: "TikTok", icon: "/icons/social/TikTok.svg", placeholder: "https://tiktok.com/@yourshop" },
-  { type: "YOUTUBE", label: "YouTube", icon: "/icons/social/YouTube.svg", placeholder: "https://youtube.com/@yourshop" },
-  { type: "SNAPCHAT", label: "Snapchat", icon: "/icons/social/Snapchat.svg", placeholder: "https://snapchat.com/add/yourshop" },
+  {
+    type: "TELEGRAM",
+    label: "Telegram",
+    icon: "/icons/social/Telegram.svg",
+    placeholder: "https://t.me/yourshop",
+  },
+  {
+    type: "INSTAGRAM",
+    label: "Instagram",
+    icon: "/icons/social/Instagram.svg",
+    placeholder: "https://instagram.com/yourshop",
+  },
+  {
+    type: "FACEBOOK",
+    label: "Facebook",
+    icon: "/icons/social/Facebook.svg",
+    placeholder: "https://facebook.com/yourshop",
+  },
+  {
+    type: "VK",
+    label: "VK",
+    icon: "/icons/social/VK.svg",
+    placeholder: "https://vk.com/yourshop",
+  },
+  {
+    type: "WHATSAPP",
+    label: "WhatsApp",
+    icon: "/icons/social/WhatsApp.svg",
+    placeholder: "+1234567890",
+  },
+  {
+    type: "X_TWITTER",
+    label: "X / Twitter",
+    icon: "/icons/social/X_Twitter.svg",
+    placeholder: "https://x.com/yourshop",
+  },
+  {
+    type: "TIKTOK",
+    label: "TikTok",
+    icon: "/icons/social/TikTok.svg",
+    placeholder: "https://tiktok.com/@yourshop",
+  },
+  {
+    type: "YOUTUBE",
+    label: "YouTube",
+    icon: "/icons/social/YouTube.svg",
+    placeholder: "https://youtube.com/@yourshop",
+  },
+  {
+    type: "SNAPCHAT",
+    label: "Snapchat",
+    icon: "/icons/social/Snapchat.svg",
+    placeholder: "https://snapchat.com/add/yourshop",
+  },
 ] as const;
 
 type ContactEntry = { type: string; value: string; label?: string };
@@ -70,7 +115,12 @@ export default function SellerShopEditPage(): React.ReactElement {
   // Track initial state for dirty check
   const [initial, setInitial] = useState<string>("");
 
-  const currentState = JSON.stringify({ shopName, description, imageUrl, socials });
+  const currentState = JSON.stringify({
+    shopName,
+    description,
+    imageUrl,
+    socials,
+  });
   const hasChanges = initial !== "" && currentState !== initial;
 
   useEffect(() => {
@@ -188,7 +238,7 @@ export default function SellerShopEditPage(): React.ReactElement {
           </Button>
         </Link>
         <h1 className="text-3xl font-bold">{t("title")}</h1>
-        <p className="mt-1 text-muted-foreground">{t("subtitle")}</p>
+        <p className="text-muted-foreground mt-1">{t("subtitle")}</p>
       </div>
 
       <form onSubmit={handleSubmit} className="space-y-6">
@@ -203,26 +253,36 @@ export default function SellerShopEditPage(): React.ReactElement {
           </CardHeader>
           <CardContent>
             <div className="flex items-center gap-6">
-              <div className="relative h-32 w-32 shrink-0 overflow-hidden rounded-lg border bg-muted">
+              <div className="bg-muted relative h-32 w-32 shrink-0 overflow-hidden rounded-lg border">
                 {imageUrl ? (
                   <>
-                    <img src={imageUrl} alt={t("shopImage")} className="h-full w-full object-cover" />
+                    <img
+                      src={imageUrl}
+                      alt={t("shopImage")}
+                      className="h-full w-full object-cover"
+                    />
                     <button
                       type="button"
                       onClick={() => setImageUrl(null)}
-                      className="absolute right-1 top-1 rounded-full bg-black/60 p-1 text-white hover:bg-black/80"
+                      className="absolute top-1 right-1 rounded-full bg-black/60 p-1 text-white hover:bg-black/80"
                     >
                       <X className="h-3 w-3" />
                     </button>
                   </>
                 ) : (
                   <div className="flex h-full w-full items-center justify-center">
-                    <ImageIcon className="h-8 w-8 text-muted-foreground/40" />
+                    <ImageIcon className="text-muted-foreground/40 h-8 w-8" />
                   </div>
                 )}
               </div>
               <div>
-                <Button type="button" variant="outline" size="sm" disabled={isUploading} asChild>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  disabled={isUploading}
+                  asChild
+                >
                   <label className="cursor-pointer">
                     {isUploading ? (
                       <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -271,7 +331,7 @@ export default function SellerShopEditPage(): React.ReactElement {
                 maxLength={1000}
                 className="resize-none"
               />
-              <p className="text-right text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-right text-xs">
                 {description.length}/1000
               </p>
             </div>
@@ -294,7 +354,9 @@ export default function SellerShopEditPage(): React.ReactElement {
                 />
                 <Input
                   value={socials[platform.type] || ""}
-                  onChange={(e) => handleSocialChange(platform.type, e.target.value)}
+                  onChange={(e) =>
+                    handleSocialChange(platform.type, e.target.value)
+                  }
                   placeholder={platform.placeholder}
                 />
               </div>

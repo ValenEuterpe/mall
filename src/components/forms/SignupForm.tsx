@@ -282,7 +282,13 @@ function PasswordStrength({
             ) : (
               <X className="h-3 w-3" aria-hidden="true" />
             )}
-            <span>{tSignup(`passwordRequirements.${req.key}` as Parameters<typeof tSignup>[0])}</span>
+            <span>
+              {tSignup(
+                `passwordRequirements.${req.key}` as Parameters<
+                  typeof tSignup
+                >[0]
+              )}
+            </span>
           </li>
         ))}
       </ul>

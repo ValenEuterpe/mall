@@ -1,0 +1,23 @@
+# Build artifacts
+.next/
+node_modules/
+dist/
+build/
+coverage/
+playwright-report/
+test-results/
+
+# Generated
+prisma/generated/
+tsconfig.tsbuildinfo
+next-env.d.ts
+
+# Agent tooling
+.kilo/
+
+# Lockfiles (Prettier reformats them needlessly)
+package-lock.json
+
+# Domain docs and guides — keep author's formatting
+markdown/
+guides/

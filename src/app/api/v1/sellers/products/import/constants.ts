@@ -5,14 +5,14 @@ export const REQUIRED_HEADERS = ["name"];
 
 /** Optional columns that will be processed */
 export const OPTIONAL_HEADERS = [
-    "description",
-    "price",
-    "stock",
-    "brand",
-    "barcode",
-    "sku",
-    "category",
-    "status",
+  "description",
+  "price",
+  "stock",
+  "brand",
+  "barcode",
+  "sku",
+  "category",
+  "status",
 ];
 
 /** Maximum rows per import */

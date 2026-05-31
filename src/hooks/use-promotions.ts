@@ -132,9 +132,7 @@ export function usePromotions(): UsePromotionsReturn {
   // Current promotion
   // ------------------------------------------------------------------
   const currentPromotion =
-    pool.length > 0 && currentIndex < pool.length
-      ? pool[currentIndex]
-      : null;
+    pool.length > 0 && currentIndex < pool.length ? pool[currentIndex] : null;
 
   // ------------------------------------------------------------------
   // Position tracking with polling fallback
@@ -177,8 +175,7 @@ export function usePromotions(): UsePromotionsReturn {
     const observers: Array<ResizeObserver | MutationObserver> = [];
 
     const attachObservers = () => {
-      const wrappers =
-        document.querySelectorAll<HTMLElement>(".svgwrapper");
+      const wrappers = document.querySelectorAll<HTMLElement>(".svgwrapper");
       let mapContainer: Element | null = null;
 
       for (const wrapper of wrappers) {

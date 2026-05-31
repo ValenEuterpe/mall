@@ -151,12 +151,6 @@ export function useMapPins(): UseMapPinsReturn {
       handleRemoveFromMap,
       isSelected,
     }),
-    [
-      productPins,
-      productIds,
-      handleAddToMap,
-      handleRemoveFromMap,
-      isSelected,
-    ]
+    [productPins, productIds, handleAddToMap, handleRemoveFromMap, isSelected]
   );
 }

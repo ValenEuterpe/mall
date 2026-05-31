@@ -46,7 +46,13 @@ export interface ShopFilters {
   floor?: string;
 }
 
-export type ShopSortField = "shopName" | "fullCode" | "createdAt" | "venue" | "building" | "floor";
+export type ShopSortField =
+  | "shopName"
+  | "fullCode"
+  | "createdAt"
+  | "venue"
+  | "building"
+  | "floor";
 
 export interface ShopSorting {
   field: ShopSortField;
@@ -149,7 +155,14 @@ export function useShops(options: UseShopsOptions = {}): UseShopsReturn {
 
   const filtersKey = useMemo(
     () => createFiltersKey(filters, sort),
-    [filters.search, filters.venue, filters.building, filters.floor, sort?.field, sort?.order]
+    [
+      filters.search,
+      filters.venue,
+      filters.building,
+      filters.floor,
+      sort?.field,
+      sort?.order,
+    ]
   );
 
   const stableFilters = useMemo(() => filters, [filtersKey]);
@@ -177,12 +190,21 @@ export function useShops(options: UseShopsOptions = {}): UseShopsReturn {
       }));
 
       try {
-        const params = buildQueryParams(pagination.page, pagination.limit, stableFilters, stableSort);
+        const params = buildQueryParams(
+          pagination.page,
+          pagination.limit,
+          stableFilters,
+          stableSort
+        );
 
-        const response = await apiClient.get<ShopListItem[]>("/public/shops", params, {
-          signal: abortControllerRef.current.signal,
-          showErrorToast: false,
-        });
+        const response = await apiClient.get<ShopListItem[]>(
+          "/public/shops",
+          params,
+          {
+            signal: abortControllerRef.current.signal,
+            showErrorToast: false,
+          }
+        );
 
         if (!isMountedRef.current) return;
 

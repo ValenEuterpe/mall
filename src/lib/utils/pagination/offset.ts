@@ -1,10 +1,6 @@
 import { paginationSchema } from "./schemas";
 import { PAGINATION_DEFAULTS } from "./constants";
-import {
-    PaginationParams,
-    PaginationMeta,
-    PrismaPageParams,
-} from "./types";
+import { PaginationParams, PaginationMeta, PrismaPageParams } from "./types";
 
 /**
  * Calculates the offset for pagination.
@@ -14,9 +10,9 @@ import {
  * @returns Offset value for database query
  */
 export function getPaginationOffset(page: number, limit: number): number {
-    const validPage = Math.max(1, Math.floor(page));
-    const validLimit = Math.max(1, Math.floor(limit));
-    return (validPage - 1) * validLimit;
+  const validPage = Math.max(1, Math.floor(page));
+  const validLimit = Math.max(1, Math.floor(limit));
+  return (validPage - 1) * validLimit;
 }
 
 /**
@@ -28,24 +24,24 @@ export function getPaginationOffset(page: number, limit: number): number {
  * @returns Pagination metadata object
  */
 export function getPaginationMeta(
-    page: number,
-    limit: number,
-    total: number
+  page: number,
+  limit: number,
+  total: number
 ): PaginationMeta {
-    const validPage = Math.max(1, Math.floor(page));
-    const validLimit = Math.max(1, Math.floor(limit));
-    const validTotal = Math.max(0, Math.floor(total));
+  const validPage = Math.max(1, Math.floor(page));
+  const validLimit = Math.max(1, Math.floor(limit));
+  const validTotal = Math.max(0, Math.floor(total));
 
-    const totalPages = validLimit > 0 ? Math.ceil(validTotal / validLimit) : 0;
+  const totalPages = validLimit > 0 ? Math.ceil(validTotal / validLimit) : 0;
 
-    return {
-        page: validPage,
-        limit: validLimit,
-        total: validTotal,
-        totalPages,
-        hasNextPage: validPage < totalPages,
-        hasPreviousPage: validPage > 1,
-    };
+  return {
+    page: validPage,
+    limit: validLimit,
+    total: validTotal,
+    totalPages,
+    hasNextPage: validPage < totalPages,
+    hasPreviousPage: validPage > 1,
+  };
 }
 
 /**
@@ -55,10 +51,10 @@ export function getPaginationMeta(
  * @returns Object with skip and take values for Prisma
  */
 export function paginateQuery(params: PaginationParams): PrismaPageParams {
-    return {
-        skip: getPaginationOffset(params.page, params.limit),
-        take: params.limit,
-    };
+  return {
+    skip: getPaginationOffset(params.page, params.limit),
+    take: params.limit,
+  };
 }
 
 /**
@@ -69,23 +65,25 @@ export function paginateQuery(params: PaginationParams): PrismaPageParams {
  * @returns Validated pagination parameters
  */
 export function parsePaginationQuery(
-    searchParams: URLSearchParams,
-    defaults?: Partial<PaginationParams>
+  searchParams: URLSearchParams,
+  defaults?: Partial<PaginationParams>
 ): PaginationParams {
-    const raw = {
-        page: searchParams.get("page") ?? defaults?.page ?? PAGINATION_DEFAULTS.PAGE,
-        limit: searchParams.get("limit") ?? defaults?.limit ?? PAGINATION_DEFAULTS.LIMIT,
+  const raw = {
+    page:
+      searchParams.get("page") ?? defaults?.page ?? PAGINATION_DEFAULTS.PAGE,
+    limit:
+      searchParams.get("limit") ?? defaults?.limit ?? PAGINATION_DEFAULTS.LIMIT,
+  };
+
+  const result = paginationSchema.safeParse(raw);
+
+  if (!result.success) {
+    // Return safe defaults on validation failure
+    return {
+      page: defaults?.page ?? PAGINATION_DEFAULTS.PAGE,
+      limit: defaults?.limit ?? PAGINATION_DEFAULTS.LIMIT,
     };
+  }
 
-    const result = paginationSchema.safeParse(raw);
-
-    if (!result.success) {
-        // Return safe defaults on validation failure
-        return {
-            page: defaults?.page ?? PAGINATION_DEFAULTS.PAGE,
-            limit: defaults?.limit ?? PAGINATION_DEFAULTS.LIMIT,
-        };
-    }
-
-    return result.data;
+  return result.data;
 }

@@ -46,7 +46,8 @@ export interface UseToastReturn {
 
 export function useToast(): UseToastReturn {
   const success = useCallback(
-    (message: string, options?: ToastOptions) => toast.success(message, options),
+    (message: string, options?: ToastOptions) =>
+      toast.success(message, options),
     []
   );
 
@@ -56,7 +57,8 @@ export function useToast(): UseToastReturn {
   );
 
   const warning = useCallback(
-    (message: string, options?: ToastOptions) => toast.warning(message, options),
+    (message: string, options?: ToastOptions) =>
+      toast.warning(message, options),
     []
   );
 
@@ -66,7 +68,8 @@ export function useToast(): UseToastReturn {
   );
 
   const loading = useCallback(
-    (message: string, options?: ToastOptions) => toast.loading(message, options),
+    (message: string, options?: ToastOptions) =>
+      toast.loading(message, options),
     []
   );
 

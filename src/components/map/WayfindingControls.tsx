@@ -56,7 +56,7 @@ export function WayfindingControls({
 
   return (
     <div className={cn("flex flex-wrap items-center gap-2", className)}>
-      <div className="flex items-center gap-2 rounded-md border bg-card p-2">
+      <div className="bg-card flex items-center gap-2 rounded-md border p-2">
         <MapPin className="h-4 w-4 text-green-600" />
         <Select
           value={selectedEntranceId ?? undefined}
@@ -80,7 +80,7 @@ export function WayfindingControls({
         <Button
           variant="outline"
           size="sm"
-          className="gap-1 text-destructive hover:text-destructive"
+          className="text-destructive hover:text-destructive gap-1"
           onClick={onClearRoute}
         >
           <X className="h-4 w-4" />
@@ -92,7 +92,9 @@ export function WayfindingControls({
         {t("disable")}
       </Button>
 
-      {isLoading && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
+      {isLoading && (
+        <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
+      )}
     </div>
   );
 }

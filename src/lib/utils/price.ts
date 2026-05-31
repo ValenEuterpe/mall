@@ -1,4 +1,7 @@
-export function formatAmdPrice(price: number | string, locale: string = "en"): string {
+export function formatAmdPrice(
+  price: number | string,
+  locale: string = "en"
+): string {
   const numericPrice =
     typeof price === "number" ? price : Number.parseFloat(price);
 

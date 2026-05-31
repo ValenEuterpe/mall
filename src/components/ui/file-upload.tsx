@@ -58,7 +58,10 @@ export interface FileUploadProps {
    * Upload handler. Must resolve to the URL for the uploaded file.
    * Provide `onProgress` callback to support progress updates.
    */
-  onUpload: (file: File, onProgress?: (progress: number) => void) => Promise<string>;
+  onUpload: (
+    file: File,
+    onProgress?: (progress: number) => void
+  ) => Promise<string>;
 
   onChange?: (files: UploadedFile[]) => void;
   onComplete?: (urls: string[]) => void;
@@ -72,7 +75,13 @@ export interface FileUploadProps {
   variant?: "default" | "compact" | "avatar";
 
   /** Initial files (e.g. edit form) */
-  initialFiles?: { id: string; url: string; name: string; type?: string; size?: number }[];
+  initialFiles?: {
+    id: string;
+    url: string;
+    name: string;
+    type?: string;
+    size?: number;
+  }[];
 }
 
 // ============================================================================
@@ -101,9 +110,12 @@ function getFileIcon(type?: string): React.ReactNode {
   if (type.startsWith("image/")) return <ImageIcon className="h-5 w-5" />;
   if (type.startsWith("video/")) return <Film className="h-5 w-5" />;
   if (type.startsWith("audio/")) return <Music className="h-5 w-5" />;
-  if (type.includes("pdf") || type.includes("document")) return <FileText className="h-5 w-5" />;
-  if (type.includes("spreadsheet") || type.includes("excel")) return <FileSpreadsheet className="h-5 w-5" />;
-  if (type.includes("zip") || type.includes("archive")) return <Archive className="h-5 w-5" />;
+  if (type.includes("pdf") || type.includes("document"))
+    return <FileText className="h-5 w-5" />;
+  if (type.includes("spreadsheet") || type.includes("excel"))
+    return <FileSpreadsheet className="h-5 w-5" />;
+  if (type.includes("zip") || type.includes("archive"))
+    return <Archive className="h-5 w-5" />;
 
   return <File className="h-5 w-5" />;
 }
@@ -111,13 +123,17 @@ function getFileIcon(type?: string): React.ReactNode {
 function isAcceptedFile(file: File, accept: string): boolean {
   if (accept === "*/*") return true;
 
-  const acceptedTypes = accept.split(",").map((t) => t.trim()).filter(Boolean);
+  const acceptedTypes = accept
+    .split(",")
+    .map((t) => t.trim())
+    .filter(Boolean);
   const fileType = file.type;
   const fileExtension = `.${file.name.split(".").pop()?.toLowerCase()}`;
 
   return acceptedTypes.some((type) => {
     if (type.startsWith(".")) return fileExtension === type.toLowerCase();
-    if (type.endsWith("/*")) return fileType.startsWith(type.replace("/*", "/"));
+    if (type.endsWith("/*"))
+      return fileType.startsWith(type.replace("/*", "/"));
     return fileType === type;
   });
 }
@@ -137,23 +153,29 @@ function FilePreview({
   onRetry?: () => void;
   showPreview?: boolean;
 }) {
-  const isImage = (file.type ?? "").startsWith("image/") || Boolean(file.previewUrl);
+  const isImage =
+    (file.type ?? "").startsWith("image/") || Boolean(file.previewUrl);
 
   return (
     <div
       className={cn(
         "group relative flex items-center gap-3 rounded-lg border p-3 transition-colors",
         file.status === "error" && "border-destructive bg-destructive/5",
-        file.status === "success" && "border-green-500/50 bg-green-50 dark:bg-green-950/20"
+        file.status === "success" &&
+          "border-green-500/50 bg-green-50 dark:bg-green-950/20"
       )}
     >
       <div className="flex-shrink-0">
         {showPreview && isImage && file.previewUrl ? (
-          <div className="h-12 w-12 overflow-hidden rounded bg-muted">
-            <img src={file.previewUrl} alt={file.name} className="h-full w-full object-cover" />
+          <div className="bg-muted h-12 w-12 overflow-hidden rounded">
+            <img
+              src={file.previewUrl}
+              alt={file.name}
+              className="h-full w-full object-cover"
+            />
           </div>
         ) : (
-          <div className="flex h-12 w-12 items-center justify-center rounded bg-muted text-muted-foreground">
+          <div className="bg-muted text-muted-foreground flex h-12 w-12 items-center justify-center rounded">
             {getFileIcon(file.type)}
           </div>
         )}
@@ -161,19 +183,29 @@ function FilePreview({
 
       <div className="min-w-0 flex-1">
         <p className="truncate text-sm font-medium">{file.name}</p>
-        <p className="text-xs text-muted-foreground">{formatFileSize(file.size ?? 0)}</p>
+        <p className="text-muted-foreground text-xs">
+          {formatFileSize(file.size ?? 0)}
+        </p>
 
-        {file.status === "uploading" && <Progress value={file.progress} className="mt-2 h-1" />}
+        {file.status === "uploading" && (
+          <Progress value={file.progress} className="mt-2 h-1" />
+        )}
 
-        {file.status === "error" && file.error && <p className="mt-1 text-xs text-destructive">{file.error}</p>}
+        {file.status === "error" && file.error && (
+          <p className="text-destructive mt-1 text-xs">{file.error}</p>
+        )}
       </div>
 
       <div className="flex items-center gap-2">
-        {file.status === "uploading" && <Loader2 className="h-4 w-4 animate-spin text-muted-foreground" />}
-        {file.status === "success" && <CheckCircle2 className="h-4 w-4 text-green-500" />}
+        {file.status === "uploading" && (
+          <Loader2 className="text-muted-foreground h-4 w-4 animate-spin" />
+        )}
+        {file.status === "success" && (
+          <CheckCircle2 className="h-4 w-4 text-green-500" />
+        )}
         {file.status === "error" && (
           <>
-            <AlertCircle className="h-4 w-4 text-destructive" />
+            <AlertCircle className="text-destructive h-4 w-4" />
             {onRetry && (
               <Button variant="ghost" size="sm" onClick={onRetry}>
                 Retry
@@ -242,7 +274,8 @@ export function FileUpload({
 
   const validateFile = React.useCallback(
     (file: File): string | null => {
-      if (file.size > maxSize) return `File size exceeds ${formatFileSize(maxSize)}`;
+      if (file.size > maxSize)
+        return `File size exceeds ${formatFileSize(maxSize)}`;
       if (!isAcceptedFile(file, accept)) return "File type not accepted";
       return null;
     },
@@ -265,12 +298,18 @@ export function FileUpload({
       if (!uploadFile.file) return;
 
       updateFiles((prev) =>
-        prev.map((f) => (f.id === uploadFile.id ? { ...f, status: "uploading", error: undefined } : f))
+        prev.map((f) =>
+          f.id === uploadFile.id
+            ? { ...f, status: "uploading", error: undefined }
+            : f
+        )
       );
 
       try {
         const url = await onUpload(uploadFile.file, (progress) => {
-          updateFiles((prev) => prev.map((f) => (f.id === uploadFile.id ? { ...f, progress } : f)));
+          updateFiles((prev) =>
+            prev.map((f) => (f.id === uploadFile.id ? { ...f, progress } : f))
+          );
         });
 
         updateFiles((prev) =>
@@ -282,7 +321,8 @@ export function FileUpload({
                   progress: 100,
                   url,
                   previewUrl:
-                    (f.type ?? "").startsWith("image/") && f.previewUrl?.startsWith("blob:")
+                    (f.type ?? "").startsWith("image/") &&
+                    f.previewUrl?.startsWith("blob:")
                       ? f.previewUrl
                       : (f.type ?? "").startsWith("image/")
                         ? url
@@ -292,15 +332,24 @@ export function FileUpload({
           )
         );
 
-        toast.success("Upload complete", { description: `${uploadFile.name} uploaded successfully` });
+        toast.success("Upload complete", {
+          description: `${uploadFile.name} uploaded successfully`,
+        });
       } catch (error) {
-        const errorMessage = error instanceof Error ? error.message : "Upload failed";
+        const errorMessage =
+          error instanceof Error ? error.message : "Upload failed";
 
         updateFiles((prev) =>
-          prev.map((f) => (f.id === uploadFile.id ? { ...f, status: "error", error: errorMessage } : f))
+          prev.map((f) =>
+            f.id === uploadFile.id
+              ? { ...f, status: "error", error: errorMessage }
+              : f
+          )
         );
 
-        toast.error("Upload failed", { description: `${uploadFile.name}: ${errorMessage}` });
+        toast.error("Upload failed", {
+          description: `${uploadFile.name}: ${errorMessage}`,
+        });
       }
     },
     [onUpload, updateFiles]
@@ -308,8 +357,12 @@ export function FileUpload({
 
   const checkComplete = React.useCallback(
     (next: UploadedFile[]) => {
-      const successful = next.filter((f) => f.status === "success" && f.url).map((f) => f.url!)
-      const allDone = next.every((f) => f.status === "success" || f.status === "error");
+      const successful = next
+        .filter((f) => f.status === "success" && f.url)
+        .map((f) => f.url!);
+      const allDone = next.every(
+        (f) => f.status === "success" || f.status === "error"
+      );
       if (allDone && successful.length > 0) {
         onComplete?.(successful);
       }
@@ -325,13 +378,17 @@ export function FileUpload({
       const remainingSlots = Math.max(0, maxFiles - nonErroredCount);
 
       if (fileArray.length > remainingSlots) {
-        toast.error("Too many files", { description: `You can only upload ${maxFiles} files` });
+        toast.error("Too many files", {
+          description: `You can only upload ${maxFiles} files`,
+        });
         return;
       }
 
       const toAdd: UploadedFile[] = fileArray.map((file) => {
         const error = validateFile(file);
-        const previewUrl = (file.type ?? "").startsWith("image/") ? URL.createObjectURL(file) : undefined;
+        const previewUrl = (file.type ?? "").startsWith("image/")
+          ? URL.createObjectURL(file)
+          : undefined;
 
         return {
           id: generateId(),
@@ -380,7 +437,12 @@ export function FileUpload({
     (id: string) => {
       const file = files.find((f) => f.id === id);
       if (file?.file) {
-        void uploadFileAsync({ ...file, status: "pending", progress: 0, error: undefined });
+        void uploadFileAsync({
+          ...file,
+          status: "pending",
+          progress: 0,
+          error: undefined,
+        });
       }
     },
     [files, uploadFileAsync]
@@ -436,7 +498,9 @@ export function FileUpload({
         <div
           className={cn(
             "h-24 w-24 cursor-pointer overflow-hidden rounded-full border-2 border-dashed transition-colors",
-            isDragging ? "border-primary bg-primary/5" : "border-muted-foreground/25",
+            isDragging
+              ? "border-primary bg-primary/5"
+              : "border-muted-foreground/25",
             disabled && "cursor-not-allowed opacity-50"
           )}
           onDragOver={handleDragOver}
@@ -451,8 +515,8 @@ export function FileUpload({
               className="h-full w-full object-cover"
             />
           ) : (
-            <div className="flex h-full w-full items-center justify-center bg-muted">
-              <Upload className="h-8 w-8 text-muted-foreground" />
+            <div className="bg-muted flex h-full w-full items-center justify-center">
+              <Upload className="text-muted-foreground h-8 w-8" />
             </div>
           )}
         </div>
@@ -461,7 +525,7 @@ export function FileUpload({
           <Button
             variant="destructive"
             size="icon"
-            className="absolute -bottom-1 -right-1 h-7 w-7 rounded-full"
+            className="absolute -right-1 -bottom-1 h-7 w-7 rounded-full"
             onClick={(e) => {
               e.stopPropagation();
               removeFile(currentFile.id);
@@ -499,7 +563,9 @@ export function FileUpload({
             <Upload className="mr-2 h-4 w-4" />
             Choose File
           </Button>
-          {files.length > 0 && <Badge variant="secondary">{files.length} file(s)</Badge>}
+          {files.length > 0 && (
+            <Badge variant="secondary">{files.length} file(s)</Badge>
+          )}
         </div>
 
         <input
@@ -519,7 +585,9 @@ export function FileUpload({
                 key={file.id}
                 file={file}
                 onRemove={() => removeFile(file.id)}
-                onRetry={file.status === "error" ? () => retryFile(file.id) : undefined}
+                onRetry={
+                  file.status === "error" ? () => retryFile(file.id) : undefined
+                }
                 showPreview={showPreview}
               />
             ))}
@@ -540,7 +608,7 @@ export function FileUpload({
         className={cn(
           "relative cursor-pointer rounded-lg border-2 border-dashed p-8 text-center transition-all",
           isDragging
-            ? "scale-[1.02] border-primary bg-primary/5"
+            ? "border-primary bg-primary/5 scale-[1.02]"
             : "border-muted-foreground/25 hover:border-muted-foreground/50",
           disabled && "pointer-events-none opacity-50"
         )}
@@ -556,18 +624,27 @@ export function FileUpload({
         />
 
         <div className="flex flex-col items-center gap-4">
-          <div className="rounded-full bg-muted p-4">{icon || <Upload className="h-8 w-8 text-muted-foreground" />}</div>
+          <div className="bg-muted rounded-full p-4">
+            {icon || <Upload className="text-muted-foreground h-8 w-8" />}
+          </div>
 
           <div className="space-y-1">
             <p className="text-sm font-medium">{uploadText}</p>
-            {description && <p className="text-xs text-muted-foreground">{description}</p>}
-            <p className="text-xs text-muted-foreground">
+            {description && (
+              <p className="text-muted-foreground text-xs">{description}</p>
+            )}
+            <p className="text-muted-foreground text-xs">
               Max file size: {formatFileSize(maxSize)}
               {maxFiles > 1 && ` • Max ${maxFiles} files`}
             </p>
           </div>
 
-          <Button type="button" variant="secondary" size="sm" disabled={disabled}>
+          <Button
+            type="button"
+            variant="secondary"
+            size="sm"
+            disabled={disabled}
+          >
             Select Files
           </Button>
         </div>
@@ -580,7 +657,9 @@ export function FileUpload({
               key={file.id}
               file={file}
               onRemove={() => removeFile(file.id)}
-              onRetry={file.status === "error" ? () => retryFile(file.id) : undefined}
+              onRetry={
+                file.status === "error" ? () => retryFile(file.id) : undefined
+              }
               showPreview={showPreview}
             />
           ))}

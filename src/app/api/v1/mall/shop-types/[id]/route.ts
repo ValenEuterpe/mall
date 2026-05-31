@@ -48,7 +48,9 @@ async function updateShopTypeHandler(
     data: validated,
   });
 
-  return successResponse(updated, { message: "Shop type updated successfully" });
+  return successResponse(updated, {
+    message: "Shop type updated successfully",
+  });
 }
 
 async function deleteShopTypeHandler(

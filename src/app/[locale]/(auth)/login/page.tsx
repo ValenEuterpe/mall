@@ -1,6 +1,12 @@
 "use client";
 
-import React, { Suspense, useCallback, useEffect, useMemo, useState } from "react";
+import React, {
+  Suspense,
+  useCallback,
+  useEffect,
+  useMemo,
+  useState,
+} from "react";
 import { useSearchParams } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { AlertCircle } from "lucide-react";
@@ -48,7 +54,10 @@ function LoginFormSkeleton(): React.ReactElement {
   );
 }
 
-function LoginPageContent({ callbackUrl, errorMessage }: LoginPageContentProps): React.ReactElement {
+function LoginPageContent({
+  callbackUrl,
+  errorMessage,
+}: LoginPageContentProps): React.ReactElement {
   const t = useTranslations("auth.loginPage");
 
   const router = useRouter();
@@ -84,7 +93,8 @@ function LoginPageContent({ callbackUrl, errorMessage }: LoginPageContentProps):
         setLoginError(t("invalidCredentials"));
         return false;
       } catch (error) {
-        const message = error instanceof Error ? error.message : t("unknownError");
+        const message =
+          error instanceof Error ? error.message : t("unknownError");
         setLoginError(message);
         return false;
       } finally {
@@ -105,8 +115,8 @@ function LoginPageContent({ callbackUrl, errorMessage }: LoginPageContentProps):
   if (isAuthenticated && user) {
     return (
       <div className="flex flex-col items-center justify-center space-y-4 py-8">
-        <div className="h-8 w-8 animate-spin rounded-full border-4 border-primary border-t-transparent" />
-        <p className="text-sm text-muted-foreground">{t("redirecting")}</p>
+        <div className="border-primary h-8 w-8 animate-spin rounded-full border-4 border-t-transparent" />
+        <p className="text-muted-foreground text-sm">{t("redirecting")}</p>
       </div>
     );
   }
@@ -162,7 +172,9 @@ function LoginPageWithParams(): React.ReactElement {
     return key ? t(key as Parameters<typeof t>[0]) : null;
   }, [searchParams, t]);
 
-  return <LoginPageContent callbackUrl={callbackUrl} errorMessage={errorMessage} />;
+  return (
+    <LoginPageContent callbackUrl={callbackUrl} errorMessage={errorMessage} />
+  );
 }
 
 export default function LoginPage(): React.ReactElement {

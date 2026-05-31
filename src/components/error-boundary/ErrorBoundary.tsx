@@ -90,7 +90,10 @@ export interface ErrorReport {
   timestamp: string;
 }
 
-export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundaryState> {
+export class ErrorBoundary extends Component<
+  ErrorBoundaryProps,
+  ErrorBoundaryState
+> {
   private autoRetryTimeout: ReturnType<typeof setTimeout> | null = null;
 
   static defaultProps: Partial<ErrorBoundaryProps> = {
@@ -100,7 +103,8 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
     maxAutoRetries: 3,
     autoRetryDelay: 1000,
     message: "Something went wrong",
-    description: "We're sorry, but an unexpected error occurred. Please try again.",
+    description:
+      "We're sorry, but an unexpected error occurred. Please try again.",
   };
 
   constructor(props: ErrorBoundaryProps) {
@@ -133,9 +137,13 @@ export class ErrorBoundary extends Component<ErrorBoundaryProps, ErrorBoundarySt
       message: error.message,
       stack: error.stack,
       // React typings may allow null here, so normalize for our report type.
-      componentStack: (errorInfo as unknown as { componentStack?: string | null }).componentStack ?? undefined,
+      componentStack:
+        (errorInfo as unknown as { componentStack?: string | null })
+          .componentStack ?? undefined,
       // Use nullish coalescing so even if a caller passes `null`, we emit `undefined`.
-      componentName: (this.props.componentName ?? undefined) as string | undefined,
+      componentName: (this.props.componentName ?? undefined) as
+        | string
+        | undefined,
       url: typeof window !== "undefined" ? window.location.href : "",
       userAgent: typeof navigator !== "undefined" ? navigator.userAgent : "",
       timestamp: new Date().toISOString(),
@@ -251,7 +259,9 @@ Time: ${new Date().toISOString()}
     };
 
     if (fallback) {
-      return typeof fallback === "function" ? fallback(fallbackProps) : fallback;
+      return typeof fallback === "function"
+        ? fallback(fallbackProps)
+        : fallback;
     }
 
     const isDev = process.env.NODE_ENV === "development";
@@ -261,7 +271,7 @@ Time: ${new Date().toISOString()}
     switch (variant) {
       case "minimal":
         return (
-          <div className="flex items-center gap-2 p-4 text-destructive">
+          <div className="text-destructive flex items-center gap-2 p-4">
             <AlertTriangle className="h-4 w-4" />
             <span className="text-sm">{message}</span>
             <Button
@@ -271,19 +281,21 @@ Time: ${new Date().toISOString()}
               disabled={isRetrying}
               aria-label="Retry"
             >
-              <RefreshCw className={cn("h-3 w-3", isRetrying && "animate-spin")} />
+              <RefreshCw
+                className={cn("h-3 w-3", isRetrying && "animate-spin")}
+              />
             </Button>
           </div>
         );
 
       case "inline":
         return (
-          <div className="rounded-lg border border-destructive/50 bg-destructive/10 p-4">
+          <div className="border-destructive/50 bg-destructive/10 rounded-lg border p-4">
             <div className="flex items-start gap-3">
-              <AlertTriangle className="mt-0.5 h-5 w-5 text-destructive" />
+              <AlertTriangle className="text-destructive mt-0.5 h-5 w-5" />
               <div className="flex-1 space-y-2">
-                <p className="font-medium text-destructive">{message}</p>
-                <p className="text-sm text-muted-foreground">{description}</p>
+                <p className="text-destructive font-medium">{message}</p>
+                <p className="text-muted-foreground text-sm">{description}</p>
                 <div className="flex gap-2 pt-2">
                   <Button
                     variant="outline"
@@ -291,7 +303,12 @@ Time: ${new Date().toISOString()}
                     onClick={this.retryRender}
                     disabled={isRetrying}
                   >
-                    <RefreshCw className={cn("mr-2 h-4 w-4", isRetrying && "animate-spin")} />
+                    <RefreshCw
+                      className={cn(
+                        "mr-2 h-4 w-4",
+                        isRetrying && "animate-spin"
+                      )}
+                    />
                     Retry
                   </Button>
                 </div>
@@ -302,7 +319,7 @@ Time: ${new Date().toISOString()}
 
       case "full":
         return (
-          <div className="flex min-h-screen items-center justify-center bg-background p-4">
+          <div className="bg-background flex min-h-screen items-center justify-center p-4">
             {this.renderErrorCard(
               error,
               errorInfo,
@@ -358,12 +375,14 @@ Time: ${new Date().toISOString()}
       <Card className="w-full max-w-lg shadow-lg">
         <CardHeader className="space-y-1">
           <div className="flex items-center gap-2">
-            <div className="flex h-10 w-10 items-center justify-center rounded-full bg-destructive/10">
-              <AlertTriangle className="h-5 w-5 text-destructive" />
+            <div className="bg-destructive/10 flex h-10 w-10 items-center justify-center rounded-full">
+              <AlertTriangle className="text-destructive h-5 w-5" />
             </div>
             <div>
               <CardTitle className="text-lg">{message}</CardTitle>
-              <p className="text-xs text-muted-foreground">Error ID: {errorId}</p>
+              <p className="text-muted-foreground text-xs">
+                Error ID: {errorId}
+              </p>
             </div>
           </div>
         </CardHeader>
@@ -372,7 +391,7 @@ Time: ${new Date().toISOString()}
           <CardDescription className="text-sm">{description}</CardDescription>
 
           {isRetrying && (
-            <div className="flex items-center gap-2 text-sm text-muted-foreground">
+            <div className="text-muted-foreground flex items-center gap-2 text-sm">
               <RefreshCw className="h-4 w-4 animate-spin" />
               <span>Retrying automatically...</span>
             </div>
@@ -381,7 +400,8 @@ Time: ${new Date().toISOString()}
           {hasExhaustedRetries && (
             <div className="rounded-md bg-yellow-50 p-3 dark:bg-yellow-950">
               <p className="text-sm text-yellow-800 dark:text-yellow-200">
-                Automatic retry attempts exhausted. Please try manually or contact support.
+                Automatic retry attempts exhausted. Please try manually or
+                contact support.
               </p>
             </div>
           )}
@@ -391,41 +411,51 @@ Time: ${new Date().toISOString()}
               <button
                 type="button"
                 onClick={this.toggleDetails}
-                className="flex items-center gap-1 text-sm text-muted-foreground transition-colors hover:text-foreground"
+                className="text-muted-foreground hover:text-foreground flex items-center gap-1 text-sm transition-colors"
               >
-                {showDetails ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+                {showDetails ? (
+                  <ChevronUp className="h-4 w-4" />
+                ) : (
+                  <ChevronDown className="h-4 w-4" />
+                )}
                 {showDetails ? "Hide" : "Show"} technical details
               </button>
 
               {showDetails && (
                 <div className="space-y-2">
                   <div className="relative">
-                    <pre className="max-h-48 overflow-auto rounded-md bg-muted p-4 font-mono text-xs">
+                    <pre className="bg-muted max-h-48 overflow-auto rounded-md p-4 font-mono text-xs">
                       <code>{error.message}</code>
                       {error.stack && (
                         <>
                           {"\n\n"}
-                          <code className="text-muted-foreground">{error.stack}</code>
+                          <code className="text-muted-foreground">
+                            {error.stack}
+                          </code>
                         </>
                       )}
                     </pre>
                     <Button
                       variant="ghost"
                       size="sm"
-                      className="absolute right-2 top-2"
+                      className="absolute top-2 right-2"
                       onClick={this.copyErrorDetails}
                       aria-label="Copy error details"
                     >
-                      {copied ? <Check className="h-4 w-4 text-green-500" /> : <Copy className="h-4 w-4" />}
+                      {copied ? (
+                        <Check className="h-4 w-4 text-green-500" />
+                      ) : (
+                        <Copy className="h-4 w-4" />
+                      )}
                     </Button>
                   </div>
 
                   {errorInfo?.componentStack && (
                     <details className="text-xs">
-                      <summary className="cursor-pointer text-muted-foreground hover:text-foreground">
+                      <summary className="text-muted-foreground hover:text-foreground cursor-pointer">
                         Component Stack
                       </summary>
-                      <pre className="mt-2 max-h-32 overflow-auto rounded-md bg-muted p-2 font-mono">
+                      <pre className="bg-muted mt-2 max-h-32 overflow-auto rounded-md p-2 font-mono">
                         {errorInfo.componentStack}
                       </pre>
                     </details>
@@ -438,18 +468,33 @@ Time: ${new Date().toISOString()}
 
         <CardFooter className="flex flex-col gap-3">
           <div className="flex w-full gap-2">
-            <Button onClick={this.retryRender} disabled={isRetrying} className="flex-1">
-              <RefreshCw className={cn("mr-2 h-4 w-4", isRetrying && "animate-spin")} />
+            <Button
+              onClick={this.retryRender}
+              disabled={isRetrying}
+              className="flex-1"
+            >
+              <RefreshCw
+                className={cn("mr-2 h-4 w-4", isRetrying && "animate-spin")}
+              />
               Try Again
             </Button>
-            <Button onClick={() => (window.location.href = "/")} variant="outline" className="flex-1">
+            <Button
+              onClick={() => (window.location.href = "/")}
+              variant="outline"
+              className="flex-1"
+            >
               <Home className="mr-2 h-4 w-4" />
               Go Home
             </Button>
           </div>
 
           <div className="flex w-full gap-2">
-            <Button onClick={() => window.location.reload()} variant="ghost" size="sm" className="flex-1">
+            <Button
+              onClick={() => window.location.reload()}
+              variant="ghost"
+              size="sm"
+              className="flex-1"
+            >
               <RefreshCw className="mr-2 h-4 w-4" />
               Refresh Page
             </Button>
@@ -484,7 +529,10 @@ export interface ErrorBoundaryWrapperProps extends ErrorBoundaryProps {
   resetKey?: string | number;
 }
 
-export function ErrorBoundaryWrapper({ resetKey, ...props }: ErrorBoundaryWrapperProps): ReactNode {
+export function ErrorBoundaryWrapper({
+  resetKey,
+  ...props
+}: ErrorBoundaryWrapperProps): ReactNode {
   return <ErrorBoundary key={resetKey} {...props} />;
 }
 

@@ -8,7 +8,10 @@ import {
 } from "@/app/response";
 import { activeDiscountWhere } from "@/app/api/v1/products/helpers/selects";
 import { logger } from "@/lib/utils/logger";
-import { enforceRateLimit, publicReadRateLimiter } from "@/lib/utils/rate-limit";
+import {
+  enforceRateLimit,
+  publicReadRateLimiter,
+} from "@/lib/utils/rate-limit";
 import { shopCodeSchema, shopProductsQuerySchema } from "./schemas";
 import { parseLocale, getLocalizedText } from "@/lib/i18n/locale";
 

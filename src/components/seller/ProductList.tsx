@@ -21,13 +21,17 @@ interface ProductListProps {
   emptyMessage?: string;
 }
 
-export function ProductList({ products, isLoading, emptyMessage }: ProductListProps) {
+export function ProductList({
+  products,
+  isLoading,
+  emptyMessage,
+}: ProductListProps) {
   const t = useTranslations("seller.products");
 
   if (isLoading) {
     return (
       <Card>
-        <CardContent className="py-8 text-center text-muted-foreground">
+        <CardContent className="text-muted-foreground py-8 text-center">
           {t("loading")}
         </CardContent>
       </Card>
@@ -38,8 +42,8 @@ export function ProductList({ products, isLoading, emptyMessage }: ProductListPr
     return (
       <Card>
         <CardContent className="py-8 text-center">
-          <Package className="mx-auto h-12 w-12 text-muted-foreground/50" />
-          <p className="mt-2 text-sm text-muted-foreground">
+          <Package className="text-muted-foreground/50 mx-auto h-12 w-12" />
+          <p className="text-muted-foreground mt-2 text-sm">
             {emptyMessage || t("noProducts")}
           </p>
         </CardContent>
@@ -55,14 +59,20 @@ export function ProductList({ products, isLoading, emptyMessage }: ProductListPr
       <CardContent>
         <ul className="divide-y">
           {products.map((product) => (
-            <li key={product.id} className="flex items-center justify-between py-3">
+            <li
+              key={product.id}
+              className="flex items-center justify-between py-3"
+            >
               <div>
                 <p className="font-medium">{product.name}</p>
-                <p className="text-sm text-muted-foreground">
-                  {product.price.toLocaleString()} ֏ · {t("stock")}: {product.stock}
+                <p className="text-muted-foreground text-sm">
+                  {product.price.toLocaleString()} ֏ · {t("stock")}:{" "}
+                  {product.stock}
                 </p>
               </div>
-              <span className="text-xs text-muted-foreground">{product.status}</span>
+              <span className="text-muted-foreground text-xs">
+                {product.status}
+              </span>
             </li>
           ))}
         </ul>

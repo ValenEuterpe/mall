@@ -29,9 +29,7 @@ async function listCategoriesAdminHandler(
   return successResponse(categories);
 }
 
-async function createCategoryHandler(
-  req: NextRequest
-): Promise<NextResponse> {
+async function createCategoryHandler(req: NextRequest): Promise<NextResponse> {
   const body = await req.json();
   const validated = createCategorySchema.parse(body);
 

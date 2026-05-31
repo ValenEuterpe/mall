@@ -5,8 +5,12 @@ export default async function AdminSettingsPage(): Promise<React.ReactElement> {
 
   return (
     <div className="space-y-2">
-      <h1 className="text-2xl font-semibold tracking-tight">{t("pages.settings.title")}</h1>
-      <p className="text-sm text-muted-foreground">{t("pages.settings.comingSoon")}</p>
+      <h1 className="text-2xl font-semibold tracking-tight">
+        {t("pages.settings.title")}
+      </h1>
+      <p className="text-muted-foreground text-sm">
+        {t("pages.settings.comingSoon")}
+      </p>
     </div>
   );
 }

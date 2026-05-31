@@ -19,7 +19,8 @@ async function main() {
 
   let updated = 0;
   for (const tag of rows) {
-    const transliteration = buildTransliterations([tag.name_ru, tag.name_am]).join(" ") || null;
+    const transliteration =
+      buildTransliterations([tag.name_ru, tag.name_am]).join(" ") || null;
     await prisma.tag.update({
       where: { id: tag.id },
       data: { transliteration },

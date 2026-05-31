@@ -48,7 +48,7 @@ export const passwordConfirmationRefinement = {
  * a `password` field, and we keep runtime behavior strict.
  */
 export function withPasswordConfirmation<
-  T extends z.ZodRawShape & { password: z.ZodTypeAny }
+  T extends z.ZodRawShape & { password: z.ZodTypeAny },
 >(schema: z.ZodObject<T>) {
   return schema
     .extend({
@@ -74,7 +74,11 @@ export function withPasswordConfirmation<
 /**
  * Standard email validation
  */
-export const emailSchema = z.string().email("Invalid email address").toLowerCase().trim();
+export const emailSchema = z
+  .string()
+  .email("Invalid email address")
+  .toLowerCase()
+  .trim();
 
 /**
  * Email object schema (for request bodies)

@@ -113,10 +113,7 @@ async function createFloorHandler(
   const existingFloor = await prisma.floor.findFirst({
     where: {
       buildingId,
-      OR: [
-        { number: validated.number },
-        { code },
-      ],
+      OR: [{ number: validated.number }, { code }],
     },
   });
 
@@ -126,9 +123,10 @@ async function createFloorHandler(
         success: false,
         error: {
           code: "DUPLICATE_FLOOR",
-          message: existingFloor.number === validated.number
-            ? `Floor ${validated.number} already exists in this building`
-            : `Floor with code ${code} already exists in this building`,
+          message:
+            existingFloor.number === validated.number
+              ? `Floor ${validated.number} already exists in this building`
+              : `Floor with code ${code} already exists in this building`,
         },
       },
       { status: 409 }

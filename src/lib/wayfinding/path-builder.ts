@@ -106,7 +106,8 @@ export function buildCalculatedRoute(
       }
 
       // Record floor change
-      const prevVertex = currentSegmentVertices[currentSegmentVertices.length - 1];
+      const prevVertex =
+        currentSegmentVertices[currentSegmentVertices.length - 1];
       if (prevVertex?.floorConnector) {
         floorChanges.push({
           type: prevVertex.floorConnector.type,
@@ -132,7 +133,11 @@ export function buildCalculatedRoute(
   }
 
   // Don't forget the last segment
-  if (currentSegmentVertices.length > 0 && currentFloor !== null && currentVenue !== null) {
+  if (
+    currentSegmentVertices.length > 0 &&
+    currentFloor !== null &&
+    currentVenue !== null
+  ) {
     segments.push({
       floor: currentFloor,
       building: currentBuilding,

@@ -9,7 +9,12 @@ import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
 import { Badge } from "@/components/ui/badge";
 import { Separator } from "@/components/ui/separator";
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipProvider,
+  TooltipTrigger,
+} from "@/components/ui/tooltip";
 import {
   Collapsible,
   CollapsibleContent,
@@ -139,7 +144,12 @@ function SidebarItemComponent({
   const content = (
     <>
       {item.icon && (
-        <span className={cn("flex-shrink-0", isCollapsed && depth === 0 ? "" : "mr-3")}>
+        <span
+          className={cn(
+            "flex-shrink-0",
+            isCollapsed && depth === 0 ? "" : "mr-3"
+          )}
+        >
           {item.icon}
         </span>
       )}
@@ -147,7 +157,10 @@ function SidebarItemComponent({
         <>
           <span className="flex-1 truncate">{item.title}</span>
           {item.badge !== undefined && (
-            <Badge variant={item.badgeVariant || "secondary"} className="ml-auto">
+            <Badge
+              variant={item.badgeVariant || "secondary"}
+              className="ml-auto"
+            >
               {item.badge}
             </Badge>
           )}
@@ -202,7 +215,9 @@ function SidebarItemComponent({
           <TooltipContent side="right" className="flex items-center gap-2">
             {item.title}
             {item.badge !== undefined && (
-              <Badge variant={item.badgeVariant || "secondary"}>{item.badge}</Badge>
+              <Badge variant={item.badgeVariant || "secondary"}>
+                {item.badge}
+              </Badge>
             )}
           </TooltipContent>
         </Tooltip>
@@ -271,13 +286,17 @@ function SidebarSectionComponent({
   return (
     <div className="space-y-1">
       {section.title && !isCollapsed && (
-        <p className="px-3 py-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">
+        <p className="text-muted-foreground px-3 py-2 text-xs font-semibold tracking-wider uppercase">
           {section.title}
         </p>
       )}
       {section.title && isCollapsed && <Separator className="my-2" />}
       {section.items.map((item) => (
-        <SidebarItemComponent key={item.id} item={item} isCollapsed={isCollapsed} />
+        <SidebarItemComponent
+          key={item.id}
+          item={item}
+          isCollapsed={isCollapsed}
+        />
       ))}
     </div>
   );
@@ -308,7 +327,7 @@ export function Sidebar({
     <TooltipProvider>
       <aside
         className={cn(
-          "flex flex-col border-r bg-background transition-all duration-300",
+          "bg-background flex flex-col border-r transition-all duration-300",
           effectivelyCollapsed ? "w-16" : "w-64",
           className
         )}
@@ -325,7 +344,9 @@ export function Sidebar({
         )}
 
         <ScrollArea className="flex-1 py-4">
-          <nav className={cn("space-y-4", effectivelyCollapsed ? "px-2" : "px-3")}>
+          <nav
+            className={cn("space-y-4", effectivelyCollapsed ? "px-2" : "px-3")}
+          >
             {sections.map((section, index) => (
               <SidebarSectionComponent
                 key={section.title ?? index}

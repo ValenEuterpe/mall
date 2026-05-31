@@ -105,12 +105,9 @@ export function useFavorites({
       setError(null);
 
       try {
-        const response = await apiClient.get<FavoritesResponse>(
-          "/favorites",
-          {
-            limit: initialLimit,
-          }
-        );
+        const response = await apiClient.get<FavoritesResponse>("/favorites", {
+          limit: initialLimit,
+        });
 
         if (response.success && response.data) {
           const data = response.data as FavoritesResponse;

@@ -7,7 +7,8 @@ import "leaflet/dist/leaflet.css";
 // Fix Leaflet default marker icon issue
 const defaultIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconRetinaUrl:
+    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
@@ -88,8 +89,14 @@ export default function LocationPickerMap({
         Math.abs(currentPos.lat - effectivePosition.lat) > 0.00001 ||
         Math.abs(currentPos.lng - effectivePosition.lng) > 0.00001
       ) {
-        markerRef.current.setLatLng([effectivePosition.lat, effectivePosition.lng]);
-        mapRef.current.setView([effectivePosition.lat, effectivePosition.lng], mapRef.current.getZoom());
+        markerRef.current.setLatLng([
+          effectivePosition.lat,
+          effectivePosition.lng,
+        ]);
+        mapRef.current.setView(
+          [effectivePosition.lat, effectivePosition.lng],
+          mapRef.current.getZoom()
+        );
       }
     }
   }, [effectivePosition.lat, effectivePosition.lng]);
@@ -97,7 +104,7 @@ export default function LocationPickerMap({
   return (
     <div
       ref={containerRef}
-      className="w-full h-[300px]"
+      className="h-[300px] w-full"
       style={{ zIndex: 0 }}
     />
   );

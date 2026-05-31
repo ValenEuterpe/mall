@@ -10,7 +10,12 @@ import { z } from "zod";
 
 const updateFloorSchema = z.object({
   label: z.string().max(100).optional(),
-  code: z.string().min(1).max(20).regex(/^F\d+$/i, "Code must be in format F1, F2, etc.").optional(),
+  code: z
+    .string()
+    .min(1)
+    .max(20)
+    .regex(/^F\d+$/i, "Code must be in format F1, F2, etc.")
+    .optional(),
   latitude: z.number().min(-90).max(90).optional(),
   longitude: z.number().min(-180).max(180).optional(),
   rotation: z.number().min(0).max(360).optional(),
@@ -167,7 +172,9 @@ async function updateFloorHandler(
       label: validated.label,
       ...(validated.code && { code: validated.code.toUpperCase() }),
       ...(validated.latitude !== undefined && { latitude: validated.latitude }),
-      ...(validated.longitude !== undefined && { longitude: validated.longitude }),
+      ...(validated.longitude !== undefined && {
+        longitude: validated.longitude,
+      }),
       ...(validated.rotation !== undefined && { rotation: validated.rotation }),
       ...(validated.scale !== undefined && { scale: validated.scale }),
     },
@@ -177,7 +184,9 @@ async function updateFloorHandler(
     },
   });
 
-  return successResponse(updatedFloor, { message: "Floor updated successfully" });
+  return successResponse(updatedFloor, {
+    message: "Floor updated successfully",
+  });
 }
 
 /**

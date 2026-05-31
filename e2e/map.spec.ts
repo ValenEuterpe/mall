@@ -5,9 +5,11 @@ test.describe("Map interaction", () => {
     await page.goto("/");
     await page.waitForLoadState("networkidle");
 
-    const mapToggle = page.locator(
-      "button[aria-label*='map'], button[aria-label*='location'], svg.lucide-map"
-    ).first();
+    const mapToggle = page
+      .locator(
+        "button[aria-label*='map'], button[aria-label*='location'], svg.lucide-map"
+      )
+      .first();
 
     if (await mapToggle.isVisible({ timeout: 5000 })) {
       await expect(mapToggle).toBeVisible({ timeout: 10000 });
@@ -26,11 +28,13 @@ test.describe("Map interaction", () => {
       await page.waitForTimeout(1000);
 
       // Check if map container is visible
-      const mapContainer = page.locator(
-        ".leaflet-container, [class*='map'], [data-testid*='map']"
-      ).first();
+      const mapContainer = page
+        .locator(".leaflet-container, [class*='map'], [data-testid*='map']")
+        .first();
 
-      const isMapVisible = await mapContainer.isVisible({ timeout: 5000 }).catch(() => false);
+      const isMapVisible = await mapContainer
+        .isVisible({ timeout: 5000 })
+        .catch(() => false);
 
       if (isMapVisible) {
         // Toggle map off
@@ -43,7 +47,9 @@ test.describe("Map interaction", () => {
     }
   });
 
-  test("map toggle button on desktop has proper styling", async ({ browser }) => {
+  test("map toggle button on desktop has proper styling", async ({
+    browser,
+  }) => {
     const context = await browser.newContext({
       viewport: { width: 1280, height: 720 },
     });
@@ -58,7 +64,9 @@ test.describe("Map interaction", () => {
       await expect(mapToggle).toBeEnabled();
       // Check that button has visible icon or text
       const icon = mapToggle.locator("svg, span").first();
-      const hasIcon = await icon.isVisible({ timeout: 5000 }).catch(() => false);
+      const hasIcon = await icon
+        .isVisible({ timeout: 5000 })
+        .catch(() => false);
       expect(hasIcon).toBeTruthy();
     }
 

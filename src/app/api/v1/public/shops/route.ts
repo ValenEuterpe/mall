@@ -21,7 +21,14 @@ import { shopListQuerySchema } from "./schemas";
 
 const SEARCHABLE_FIELDS = ["shopName", "fullCode", "description"] as const;
 
-const SORTABLE_FIELDS = ["shopName", "fullCode", "createdAt", "venue", "building", "floor"] as const;
+const SORTABLE_FIELDS = [
+  "shopName",
+  "fullCode",
+  "createdAt",
+  "venue",
+  "building",
+  "floor",
+] as const;
 
 const DEFAULT_SORT = {
   field: "shopName",
@@ -102,7 +109,9 @@ function transformShopForList(shop: ShopRaw) {
 async function getShopsHandler(request: NextRequest): Promise<NextResponse> {
   const { searchParams } = new URL(request.url);
 
-  const parsed = shopListQuerySchema.safeParse(Object.fromEntries(searchParams));
+  const parsed = shopListQuerySchema.safeParse(
+    Object.fromEntries(searchParams)
+  );
   if (!parsed.success) {
     // Fall through with defaults — non-critical validation
   }

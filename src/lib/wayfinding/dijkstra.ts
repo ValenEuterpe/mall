@@ -83,7 +83,9 @@ class PriorityQueue {
         rightChild = this.values[rightChildIdx];
         if (
           (swap === null && rightChild.priority < element.priority) ||
-          (swap !== null && leftChild && rightChild.priority < leftChild.priority)
+          (swap !== null &&
+            leftChild &&
+            rightChild.priority < leftChild.priority)
         ) {
           swap = rightChildIdx;
         }
@@ -252,7 +254,10 @@ export function findEntrances(
 export function findFloorConnectors(
   graph: NavigationGraph
 ): Map<string, Array<NavigationVertex & { compositeId: string }>> {
-  const connectors = new Map<string, Array<NavigationVertex & { compositeId: string }>>();
+  const connectors = new Map<
+    string,
+    Array<NavigationVertex & { compositeId: string }>
+  >();
 
   for (const [compositeId, vertex] of graph.vertices) {
     if (vertex.floorConnector) {

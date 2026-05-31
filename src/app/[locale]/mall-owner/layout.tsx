@@ -25,13 +25,17 @@ const REDIRECT_DELAY = 100;
  * - Requires an authenticated session with role `MALL_OWNER`
  * - Redirects unauthenticated users to the Mall Owner login (magic-link request)
  */
-export default function MallOwnerLayout({ children }: MallOwnerLayoutProps): React.ReactElement | null {
+export default function MallOwnerLayout({
+  children,
+}: MallOwnerLayoutProps): React.ReactElement | null {
   const { user, isLoading, isAuthenticated, isInitialized } = useAuth();
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
 
-  const isMagicLinkCallback = pathname.endsWith("/mall-owner/dashboard") && Boolean(searchParams.get("token"));
+  const isMagicLinkCallback =
+    pathname.endsWith("/mall-owner/dashboard") &&
+    Boolean(searchParams.get("token"));
 
   const [authState, setAuthState] = useState<AuthState>("loading");
 

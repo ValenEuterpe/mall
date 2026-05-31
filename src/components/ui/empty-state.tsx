@@ -112,16 +112,32 @@ export function EmptyState({
 
   if (compact) {
     return (
-      <div className={cn("flex items-center gap-4 rounded-lg border border-dashed p-4", className)}>
+      <div
+        className={cn(
+          "flex items-center gap-4 rounded-lg border border-dashed p-4",
+          className
+        )}
+      >
         <div className={cn(iconColor, "flex-shrink-0")}>{displayIcon}</div>
         <div className="min-w-0 flex-1">
           <h3 className={cn("font-medium", styles.title)}>{title}</h3>
           {description && (
-            <p className={cn("mt-1 truncate text-muted-foreground", styles.description)}>{description}</p>
+            <p
+              className={cn(
+                "text-muted-foreground mt-1 truncate",
+                styles.description
+              )}
+            >
+              {description}
+            </p>
           )}
         </div>
         {action && (
-          <Button variant={action.variant ?? "default"} size="sm" onClick={action.onClick}>
+          <Button
+            variant={action.variant ?? "default"}
+            size="sm"
+            onClick={action.onClick}
+          >
             {action.icon}
             {action.label}
           </Button>
@@ -131,28 +147,55 @@ export function EmptyState({
   }
 
   return (
-    <div className={cn("flex flex-col items-center justify-center text-center", styles.container, className)}>
-      <div className={cn("mb-4 rounded-full bg-muted p-4", iconColor, size === "lg" && "p-6")}>
+    <div
+      className={cn(
+        "flex flex-col items-center justify-center text-center",
+        styles.container,
+        className
+      )}
+    >
+      <div
+        className={cn(
+          "bg-muted mb-4 rounded-full p-4",
+          iconColor,
+          size === "lg" && "p-6"
+        )}
+      >
         <div className={styles.icon}>{displayIcon}</div>
       </div>
 
       <h3 className={cn("font-semibold", styles.title)}>{title}</h3>
 
       {description && (
-        <p className={cn("mt-2 max-w-md text-muted-foreground", styles.description)}>{description}</p>
+        <p
+          className={cn(
+            "text-muted-foreground mt-2 max-w-md",
+            styles.description
+          )}
+        >
+          {description}
+        </p>
       )}
 
       {(action || secondaryAction) && (
         <div className="mt-6 flex items-center gap-3">
           {action && (
-            <Button variant={action.variant ?? "default"} onClick={action.onClick}>
+            <Button
+              variant={action.variant ?? "default"}
+              onClick={action.onClick}
+            >
               {action.icon && <span className="mr-2">{action.icon}</span>}
               {action.label}
             </Button>
           )}
           {secondaryAction && (
-            <Button variant={secondaryAction.variant ?? "outline"} onClick={secondaryAction.onClick}>
-              {secondaryAction.icon && <span className="mr-2">{secondaryAction.icon}</span>}
+            <Button
+              variant={secondaryAction.variant ?? "outline"}
+              onClick={secondaryAction.onClick}
+            >
+              {secondaryAction.icon && (
+                <span className="mr-2">{secondaryAction.icon}</span>
+              )}
               {secondaryAction.label}
             </Button>
           )}
@@ -170,7 +213,11 @@ interface PresetEmptyStateProps {
   className?: string;
 }
 
-export function NoSearchResults({ onAction, actionLabel = "Clear search", className }: PresetEmptyStateProps) {
+export function NoSearchResults({
+  onAction,
+  actionLabel = "Clear search",
+  className,
+}: PresetEmptyStateProps) {
   return (
     <EmptyState
       variant="search"
@@ -191,7 +238,11 @@ export function NoSearchResults({ onAction, actionLabel = "Clear search", classN
   );
 }
 
-export function NoProducts({ onAction, actionLabel = "Add Product", className }: PresetEmptyStateProps) {
+export function NoProducts({
+  onAction,
+  actionLabel = "Add Product",
+  className,
+}: PresetEmptyStateProps) {
   return (
     <EmptyState
       variant="products"
@@ -211,7 +262,11 @@ export function NoProducts({ onAction, actionLabel = "Add Product", className }:
   );
 }
 
-export function EmptyCart({ onAction, actionLabel = "Browse Products", className }: PresetEmptyStateProps) {
+export function EmptyCart({
+  onAction,
+  actionLabel = "Browse Products",
+  className,
+}: PresetEmptyStateProps) {
   return (
     <EmptyState
       variant="cart"
@@ -223,7 +278,11 @@ export function EmptyCart({ onAction, actionLabel = "Browse Products", className
   );
 }
 
-export function NoUsers({ onAction, actionLabel = "Invite User", className }: PresetEmptyStateProps) {
+export function NoUsers({
+  onAction,
+  actionLabel = "Invite User",
+  className,
+}: PresetEmptyStateProps) {
   return (
     <EmptyState
       variant="users"
@@ -243,7 +302,11 @@ export function NoUsers({ onAction, actionLabel = "Invite User", className }: Pr
   );
 }
 
-export function NoFiles({ onAction, actionLabel = "Upload File", className }: PresetEmptyStateProps) {
+export function NoFiles({
+  onAction,
+  actionLabel = "Upload File",
+  className,
+}: PresetEmptyStateProps) {
   return (
     <EmptyState
       variant="files"

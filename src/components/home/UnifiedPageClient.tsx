@@ -97,12 +97,8 @@ export function UnifiedPageClient(): React.ReactElement {
   );
 
   // Shop popup
-  const {
-    activeShopSvgId,
-    activeShop,
-    handleShopClick,
-    handleCloseShopPopup,
-  } = useShopPopup(allShopsBySvgId);
+  const { activeShopSvgId, activeShop, handleShopClick, handleCloseShopPopup } =
+    useShopPopup(allShopsBySvgId);
 
   // Map pins
   const {
@@ -231,7 +227,10 @@ export function UnifiedPageClient(): React.ReactElement {
         )}
 
         {/* Mobile Filter Panel — opened via header SlidersHorizontal button */}
-        <MobilePanelSheet name={SIDEBAR_PANELS.filter} title={t("filters.title")}>
+        <MobilePanelSheet
+          name={SIDEBAR_PANELS.filter}
+          title={t("filters.title")}
+        >
           <div className="h-full space-y-4 overflow-y-auto p-4">
             <ProductFilterPanel
               categories={categories}
@@ -262,7 +261,9 @@ export function UnifiedPageClient(): React.ReactElement {
         <ProductDetailModal
           productId={selectedProductId}
           onClose={handleCloseProductDetail}
-          onAddToMap={selectedProduct ? () => handleAddToMap(selectedProduct) : undefined}
+          onAddToMap={
+            selectedProduct ? () => handleAddToMap(selectedProduct) : undefined
+          }
           onRemoveFromMap={handleRemoveSelectedFromMap}
           isOnMap={selectedProductId ? isSelected(selectedProductId) : false}
           context="user"
@@ -311,7 +312,9 @@ export function UnifiedPageClient(): React.ReactElement {
         <ProductDetailModal
           productId={selectedProductId}
           onClose={handleCloseProductDetail}
-          onAddToMap={selectedProduct ? () => handleAddToMap(selectedProduct) : undefined}
+          onAddToMap={
+            selectedProduct ? () => handleAddToMap(selectedProduct) : undefined
+          }
           onRemoveFromMap={handleRemoveSelectedFromMap}
           isOnMap={selectedProductId ? isSelected(selectedProductId) : false}
           context="user"
@@ -377,7 +380,9 @@ export function UnifiedPageClient(): React.ReactElement {
       <ProductDetailModal
         productId={selectedProductId}
         onClose={handleCloseProductDetail}
-        onAddToMap={selectedProduct ? () => handleAddToMap(selectedProduct) : undefined}
+        onAddToMap={
+          selectedProduct ? () => handleAddToMap(selectedProduct) : undefined
+        }
         onRemoveFromMap={handleRemoveSelectedFromMap}
         isOnMap={selectedProductId ? isSelected(selectedProductId) : false}
         context="user"

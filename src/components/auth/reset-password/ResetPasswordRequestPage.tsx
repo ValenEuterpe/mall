@@ -21,7 +21,14 @@ import { useRouter } from "@/i18n/routing";
 import { apiClient } from "@/lib/api-client";
 import { toast } from "@/lib/utils/toast";
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -67,7 +74,15 @@ function ResetFormSkeleton(): React.ReactElement {
   );
 }
 
-function SuccessView({ email, onResend, onBack }: { email: string; onResend: () => Promise<void>; onBack: () => void }): React.ReactElement {
+function SuccessView({
+  email,
+  onResend,
+  onBack,
+}: {
+  email: string;
+  onResend: () => Promise<void>;
+  onBack: () => void;
+}): React.ReactElement {
   const t = useTranslations("auth.resetPasswordRequest");
 
   const [isResending, setIsResending] = useState(false);
@@ -106,17 +121,19 @@ function SuccessView({ email, onResend, onBack }: { email: string; onResend: () 
 
         <div className="space-y-2">
           <CardTitle className="text-2xl">{t("successTitle")}</CardTitle>
-          <CardDescription className="text-base">{t("successSubtitle")}</CardDescription>
+          <CardDescription className="text-base">
+            {t("successSubtitle")}
+          </CardDescription>
         </div>
 
-        <div className="inline-flex items-center justify-center gap-2 rounded-full bg-muted px-4 py-2">
-          <Mail className="h-4 w-4 text-muted-foreground" />
+        <div className="bg-muted inline-flex items-center justify-center gap-2 rounded-full px-4 py-2">
+          <Mail className="text-muted-foreground h-4 w-4" />
           <span className="font-medium">{email}</span>
         </div>
       </CardHeader>
 
       <CardContent className="space-y-4 text-center">
-        <p className="text-sm text-muted-foreground">{t("instructions")}</p>
+        <p className="text-muted-foreground text-sm">{t("instructions")}</p>
 
         <Alert className="text-left">
           <Mail className="h-4 w-4" />
@@ -125,9 +142,20 @@ function SuccessView({ email, onResend, onBack }: { email: string; onResend: () 
       </CardContent>
 
       <CardFooter className="flex flex-col gap-4">
-        <Button variant="outline" onClick={() => void handleResend()} disabled={cooldown > 0 || isResending} className="w-full gap-2">
-          {isResending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
-          {cooldown > 0 ? t("resendIn", { seconds: cooldown }) : t("resendEmail")}
+        <Button
+          variant="outline"
+          onClick={() => void handleResend()}
+          disabled={cooldown > 0 || isResending}
+          className="w-full gap-2"
+        >
+          {isResending ? (
+            <Loader2 className="h-4 w-4 animate-spin" />
+          ) : (
+            <RefreshCw className="h-4 w-4" />
+          )}
+          {cooldown > 0
+            ? t("resendIn", { seconds: cooldown })
+            : t("resendEmail")}
         </Button>
 
         <Button variant="ghost" onClick={onBack} className="w-full gap-2">
@@ -155,7 +183,10 @@ export default function ResetPasswordRequestPage(): React.ReactElement {
   const schema = useMemo(
     () =>
       z.object({
-        email: z.string().min(1, tErrors("required")).email(tErrors("invalidEmail")),
+        email: z
+          .string()
+          .min(1, tErrors("required"))
+          .email(tErrors("invalidEmail")),
       }),
     [tErrors]
   );
@@ -175,27 +206,32 @@ export default function ResetPasswordRequestPage(): React.ReactElement {
     mode: "onBlur",
   });
 
-  const onSubmit = useCallback(async (data: ResetRequestFormData) => {
-    setPageState("submitting");
+  const onSubmit = useCallback(
+    async (data: ResetRequestFormData) => {
+      setPageState("submitting");
 
-    try {
-      await apiClient.post<ResetRequestData>(
-        "/auth/reset-password/request",
-        { email: data.email },
-        { showErrorToast: false }
-      );
+      try {
+        await apiClient.post<ResetRequestData>(
+          "/auth/reset-password/request",
+          { email: data.email },
+          { showErrorToast: false }
+        );
 
-      // Always show success (email enumeration protection)
-      setSubmittedEmail(data.email);
-      setPageState("success");
-      toast.success(t("toastSuccess"), { description: t("toastSuccessDescription") });
-    } catch {
-      // Still show success (email enumeration protection)
-      setSubmittedEmail(data.email);
-      setPageState("success");
-      toast.success(t("toastGenericSuccess"));
-    }
-  }, [t]);
+        // Always show success (email enumeration protection)
+        setSubmittedEmail(data.email);
+        setPageState("success");
+        toast.success(t("toastSuccess"), {
+          description: t("toastSuccessDescription"),
+        });
+      } catch {
+        // Still show success (email enumeration protection)
+        setSubmittedEmail(data.email);
+        setPageState("success");
+        toast.success(t("toastGenericSuccess"));
+      }
+    },
+    [t]
+  );
 
   const handleResend = useCallback(async () => {
     const email = submittedEmail || getValues("email");
@@ -219,7 +255,13 @@ export default function ResetPasswordRequestPage(): React.ReactElement {
   }, [router]);
 
   if (pageState === "success" && submittedEmail) {
-    return <SuccessView email={submittedEmail} onResend={handleResend} onBack={handleBack} />;
+    return (
+      <SuccessView
+        email={submittedEmail}
+        onResend={handleResend}
+        onBack={handleBack}
+      />
+    );
   }
 
   const isSubmitting = pageState === "submitting";
@@ -228,8 +270,8 @@ export default function ResetPasswordRequestPage(): React.ReactElement {
     <Card className="w-full">
       <CardHeader className="space-y-4">
         <div className="flex justify-center">
-          <div className="flex h-14 w-14 items-center justify-center rounded-full bg-primary/10">
-            <KeyRound className="h-7 w-7 text-primary" />
+          <div className="bg-primary/10 flex h-14 w-14 items-center justify-center rounded-full">
+            <KeyRound className="text-primary h-7 w-7" />
           </div>
         </div>
 
@@ -245,7 +287,7 @@ export default function ResetPasswordRequestPage(): React.ReactElement {
             <Label htmlFor="reset-email">{t("emailLabel")}</Label>
             <div className="relative">
               <Mail
-                className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground"
+                className="text-muted-foreground absolute top-1/2 left-3 h-4 w-4 -translate-y-1/2"
                 aria-hidden="true"
               />
               <Input
@@ -254,12 +296,16 @@ export default function ResetPasswordRequestPage(): React.ReactElement {
                 autoComplete="email"
                 placeholder={t("emailPlaceholder")}
                 disabled={isSubmitting}
-                className={cn("pl-10", errors.email && "border-destructive focus-visible:ring-destructive")}
+                className={cn(
+                  "pl-10",
+                  errors.email &&
+                    "border-destructive focus-visible:ring-destructive"
+                )}
                 {...register("email")}
               />
             </div>
             {errors.email && (
-              <p className="flex items-center gap-1 text-sm text-destructive">
+              <p className="text-destructive flex items-center gap-1 text-sm">
                 <AlertCircle className="h-3 w-3" />
                 {errors.email.message}
               </p>
@@ -268,7 +314,12 @@ export default function ResetPasswordRequestPage(): React.ReactElement {
         </CardContent>
 
         <CardFooter className="flex flex-col gap-4">
-          <Button type="submit" className="w-full" size="lg" disabled={isSubmitting}>
+          <Button
+            type="submit"
+            className="w-full"
+            size="lg"
+            disabled={isSubmitting}
+          >
             {isSubmitting ? (
               <>
                 <Loader2 className="mr-2 h-4 w-4 animate-spin" />
@@ -282,7 +333,12 @@ export default function ResetPasswordRequestPage(): React.ReactElement {
             )}
           </Button>
 
-          <Button type="button" variant="ghost" onClick={handleBackToLogin} className="w-full gap-2">
+          <Button
+            type="button"
+            variant="ghost"
+            onClick={handleBackToLogin}
+            className="w-full gap-2"
+          >
             <ArrowLeft className="h-4 w-4" />
             {t("backToLogin")}
           </Button>

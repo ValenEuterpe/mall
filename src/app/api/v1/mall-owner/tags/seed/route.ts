@@ -77,7 +77,7 @@ async function seedTagsHandler(req: NextRequest) {
 
   for (let i = 0; i < tagsToSeed.length; i++) {
     const tagData = tagsToSeed[i];
-    
+
     const existing = await prisma.tag.findUnique({
       where: {
         categoryId_key: {
@@ -92,7 +92,9 @@ async function seedTagsHandler(req: NextRequest) {
       continue;
     }
 
-    const transliteration = buildTransliterations([tagData.name_ru, tagData.name_am]).join(" ") || null;
+    const transliteration =
+      buildTransliterations([tagData.name_ru, tagData.name_am]).join(" ") ||
+      null;
     await prisma.tag.create({
       data: {
         categoryId,

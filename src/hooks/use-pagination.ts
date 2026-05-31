@@ -118,7 +118,9 @@ function generatePageNumbers(
 // Hook
 // ============================================================================
 
-export function usePagination(options: UsePaginationOptions = {}): UsePaginationReturn {
+export function usePagination(
+  options: UsePaginationOptions = {}
+): UsePaginationReturn {
   const {
     initialPage = 1,
     initialLimit = 20,
@@ -188,7 +190,9 @@ export function usePagination(options: UsePaginationOptions = {}): UsePagination
     [syncWithUrl, searchParams, paramNames, pathname, router, initialLimit]
   );
 
-  const computed = useMemo<Omit<PaginationState, "page" | "limit" | "total">>(() => {
+  const computed = useMemo<
+    Omit<PaginationState, "page" | "limit" | "total">
+  >(() => {
     const totalPages = Math.max(1, Math.ceil(total / limit));
     const safePage = Math.min(Math.max(1, page), totalPages);
     const offset = (safePage - 1) * limit;
@@ -217,7 +221,10 @@ export function usePagination(options: UsePaginationOptions = {}): UsePagination
 
   const setPage = useCallback(
     (newPage: number) => {
-      const validPage = Math.min(Math.max(1, newPage), computed.totalPages || 1);
+      const validPage = Math.min(
+        Math.max(1, newPage),
+        computed.totalPages || 1
+      );
       setPageInternal(validPage);
       updateUrl(validPage, limit);
       onPageChange?.(validPage);
@@ -251,9 +258,15 @@ export function usePagination(options: UsePaginationOptions = {}): UsePagination
 
   const firstPage = useCallback(() => setPage(1), [setPage]);
 
-  const lastPage = useCallback(() => setPage(computed.totalPages), [computed.totalPages, setPage]);
+  const lastPage = useCallback(
+    () => setPage(computed.totalPages),
+    [computed.totalPages, setPage]
+  );
 
-  const goToPage = useCallback((targetPage: number) => setPage(targetPage), [setPage]);
+  const goToPage = useCallback(
+    (targetPage: number) => setPage(targetPage),
+    [setPage]
+  );
 
   const reset = useCallback(() => {
     setPageInternal(initialPage);
@@ -261,7 +274,10 @@ export function usePagination(options: UsePaginationOptions = {}): UsePagination
     updateUrl(initialPage, initialLimit);
   }, [initialPage, initialLimit, updateUrl]);
 
-  const isCurrentPage = useCallback((targetPage: number) => page === targetPage, [page]);
+  const isCurrentPage = useCallback(
+    (targetPage: number) => page === targetPage,
+    [page]
+  );
 
   const getRangeText = useCallback((): string => {
     if (total === 0) return "No items";

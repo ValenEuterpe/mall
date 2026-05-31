@@ -11,7 +11,12 @@ import { z } from "zod";
 const createBuildingSchema = z.object({
   venueId: z.string().min(1, "Venue ID is required"),
   name: z.string().min(1).max(200),
-  code: z.string().min(1).max(20).regex(/^B\d+$/i, "Code must be in format B1, B2, etc.").optional(),
+  code: z
+    .string()
+    .min(1)
+    .max(20)
+    .regex(/^B\d+$/i, "Code must be in format B1, B2, etc.")
+    .optional(),
   latitude: z.number().min(-90).max(90).optional(),
   longitude: z.number().min(-180).max(180).optional(),
   rotation: z.number().min(0).max(360).default(0),
@@ -111,7 +116,8 @@ async function createBuildingHandler(req: NextRequest): Promise<NextResponse> {
         return match ? parseInt(match[1], 10) : 0;
       })
       .filter((n) => n > 0);
-    const nextNumber = existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
+    const nextNumber =
+      existingNumbers.length > 0 ? Math.max(...existingNumbers) + 1 : 1;
     buildingCode = `B${nextNumber}`;
   }
 

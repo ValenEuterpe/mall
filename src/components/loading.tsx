@@ -93,7 +93,9 @@ export function LoadingSpinner({
         role="status"
         aria-label={label}
       >
-        <Loader2 className={cn("animate-spin text-primary", SPINNER_SIZES[size])} />
+        <Loader2
+          className={cn("text-primary animate-spin", SPINNER_SIZES[size])}
+        />
         <span className="sr-only">{label}</span>
       </div>
     );
@@ -107,7 +109,7 @@ export function LoadingSpinner({
     >
       <div
         className={cn(
-          "animate-spin rounded-full border-primary border-t-transparent",
+          "border-primary animate-spin rounded-full border-t-transparent",
           SPINNER_SIZES[size],
           SPINNER_BORDER_SIZES[size]
         )}
@@ -130,7 +132,7 @@ export function LoadingDots({ className }: { className?: string }) {
       {[0, 1, 2].map((i) => (
         <div
           key={i}
-          className="h-2 w-2 rounded-full bg-primary animate-bounce"
+          className="bg-primary h-2 w-2 animate-bounce rounded-full"
           style={{ animationDelay: `${i * 0.15}s` }}
         />
       ))}
@@ -192,7 +194,7 @@ export function LoadingPage({ message }: { message?: string }) {
     >
       <LoadingSpinner size="xl" variant="icon" />
       {message && (
-        <p className="animate-pulse text-sm text-muted-foreground">{message}</p>
+        <p className="text-muted-foreground animate-pulse text-sm">{message}</p>
       )}
     </div>
   );
@@ -216,7 +218,7 @@ export function LoadingSection({
       aria-label={message || "Loading..."}
     >
       <LoadingSpinner size="lg" />
-      {message && <p className="text-sm text-muted-foreground">{message}</p>}
+      {message && <p className="text-muted-foreground text-sm">{message}</p>}
     </div>
   );
 }
@@ -234,7 +236,7 @@ export function LoadingInline({
   return (
     <div className="flex items-center gap-2">
       <LoadingSpinner size={size} variant="icon" />
-      <span className="text-sm text-muted-foreground">{message}</span>
+      <span className="text-muted-foreground text-sm">{message}</span>
     </div>
   );
 }
@@ -270,7 +272,9 @@ export function LoadingOverlay({
           aria-label={message || "Loading..."}
         >
           <LoadingSpinner size={spinnerSize} />
-          {message && <p className="text-sm text-muted-foreground">{message}</p>}
+          {message && (
+            <p className="text-muted-foreground text-sm">{message}</p>
+          )}
         </div>
       )}
     </div>

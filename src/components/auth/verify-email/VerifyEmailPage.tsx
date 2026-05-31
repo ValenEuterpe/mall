@@ -18,12 +18,25 @@ import { useRouter } from "@/i18n/routing";
 import { apiClient, ApiClientError } from "@/lib/api-client";
 import { toast } from "@/lib/utils/toast";
 
-import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardFooter,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
 import { cn } from "@/lib/utils";
 
-type VerificationState = "verifying" | "success" | "expired" | "invalid" | "alreadyVerified" | "error";
+type VerificationState =
+  | "verifying"
+  | "success"
+  | "expired"
+  | "invalid"
+  | "alreadyVerified"
+  | "error";
 
 const REDIRECT_DELAY_MS = 5000;
 const RESEND_COOLDOWN_SECONDS = 60;
@@ -127,14 +140,20 @@ function VerificationSkeleton(): React.ReactElement {
 function CountdownTimer({ seconds }: { seconds: number }): React.ReactElement {
   const t = useTranslations("auth.verifyEmail");
   return (
-    <div className="flex items-center justify-center gap-2 text-sm text-muted-foreground">
+    <div className="text-muted-foreground flex items-center justify-center gap-2 text-sm">
       <Loader2 className="h-4 w-4 animate-spin" />
       <span>{t("redirectCountdown", { seconds })}</span>
     </div>
   );
 }
 
-function ResendButton({ email, disabled }: { email: string | null; disabled?: boolean }): React.ReactElement {
+function ResendButton({
+  email,
+  disabled,
+}: {
+  email: string | null;
+  disabled?: boolean;
+}): React.ReactElement {
   const t = useTranslations("auth.verifyEmail");
 
   const [isResending, setIsResending] = useState(false);
@@ -153,14 +172,15 @@ function ResendButton({ email, disabled }: { email: string | null; disabled?: bo
     setIsResending(true);
 
     try {
-      const response = await apiClient.put<{ email: string; expiresAt: string }>(
-        "/auth/verify-email",
-        { email },
-        { showErrorToast: false }
-      );
+      const response = await apiClient.put<{
+        email: string;
+        expiresAt: string;
+      }>("/auth/verify-email", { email }, { showErrorToast: false });
 
       if (response.success) {
-        toast.success(t("resendSuccessTitle"), { description: t("resendSuccessDescription") });
+        toast.success(t("resendSuccessTitle"), {
+          description: t("resendSuccessDescription"),
+        });
         setCooldown(RESEND_COOLDOWN_SECONDS);
         return;
       }
@@ -171,7 +191,9 @@ function ResendButton({ email, disabled }: { email: string | null; disabled?: bo
       const apiError = err as ApiClientError;
 
       if (apiError.status === 409 && apiError.code === "ALREADY_VERIFIED") {
-        toast.info(t("alreadyVerifiedToastTitle"), { description: t("alreadyVerifiedToastDescription") });
+        toast.info(t("alreadyVerifiedToastTitle"), {
+          description: t("alreadyVerifiedToastDescription"),
+        });
         setCooldown(RESEND_COOLDOWN_SECONDS);
         return;
       }
@@ -187,8 +209,17 @@ function ResendButton({ email, disabled }: { email: string | null; disabled?: bo
   const isDisabled = disabled || !email || cooldown > 0 || isResending;
 
   return (
-    <Button variant="outline" onClick={() => void handleResend()} disabled={isDisabled} className="gap-2">
-      {isResending ? <Loader2 className="h-4 w-4 animate-spin" /> : <RefreshCw className="h-4 w-4" />}
+    <Button
+      variant="outline"
+      onClick={() => void handleResend()}
+      disabled={isDisabled}
+      className="gap-2"
+    >
+      {isResending ? (
+        <Loader2 className="h-4 w-4 animate-spin" />
+      ) : (
+        <RefreshCw className="h-4 w-4" />
+      )}
       {cooldown > 0 ? t("resendIn", { seconds: cooldown }) : t("resendEmail")}
     </Button>
   );
@@ -205,7 +236,9 @@ export default function VerifyEmailPage(): React.ReactElement {
 
   const [state, setState] = useState<VerificationState>("verifying");
   const [message, setMessage] = useState<string>("");
-  const [redirectCountdown, setRedirectCountdown] = useState<number | null>(null);
+  const [redirectCountdown, setRedirectCountdown] = useState<number | null>(
+    null
+  );
 
   const config = STATE_CONFIG[state];
   const Icon = config.icon;
@@ -234,7 +267,9 @@ export default function VerifyEmailPage(): React.ReactElement {
           } else {
             setState("success");
             setMessage(t("successMessage"));
-            toast.success(t("verifiedToastTitle"), { description: t("verifiedToastDescription") });
+            toast.success(t("verifiedToastTitle"), {
+              description: t("verifiedToastDescription"),
+            });
           }
 
           return;
@@ -311,9 +346,18 @@ export default function VerifyEmailPage(): React.ReactElement {
     <Card className="w-full">
       <CardHeader className="space-y-6 text-center">
         <div className="flex justify-center">
-          <div className={cn("flex h-20 w-20 items-center justify-center rounded-full", config.iconBg)}>
+          <div
+            className={cn(
+              "flex h-20 w-20 items-center justify-center rounded-full",
+              config.iconBg
+            )}
+          >
             <Icon
-              className={cn("h-10 w-10", config.iconColor, state === "verifying" && "animate-spin")}
+              className={cn(
+                "h-10 w-10",
+                config.iconColor,
+                state === "verifying" && "animate-spin"
+              )}
             />
           </div>
         </div>
@@ -324,19 +368,23 @@ export default function VerifyEmailPage(): React.ReactElement {
         </div>
 
         {email && state !== "verifying" && (
-          <div className="inline-flex items-center justify-center gap-2 rounded-full bg-muted px-4 py-2 text-sm">
-            <Mail className="h-4 w-4 text-muted-foreground" />
+          <div className="bg-muted inline-flex items-center justify-center gap-2 rounded-full px-4 py-2 text-sm">
+            <Mail className="text-muted-foreground h-4 w-4" />
             <span className="font-medium">{email}</span>
           </div>
         )}
       </CardHeader>
 
       <CardContent className="space-y-4">
-        {redirectCountdown !== null && redirectCountdown > 0 && <CountdownTimer seconds={redirectCountdown} />}
+        {redirectCountdown !== null && redirectCountdown > 0 && (
+          <CountdownTimer seconds={redirectCountdown} />
+        )}
 
         {(config.showLogin || config.showResend) && (
           <div className="flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
-            {config.showResend && <ResendButton email={email} disabled={state === "verifying"} />}
+            {config.showResend && (
+              <ResendButton email={email} disabled={state === "verifying"} />
+            )}
 
             {config.showLogin && (
               <Button onClick={goToLogin} className="gap-2">
@@ -350,7 +398,7 @@ export default function VerifyEmailPage(): React.ReactElement {
         {redirectCountdown !== null && redirectCountdown > 0 && (
           <button
             onClick={goToLogin}
-            className="mx-auto block text-sm text-muted-foreground underline-offset-4 hover:underline"
+            className="text-muted-foreground mx-auto block text-sm underline-offset-4 hover:underline"
           >
             {t("skipCountdown")}
           </button>
@@ -359,9 +407,12 @@ export default function VerifyEmailPage(): React.ReactElement {
 
       {(state === "expired" || state === "invalid" || state === "error") && (
         <CardFooter className="justify-center border-t pt-6">
-          <p className="text-center text-sm text-muted-foreground">
-            {t("helpText")} {" "}
-            <a href="/support" className="font-medium text-primary hover:underline">
+          <p className="text-muted-foreground text-center text-sm">
+            {t("helpText")}{" "}
+            <a
+              href="/support"
+              className="text-primary font-medium hover:underline"
+            >
               {t("contactSupport")}
             </a>
           </p>

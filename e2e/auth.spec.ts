@@ -32,7 +32,9 @@ test.describe("Authentication", () => {
     await page.goto("/login");
     await page.waitForLoadState("networkidle");
 
-    const signupLink = page.locator("a[href*='signup'], text=/sign up|create account/i");
+    const signupLink = page.locator(
+      "a[href*='signup'], text=/sign up|create account/i"
+    );
     await expect(signupLink).toBeVisible();
   });
 
@@ -47,7 +49,9 @@ test.describe("Authentication", () => {
     await passwordInput.fill("wrongpassword1!");
     await page.click("button[type='submit']");
 
-    await expect(page.locator("text=/invalid|error|failed|credentials/i")).toBeVisible({
+    await expect(
+      page.locator("text=/invalid|error|failed|credentials/i")
+    ).toBeVisible({
       timeout: 10000,
     });
   });

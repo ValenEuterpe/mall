@@ -8,21 +8,21 @@ import { transformShopForDetail } from "../transforms";
 import { getShopById } from "../../queries/get-shop-by-id";
 
 export async function getShopHandler(
-    request: NextRequest,
-    { params }: { params: Promise<{ id: string }> }
+  request: NextRequest,
+  { params }: { params: Promise<{ id: string }> }
 ): Promise<NextResponse> {
-    const user = requireAuth(request, ["MALL_OWNER"]);
-    const { id } = await params;
+  const user = requireAuth(request, ["MALL_OWNER"]);
+  const { id } = await params;
 
-    validateShopId(id);
+  validateShopId(id);
 
-    const shop = await getShopById(id);
-    const transformedShop = transformShopForDetail(shop);
+  const shop = await getShopById(id);
+  const transformedShop = transformShopForDetail(shop);
 
-    logger.debug("Shop details fetched", {
-        shopId: id,
-        userId: user.userId,
-    });
+  logger.debug("Shop details fetched", {
+    shopId: id,
+    userId: user.userId,
+  });
 
-    return successResponse(transformedShop);
+  return successResponse(transformedShop);
 }

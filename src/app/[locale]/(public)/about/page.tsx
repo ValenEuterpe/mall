@@ -15,12 +15,7 @@ import {
 
 import { apiClient } from "@/lib/api-client";
 
-import {
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Skeleton } from "@/components/ui/skeleton";
 
 interface SocialLinks {
@@ -103,7 +98,7 @@ export default function AboutPage(): React.ReactElement {
       <div className="container mx-auto max-w-4xl p-6">
         <Card>
           <CardContent className="flex flex-col items-center justify-center py-12">
-            <Building2 className="mb-4 h-12 w-12 text-muted-foreground/50" />
+            <Building2 className="text-muted-foreground/50 mb-4 h-12 w-12" />
             <p className="text-muted-foreground">{t("noInfo")}</p>
           </CardContent>
         </Card>
@@ -115,7 +110,8 @@ export default function AboutPage(): React.ReactElement {
   const policies = getLocalizedField(data, "policies", locale);
   const socialLinks = data.socialLinks as SocialLinks | null;
   const hasSocialLinks =
-    socialLinks && (socialLinks.instagram || socialLinks.facebook || socialLinks.telegram);
+    socialLinks &&
+    (socialLinks.instagram || socialLinks.facebook || socialLinks.telegram);
   const hasContact = data.contactPhone || data.contactEmail;
 
   return (
@@ -131,7 +127,7 @@ export default function AboutPage(): React.ReactElement {
         )}
         <h1 className="text-3xl font-bold tracking-tight">{data.name}</h1>
         {data.address && (
-          <p className="mt-2 flex items-center justify-center gap-1 text-muted-foreground">
+          <p className="text-muted-foreground mt-2 flex items-center justify-center gap-1">
             <MapPin className="h-4 w-4" />
             {data.address}
           </p>
@@ -145,7 +141,7 @@ export default function AboutPage(): React.ReactElement {
             <CardTitle>{t("description")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="whitespace-pre-line text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground leading-relaxed whitespace-pre-line">
               {description}
             </p>
           </CardContent>
@@ -159,12 +155,12 @@ export default function AboutPage(): React.ReactElement {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
-                <Clock className="h-5 w-5 text-primary" />
+                <Clock className="text-primary h-5 w-5" />
                 {t("workingHours")}
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <p className="whitespace-pre-line text-sm text-muted-foreground">
+              <p className="text-muted-foreground text-sm whitespace-pre-line">
                 {data.workingHours}
               </p>
             </CardContent>
@@ -176,7 +172,7 @@ export default function AboutPage(): React.ReactElement {
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2 text-base">
-                <Phone className="h-5 w-5 text-primary" />
+                <Phone className="text-primary h-5 w-5" />
                 {t("contactInfo")}
               </CardTitle>
             </CardHeader>
@@ -184,7 +180,7 @@ export default function AboutPage(): React.ReactElement {
               {data.contactPhone && (
                 <a
                   href={`tel:${data.contactPhone}`}
-                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm transition-colors"
                 >
                   <Phone className="h-4 w-4" />
                   {data.contactPhone}
@@ -193,7 +189,7 @@ export default function AboutPage(): React.ReactElement {
               {data.contactEmail && (
                 <a
                   href={`mailto:${data.contactEmail}`}
-                  className="flex items-center gap-2 text-sm text-muted-foreground hover:text-foreground transition-colors"
+                  className="text-muted-foreground hover:text-foreground flex items-center gap-2 text-sm transition-colors"
                 >
                   <Mail className="h-4 w-4" />
                   {data.contactEmail}
@@ -217,7 +213,7 @@ export default function AboutPage(): React.ReactElement {
                   href={socialLinks.instagram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors hover:bg-accent"
+                  className="hover:bg-accent flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors"
                 >
                   <Instagram className="h-5 w-5" />
                   Instagram
@@ -228,7 +224,7 @@ export default function AboutPage(): React.ReactElement {
                   href={socialLinks.facebook}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors hover:bg-accent"
+                  className="hover:bg-accent flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors"
                 >
                   <Facebook className="h-5 w-5" />
                   Facebook
@@ -239,7 +235,7 @@ export default function AboutPage(): React.ReactElement {
                   href={socialLinks.telegram}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors hover:bg-accent"
+                  className="hover:bg-accent flex items-center gap-2 rounded-lg border px-4 py-2 text-sm transition-colors"
                 >
                   <Send className="h-5 w-5" />
                   Telegram
@@ -257,7 +253,7 @@ export default function AboutPage(): React.ReactElement {
             <CardTitle>{t("policies")}</CardTitle>
           </CardHeader>
           <CardContent>
-            <p className="whitespace-pre-line text-sm text-muted-foreground leading-relaxed">
+            <p className="text-muted-foreground text-sm leading-relaxed whitespace-pre-line">
               {policies}
             </p>
           </CardContent>

@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import prisma from "@/lib/db/prisma";
 import { successResponse } from "@/lib/api/response";
-import {
-  getProductListSelect,
-} from "../helpers/selects";
+import { getProductListSelect } from "../helpers/selects";
 import { transformProductForList } from "../helpers/transform";
 import { parseLocale } from "@/lib/i18n/locale";
 
@@ -71,10 +69,7 @@ export async function getPromotionsHandler(
   shuffleArray(transformed);
 
   const headers = new Headers();
-  headers.set(
-    "Cache-Control",
-    "public, max-age=30, stale-while-revalidate=15"
-  );
+  headers.set("Cache-Control", "public, max-age=30, stale-while-revalidate=15");
 
   return successResponse(
     { products: transformed },

@@ -25,10 +25,10 @@ These cookies are necessary for the Platform to function properly. They enable:
 
 **Our Essential Cookies:**
 
-| Cookie Name | Purpose | Duration |
-|------------|---------|----------|
-| access_token | Authentication session | 15 minutes |
-| refresh_token | Extended session | 7 days |
+| Cookie Name   | Purpose                | Duration   |
+| ------------- | ---------------------- | ---------- |
+| access_token  | Authentication session | 15 minutes |
+| refresh_token | Extended session       | 7 days     |
 
 These cookies are:
 
@@ -93,6 +93,7 @@ If you disable or remove cookies, please note:
 ### How to Disable Cookies
 
 **Chrome:**
+
 1. Click the menu icon (three dots)
 2. Select "Settings"
 3. Click "Privacy and security"
@@ -100,18 +101,21 @@ If you disable or remove cookies, please note:
 5. Choose your preference
 
 **Safari:**
+
 1. Click "Safari" in the menu bar
 2. Select "Preferences"
 3. Click "Privacy"
 4. Check "Prevent cross-site tracking"
 
 **Firefox:**
+
 1. Click the menu icon (three lines)
 2. Select "Settings"
 3. Click "Privacy & Security"
 4. Choose "Standard" or "Strict"
 
 **Edge:**
+
 1. Click the settings icon (three dots)
 2. Select "Cookies and site permissions"
 3. Manage your preferences
@@ -120,22 +124,22 @@ If you disable or remove cookies, please note:
 
 We use cookies based on the following legal grounds:
 
-| Purpose | Legal Basis |
-|---------|-------------|
+| Purpose             | Legal Basis                              |
+| ------------------- | ---------------------------------------- |
 | Essential functions | Legitimate interest / Contract necessity |
-| Analytics | Consent (where required) |
-| Marketing | Consent |
+| Analytics           | Consent (where required)                 |
+| Marketing           | Consent                                  |
 
 Essential cookies do not require your consent as they are necessary for the Platform to function.
 
 ## 7. Cookie Retention
 
-| Cookie Type | Retention Period |
-|------------|------------------|
-| access_token | 15 minutes |
-| refresh_token | 7 days |
-| Session cookies | Until browser closes |
-| Persistent cookies | Up to 1 year |
+| Cookie Type        | Retention Period     |
+| ------------------ | -------------------- |
+| access_token       | 15 minutes           |
+| refresh_token      | 7 days               |
+| Session cookies    | Until browser closes |
+| Persistent cookies | Up to 1 year         |
 
 ## 8. Updates to This Policy
 

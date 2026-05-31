@@ -42,7 +42,8 @@ export const FloorSelector = memo(function FloorSelector({
   };
 
   const displayLabel =
-    currentFloorData?.label || `${floorLabel} ${currentFloorData?.floor ?? currentFloor}`;
+    currentFloorData?.label ||
+    `${floorLabel} ${currentFloorData?.floor ?? currentFloor}`;
 
   return (
     <div className="absolute bottom-4 left-4 z-10">
@@ -58,7 +59,7 @@ export const FloorSelector = memo(function FloorSelector({
           >
             <ChevronUp className="h-4 w-4" />
           </Button>
-          <span className="text-xs font-medium px-2 whitespace-nowrap">
+          <span className="px-2 text-xs font-medium whitespace-nowrap">
             {displayLabel}
           </span>
           <Button

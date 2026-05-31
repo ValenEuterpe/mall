@@ -9,19 +9,19 @@ import { ValidationError } from "@/lib/errors/custom-errors";
 // ============================================================================
 
 export type ValidationResult<T> =
-    | {
-        success: true;
-        data: T;
+  | {
+      success: true;
+      data: T;
     }
-    | {
-        success: false;
-        error: ValidationError;
+  | {
+      success: false;
+      error: ValidationError;
     };
 
 export interface PaginationParams {
-    page: number;
-    limit: number;
-    offset: number;
+  page: number;
+  limit: number;
+  offset: number;
 }
 
 // ============================================================================
@@ -32,23 +32,23 @@ export interface PaginationParams {
  * Common pagination schema
  */
 export const paginationSchema = z.object({
-    page: z.coerce.number().int().min(1).default(1),
-    limit: z.coerce.number().int().min(1).max(100).default(20),
+  page: z.coerce.number().int().min(1).default(1),
+  limit: z.coerce.number().int().min(1).max(100).default(20),
 });
 
 /**
  * Common sort schema
  */
 export const sortSchema = z.object({
-    sortBy: z.string().optional(),
-    sortOrder: z.enum(["asc", "desc"]).default("desc"),
+  sortBy: z.string().optional(),
+  sortOrder: z.enum(["asc", "desc"]).default("desc"),
 });
 
 /**
  * UUID parameter schema
  */
 export const uuidParamSchema = z.object({
-    id: z.string().cuid(),
+  id: z.string().cuid(),
 });
 
 // ============================================================================
@@ -57,140 +57,140 @@ export const uuidParamSchema = z.object({
 
 /**
  * Validate request body against Zod schema
- * 
+ *
  * @throws ValidationError if validation fails
- * 
+ *
  * @example
  * ```ts
  * const data = await validateBody(request, createUserSchema);
  * ```
  */
 export async function validateBody<T>(
-    request: NextRequest,
-    schema: ZodSchema<T>
+  request: NextRequest,
+  schema: ZodSchema<T>
 ): Promise<T> {
-    try {
-        const body = await request.json();
-        return schema.parse(body);
-    } catch (error) {
-        if (error instanceof ZodError) {
-            const formattedErrors = error.issues.map((err) => ({
-                field: err.path.join("."),
-                message: err.message,
-                code: err.code,
-            }));
-            throw new ValidationError("Invalid request body", formattedErrors);
-        }
-
-        if (error instanceof SyntaxError) {
-            throw new ValidationError("Invalid JSON in request body");
-        }
-
-        throw error;
+  try {
+    const body = await request.json();
+    return schema.parse(body);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      const formattedErrors = error.issues.map((err) => ({
+        field: err.path.join("."),
+        message: err.message,
+        code: err.code,
+      }));
+      throw new ValidationError("Invalid request body", formattedErrors);
     }
+
+    if (error instanceof SyntaxError) {
+      throw new ValidationError("Invalid JSON in request body");
+    }
+
+    throw error;
+  }
 }
 
 /**
  * Validate request body without throwing (returns result object)
  */
 export async function safeValidateBody<T>(
-    request: NextRequest,
-    schema: ZodSchema<T>
+  request: NextRequest,
+  schema: ZodSchema<T>
 ): Promise<ValidationResult<T>> {
-    try {
-        const data = await validateBody(request, schema);
-        return { success: true, data };
-    } catch (error) {
-        if (error instanceof ValidationError) {
-            return { success: false, error };
-        }
-        throw error;
+  try {
+    const data = await validateBody(request, schema);
+    return { success: true, data };
+  } catch (error) {
+    if (error instanceof ValidationError) {
+      return { success: false, error };
     }
+    throw error;
+  }
 }
 
 /**
  * Validate query parameters against Zod schema
- * 
+ *
  * @throws ValidationError if validation fails
- * 
+ *
  * @example
  * ```ts
  * const { page, limit } = validateQuery(request, paginationSchema);
  * ```
  */
 export function validateQuery<T>(
-    request: NextRequest,
-    schema: ZodSchema<T>
+  request: NextRequest,
+  schema: ZodSchema<T>
 ): T {
-    const { searchParams } = new URL(request.url);
-    const query: Record<string, string | string[]> = {};
+  const { searchParams } = new URL(request.url);
+  const query: Record<string, string | string[]> = {};
 
-    searchParams.forEach((value, key) => {
-        const existing = query[key];
-        if (existing) {
-            // Handle multiple values for same key
-            query[key] = Array.isArray(existing)
-                ? [...existing, value]
-                : [existing, value];
-        } else {
-            query[key] = value;
-        }
-    });
-
-    try {
-        return schema.parse(query);
-    } catch (error) {
-        if (error instanceof ZodError) {
-            const formattedErrors = error.issues.map((err) => ({
-                field: err.path.join("."),
-                message: err.message,
-                code: err.code,
-            }));
-            throw new ValidationError("Invalid query parameters", formattedErrors);
-        }
-        throw error;
+  searchParams.forEach((value, key) => {
+    const existing = query[key];
+    if (existing) {
+      // Handle multiple values for same key
+      query[key] = Array.isArray(existing)
+        ? [...existing, value]
+        : [existing, value];
+    } else {
+      query[key] = value;
     }
+  });
+
+  try {
+    return schema.parse(query);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      const formattedErrors = error.issues.map((err) => ({
+        field: err.path.join("."),
+        message: err.message,
+        code: err.code,
+      }));
+      throw new ValidationError("Invalid query parameters", formattedErrors);
+    }
+    throw error;
+  }
 }
 
 /**
  * Validate route params against Zod schema
- * 
+ *
  * @throws ValidationError if validation fails
- * 
+ *
  * @example
  * ```ts
  * const { id } = await validateParams(params, uuidParamSchema);
  * ```
  */
 export async function validateParams<T>(
-    params: Promise<Record<string, string>> | Record<string, string>,
-    schema: ZodSchema<T>
+  params: Promise<Record<string, string>> | Record<string, string>,
+  schema: ZodSchema<T>
 ): Promise<T> {
-    const resolvedParams = params instanceof Promise ? await params : params;
+  const resolvedParams = params instanceof Promise ? await params : params;
 
-    try {
-        return schema.parse(resolvedParams);
-    } catch (error) {
-        if (error instanceof ZodError) {
-            const formattedErrors = error.issues.map((err) => ({
-                field: err.path.join("."),
-                message: err.message,
-                code: err.code,
-            }));
-            throw new ValidationError("Invalid route parameters", formattedErrors);
-        }
-        throw error;
+  try {
+    return schema.parse(resolvedParams);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      const formattedErrors = error.issues.map((err) => ({
+        field: err.path.join("."),
+        message: err.message,
+        code: err.code,
+      }));
+      throw new ValidationError("Invalid route parameters", formattedErrors);
     }
+    throw error;
+  }
 }
 
 /**
  * Parse pagination from query params
  */
 export function parsePagination(request: NextRequest): PaginationParams {
-    const { page, limit } = validateQuery(request, paginationSchema);
-    const offset = (page - 1) * limit;
+  const { page, limit } = validateQuery(request, paginationSchema);
+  const offset = (page - 1) * limit;
 
-    return { page, limit, offset };
+  return { page, limit, offset };
 }
 
 /**
@@ -206,49 +206,49 @@ export function parsePagination(request: NextRequest): PaginationParams {
  * ```
  */
 export function validateRequestBody<T>(
-    schema: ZodSchema<T>,
-    data: unknown
+  schema: ZodSchema<T>,
+  data: unknown
 ): ValidationResult<T> {
-    try {
-        const parsed = schema.parse(data);
-        return { success: true, data: parsed };
-    } catch (error) {
-        if (error instanceof ZodError) {
-            const formattedErrors = error.issues.map((err) => ({
-                field: err.path.join("."),
-                message: err.message,
-                code: err.code,
-            }));
-            return {
-                success: false,
-                error: new ValidationError("Validation failed", formattedErrors),
-            };
-        }
-        throw error;
+  try {
+    const parsed = schema.parse(data);
+    return { success: true, data: parsed };
+  } catch (error) {
+    if (error instanceof ZodError) {
+      const formattedErrors = error.issues.map((err) => ({
+        field: err.path.join("."),
+        message: err.message,
+        code: err.code,
+      }));
+      return {
+        success: false,
+        error: new ValidationError("Validation failed", formattedErrors),
+      };
     }
+    throw error;
+  }
 }
 
 /**
  * Validate file upload
  */
 export function validateFile(
-    file: File,
-    options: {
-        maxSize?: number; // in bytes
-        allowedTypes?: string[];
-    } = {}
+  file: File,
+  options: {
+    maxSize?: number; // in bytes
+    allowedTypes?: string[];
+  } = {}
 ): void {
-    const { maxSize = 5 * 1024 * 1024, allowedTypes } = options; // Default 5MB
+  const { maxSize = 5 * 1024 * 1024, allowedTypes } = options; // Default 5MB
 
-    if (file.size > maxSize) {
-        throw new ValidationError(
-            `File size exceeds maximum of ${Math.round(maxSize / 1024 / 1024)}MB`
-        );
-    }
+  if (file.size > maxSize) {
+    throw new ValidationError(
+      `File size exceeds maximum of ${Math.round(maxSize / 1024 / 1024)}MB`
+    );
+  }
 
-    if (allowedTypes && !allowedTypes.includes(file.type)) {
-        throw new ValidationError(
-            `File type ${file.type} is not allowed. Allowed types: ${allowedTypes.join(", ")}`
-        );
-    }
+  if (allowedTypes && !allowedTypes.includes(file.type)) {
+    throw new ValidationError(
+      `File type ${file.type} is not allowed. Allowed types: ${allowedTypes.join(", ")}`
+    );
+  }
 }

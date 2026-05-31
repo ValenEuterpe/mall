@@ -7,26 +7,26 @@ import { NextResponse } from "next/server";
 // ============================================================================
 
 export interface ApiSuccessResponse<T = unknown> {
-    success: true;
-    data: T;
-    message?: string;
-    meta?: PaginationMeta;
+  success: true;
+  data: T;
+  message?: string;
+  meta?: PaginationMeta;
 }
 
 export interface PaginationMeta {
-    page: number;
-    limit: number;
-    total: number;
-    totalPages: number;
-    hasMore: boolean;
-    hasPrevious: boolean;
-    [key: string]: unknown;
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+  hasMore: boolean;
+  hasPrevious: boolean;
+  [key: string]: unknown;
 }
 
 export interface ApiListResponse<T> {
-    success: true;
-    data: T[];
-    meta: PaginationMeta;
+  success: true;
+  data: T[];
+  meta: PaginationMeta;
 }
 
 // ============================================================================
@@ -36,9 +36,9 @@ export interface ApiListResponse<T> {
 export type ResponseHeaders = Record<string, string>;
 
 export interface SuccessResponseOptions {
-    message?: string;
-    status?: number;
-    headers?: ResponseHeaders;
+  message?: string;
+  status?: number;
+  headers?: ResponseHeaders;
 }
 
 /**
@@ -50,33 +50,33 @@ export interface SuccessResponseOptions {
  * - successResponse(data, status, headers) // legacy
  */
 export function successResponse<T>(
-    data: T,
-    options?: SuccessResponseOptions
+  data: T,
+  options?: SuccessResponseOptions
 ): NextResponse<ApiSuccessResponse<T>>;
 export function successResponse<T>(
-    data: T,
-    status?: number,
-    headers?: ResponseHeaders
+  data: T,
+  status?: number,
+  headers?: ResponseHeaders
 ): NextResponse<ApiSuccessResponse<T>>;
 export function successResponse<T>(
-    data: T,
-    arg2?: number | SuccessResponseOptions,
-    arg3?: ResponseHeaders
+  data: T,
+  arg2?: number | SuccessResponseOptions,
+  arg3?: ResponseHeaders
 ): NextResponse<ApiSuccessResponse<T>> {
-    const options: SuccessResponseOptions | undefined =
-        typeof arg2 === "number" ? { status: arg2, headers: arg3 } : arg2;
+  const options: SuccessResponseOptions | undefined =
+    typeof arg2 === "number" ? { status: arg2, headers: arg3 } : arg2;
 
-    return NextResponse.json(
-        {
-            success: true,
-            data,
-            ...(options?.message && { message: options.message }),
-        },
-        {
-            status: options?.status ?? 200,
-            headers: options?.headers,
-        }
-    );
+  return NextResponse.json(
+    {
+      success: true,
+      data,
+      ...(options?.message && { message: options.message }),
+    },
+    {
+      status: options?.status ?? 200,
+      headers: options?.headers,
+    }
+  );
 }
 
 /**
@@ -88,54 +88,54 @@ export function successResponse<T>(
  * - createdResponse(data, { message, headers })
  */
 export function createdResponse<T>(
-    data: T,
-    message?: string
+  data: T,
+  message?: string
 ): NextResponse<ApiSuccessResponse<T>>;
 export function createdResponse<T>(
-    data: T,
-    options?: { message?: string; headers?: ResponseHeaders }
+  data: T,
+  options?: { message?: string; headers?: ResponseHeaders }
 ): NextResponse<ApiSuccessResponse<T>>;
 export function createdResponse<T>(
-    data: T,
-    arg2?: string | { message?: string; headers?: ResponseHeaders }
+  data: T,
+  arg2?: string | { message?: string; headers?: ResponseHeaders }
 ): NextResponse<ApiSuccessResponse<T>> {
-    const options = typeof arg2 === "string" ? { message: arg2 } : arg2;
+  const options = typeof arg2 === "string" ? { message: arg2 } : arg2;
 
-    return NextResponse.json(
-        {
-            success: true,
-            data,
-            ...(options?.message && { message: options.message }),
-        },
-        {
-            status: 201,
-            headers: options?.headers,
-        }
-    );
+  return NextResponse.json(
+    {
+      success: true,
+      data,
+      ...(options?.message && { message: options.message }),
+    },
+    {
+      status: 201,
+      headers: options?.headers,
+    }
+  );
 }
 
 /**
  * No content response (204)
  */
 export function noContentResponse(): NextResponse {
-    return new NextResponse(null, { status: 204 });
+  return new NextResponse(null, { status: 204 });
 }
 
 /**
  * Accepted response (202) - for async operations
  */
 export function acceptedResponse<T>(
-    data: T,
-    message: string = "Request accepted for processing"
+  data: T,
+  message: string = "Request accepted for processing"
 ): NextResponse<ApiSuccessResponse<T>> {
-    return NextResponse.json(
-        {
-            success: true,
-            data,
-            message,
-        },
-        { status: 202 }
-    );
+  return NextResponse.json(
+    {
+      success: true,
+      data,
+      message,
+    },
+    { status: 202 }
+  );
 }
 
 // ============================================================================
@@ -146,49 +146,49 @@ export function acceptedResponse<T>(
  * Paginated success response
  */
 export function paginatedResponse<T>(
-    data: T[],
-    pagination: {
-        page: number;
-        limit: number;
-        total: number;
-    },
-    extraMeta?: Record<string, unknown>
+  data: T[],
+  pagination: {
+    page: number;
+    limit: number;
+    total: number;
+  },
+  extraMeta?: Record<string, unknown>
 ): NextResponse<ApiListResponse<T>> {
-    const { page, limit, total } = pagination;
-    const totalPages = Math.ceil(total / limit);
+  const { page, limit, total } = pagination;
+  const totalPages = Math.ceil(total / limit);
 
-    return NextResponse.json({
-        success: true,
-        data,
-        meta: {
-            page,
-            limit,
-            total,
-            totalPages,
-            hasMore: page < totalPages,
-            hasPrevious: page > 1,
-            ...extraMeta,
-        },
-    });
+  return NextResponse.json({
+    success: true,
+    data,
+    meta: {
+      page,
+      limit,
+      total,
+      totalPages,
+      hasMore: page < totalPages,
+      hasPrevious: page > 1,
+      ...extraMeta,
+    },
+  });
 }
 
 /**
  * Build pagination meta from params
  */
 export function buildPaginationMeta(
-    page: number,
-    limit: number,
-    total: number
+  page: number,
+  limit: number,
+  total: number
 ): PaginationMeta {
-    const totalPages = Math.ceil(total / limit);
-    return {
-        page,
-        limit,
-        total,
-        totalPages,
-        hasMore: page < totalPages,
-        hasPrevious: page > 1,
-    };
+  const totalPages = Math.ceil(total / limit);
+  return {
+    page,
+    limit,
+    total,
+    totalPages,
+    hasMore: page < totalPages,
+    hasPrevious: page > 1,
+  };
 }
 
 // ============================================================================
@@ -199,10 +199,10 @@ export function buildPaginationMeta(
  * Redirect response
  */
 export function redirectResponse(
-    url: string,
-    status: 301 | 302 | 303 | 307 | 308 = 302
+  url: string,
+  status: 301 | 302 | 303 | 307 | 308 = 302
 ): NextResponse {
-    return NextResponse.redirect(url, status);
+  return NextResponse.redirect(url, status);
 }
 
 // ============================================================================
@@ -213,40 +213,40 @@ export function redirectResponse(
  * Method not allowed response (405)
  */
 export function methodNotAllowed(allowedMethods: string[]): NextResponse {
-    return NextResponse.json(
-        {
-            success: false,
-            error: {
-                code: "METHOD_NOT_ALLOWED",
-                message: `Use ${allowedMethods.join(" or ")} method`,
-            },
-        },
-        {
-            status: 405,
-            headers: { Allow: allowedMethods.join(", ") },
-        }
-    );
+  return NextResponse.json(
+    {
+      success: false,
+      error: {
+        code: "METHOD_NOT_ALLOWED",
+        message: `Use ${allowedMethods.join(" or ")} method`,
+      },
+    },
+    {
+      status: 405,
+      headers: { Allow: allowedMethods.join(", ") },
+    }
+  );
 }
 
 /**
  * Health check response
  */
 export function healthResponse(
-    status: "healthy" | "degraded" | "unhealthy",
-    details?: Record<string, unknown>
+  status: "healthy" | "degraded" | "unhealthy",
+  details?: Record<string, unknown>
 ): NextResponse {
-    const statusCode =
-        status === "healthy" ? 200 : status === "degraded" ? 200 : 503;
+  const statusCode =
+    status === "healthy" ? 200 : status === "degraded" ? 200 : 503;
 
-    return NextResponse.json(
-        {
-            success: true,
-            data: {
-                status,
-                timestamp: new Date().toISOString(),
-                ...details,
-            },
-        },
-        { status: statusCode }
-    );
+  return NextResponse.json(
+    {
+      success: true,
+      data: {
+        status,
+        timestamp: new Date().toISOString(),
+        ...details,
+      },
+    },
+    { status: statusCode }
+  );
 }

@@ -13,4 +13,8 @@ export { LoginForm } from "./LoginForm";
 export type { LoginFormData, LoginFormProps, LoginFormRef } from "./LoginForm";
 
 export { SignupForm } from "./SignupForm";
-export type { SignupFormData, SignupFormProps, SignupFormRef } from "./SignupForm";
+export type {
+  SignupFormData,
+  SignupFormProps,
+  SignupFormRef,
+} from "./SignupForm";

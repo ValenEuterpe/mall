@@ -157,7 +157,7 @@ export function AddShopTypeDialog({
                     />
                     <button
                       type="button"
-                      className="bg-destructive text-destructive-foreground absolute -right-1 -top-1 flex h-4 w-4 items-center justify-center rounded-full"
+                      className="bg-destructive text-destructive-foreground absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full"
                       onClick={() => setIcon("")}
                     >
                       <X className="h-3 w-3" />
@@ -238,10 +238,7 @@ export function AddShopTypeDialog({
             >
               {commonT("cancel")}
             </Button>
-            <Button
-              type="submit"
-              disabled={submitting || !nameEn || !nameRu}
-            >
+            <Button type="submit" disabled={submitting || !nameEn || !nameRu}>
               {submitting ? "..." : t("addType")}
             </Button>
           </DialogFooter>

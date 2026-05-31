@@ -101,7 +101,10 @@ export function useLocalStorage<T>(
       }
 
       const parsed = deserializer(raw);
-      const { value, expiry } = unwrapStoredValue(parsed, initialValueRef.current);
+      const { value, expiry } = unwrapStoredValue(
+        parsed,
+        initialValueRef.current
+      );
 
       if (ttl && expiry && Date.now() > expiry) {
         window.localStorage.removeItem(key);
@@ -110,7 +113,10 @@ export function useLocalStorage<T>(
 
       return value;
     } catch (err) {
-      const e = err instanceof Error ? err : new Error("Failed to read from localStorage");
+      const e =
+        err instanceof Error
+          ? err
+          : new Error("Failed to read from localStorage");
       setError(e);
       onError?.(e);
       return initialValueRef.current;
@@ -129,7 +135,8 @@ export function useLocalStorage<T>(
       }
 
       try {
-        const nextValue = valueOrFn instanceof Function ? valueOrFn(storedValue) : valueOrFn;
+        const nextValue =
+          valueOrFn instanceof Function ? valueOrFn(storedValue) : valueOrFn;
 
         const toStore: StoredValue<T> = {
           value: nextValue,
@@ -147,7 +154,10 @@ export function useLocalStorage<T>(
           dispatchStorageEvent(key, serialized);
         }
       } catch (err) {
-        const e = err instanceof Error ? err : new Error("Failed to write to localStorage");
+        const e =
+          err instanceof Error
+            ? err
+            : new Error("Failed to write to localStorage");
         setError(e);
         onError?.(e);
       }
@@ -169,7 +179,10 @@ export function useLocalStorage<T>(
         dispatchStorageEvent(key, null);
       }
     } catch (err) {
-      const e = err instanceof Error ? err : new Error("Failed to remove from localStorage");
+      const e =
+        err instanceof Error
+          ? err
+          : new Error("Failed to remove from localStorage");
       setError(e);
       onError?.(e);
     }
@@ -217,7 +230,11 @@ export function useLocalStorage<T>(
 export function useLocalStorageToggle(
   key: string,
   defaultValue: boolean = false
-): [boolean, () => void, (value: boolean | ((prev: boolean) => boolean)) => void] {
+): [
+  boolean,
+  () => void,
+  (value: boolean | ((prev: boolean) => boolean)) => void,
+] {
   const { value, setValue } = useLocalStorage<boolean>(key, defaultValue);
 
   const toggle = useCallback(() => setValue((prev) => !prev), [setValue]);
@@ -236,21 +253,29 @@ export function useLocalStorageArray<T>(
   contains: (predicate: (item: T) => boolean) => boolean;
   toggle: (item: T, predicate?: (item: T) => boolean) => void;
 } {
-  const { value: items, setValue: setItems, removeValue } = useLocalStorage<T[]>(
-    key,
-    initialValue
+  const {
+    value: items,
+    setValue: setItems,
+    removeValue,
+  } = useLocalStorage<T[]>(key, initialValue);
+
+  const add = useCallback(
+    (item: T) => setItems((prev) => [...prev, item]),
+    [setItems]
   );
 
-  const add = useCallback((item: T) => setItems((prev) => [...prev, item]), [setItems]);
-
   const remove = useCallback(
-    (predicate: (item: T) => boolean) => setItems((prev) => prev.filter((i) => !predicate(i))),
+    (predicate: (item: T) => boolean) =>
+      setItems((prev) => prev.filter((i) => !predicate(i))),
     [setItems]
   );
 
   const clear = useCallback(() => removeValue(), [removeValue]);
 
-  const contains = useCallback((predicate: (item: T) => boolean) => items.some(predicate), [items]);
+  const contains = useCallback(
+    (predicate: (item: T) => boolean) => items.some(predicate),
+    [items]
+  );
 
   const toggle = useCallback(
     (item: T, predicate?: (i: T) => boolean) => {

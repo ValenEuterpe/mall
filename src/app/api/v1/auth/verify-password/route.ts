@@ -41,7 +41,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     } catch {
       await ensureMinResponseTime(startTime, MIN_WAIT);
       return NextResponse.json(
-        { success: false, error: { code: "VALIDATION_ERROR", message: "Invalid JSON" } },
+        {
+          success: false,
+          error: { code: "VALIDATION_ERROR", message: "Invalid JSON" },
+        },
         { status: 400 }
       );
     }
@@ -50,7 +53,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     if (!result.success) {
       await ensureMinResponseTime(startTime, MIN_WAIT);
       return NextResponse.json(
-        { success: false, error: { code: "VALIDATION_ERROR", message: "Password is required" } },
+        {
+          success: false,
+          error: { code: "VALIDATION_ERROR", message: "Password is required" },
+        },
         { status: 400 }
       );
     }
@@ -68,7 +74,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
     if (!mallOwner) {
       await ensureMinResponseTime(startTime, MIN_WAIT);
       return NextResponse.json(
-        { success: false, error: { code: "INVALID_PASSWORD", message: "Verification failed" } },
+        {
+          success: false,
+          error: { code: "INVALID_PASSWORD", message: "Verification failed" },
+        },
         { status: 401 }
       );
     }
@@ -81,7 +90,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
           success: false,
           error: {
             code: "ACCOUNT_LOCKED",
-            message: "Account has been locked due to too many failed attempts. Please try again later.",
+            message:
+              "Account has been locked due to too many failed attempts. Please try again later.",
           },
           retryAfter: lockStatus.retryAfterSeconds,
         },
@@ -92,7 +102,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
       );
     }
 
-    const isValid = await verifyPassword(result.data.password, mallOwner.password);
+    const isValid = await verifyPassword(
+      result.data.password,
+      mallOwner.password
+    );
 
     if (!isValid) {
       const { shouldLock } = await handleMallOwnerFailedAttempt(mallOwner);
@@ -104,7 +117,8 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
             success: false,
             error: {
               code: "ACCOUNT_LOCKED",
-              message: "Account has been locked due to too many failed attempts. Please try again later.",
+              message:
+                "Account has been locked due to too many failed attempts. Please try again later.",
             },
             retryAfter,
           },
@@ -115,7 +129,10 @@ export async function POST(request: NextRequest): Promise<NextResponse> {
         );
       }
       return NextResponse.json(
-        { success: false, error: { code: "INVALID_PASSWORD", message: "Incorrect password" } },
+        {
+          success: false,
+          error: { code: "INVALID_PASSWORD", message: "Incorrect password" },
+        },
         { status: 401 }
       );
     }

@@ -72,9 +72,7 @@ export function UploadSvgDialog({
       <DialogContent className="max-w-lg">
         <DialogHeader>
           <DialogTitle>{t("title")}</DialogTitle>
-          <DialogDescription>
-            {t("description")}
-          </DialogDescription>
+          <DialogDescription>{t("description")}</DialogDescription>
         </DialogHeader>
 
         <div className="space-y-4">
@@ -82,14 +80,14 @@ export function UploadSvgDialog({
             <div>
               <Label>{t("floorLabel")}</Label>
               {existingFloors.length === 0 ? (
-                <p className="text-sm text-muted-foreground mt-1">
+                <p className="text-muted-foreground mt-1 text-sm">
                   {t("noFloors")}
                 </p>
               ) : (
                 <Select
                   value={selectedFloor?.id ?? ""}
                   onValueChange={(v) => {
-                    const floor = existingFloors.find(f => f.id === v);
+                    const floor = existingFloors.find((f) => f.id === v);
                     onFloorChange(floor || null);
                   }}
                 >
@@ -122,9 +120,9 @@ export function UploadSvgDialog({
           </div>
 
           {svgFile && (
-            <div className="p-3 bg-muted rounded-lg">
+            <div className="bg-muted rounded-lg p-3">
               <p className="text-sm font-medium">{svgFile.name}</p>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-muted-foreground text-xs">
                 {(svgFile.size / 1024).toFixed(1)} KB
               </p>
             </div>
@@ -133,10 +131,14 @@ export function UploadSvgDialog({
           {parsedShopIds.length > 0 && (
             <div className="space-y-2">
               <Label>{t("foundShops", { count: parsedShopIds.length })}</Label>
-              <div className="max-h-40 overflow-y-auto p-2 border rounded-lg">
+              <div className="max-h-40 overflow-y-auto rounded-lg border p-2">
                 <div className="flex flex-wrap gap-1">
                   {parsedShopIds.slice(0, 50).map((shop) => (
-                    <Badge key={shop.id} variant="secondary" className="text-xs">
+                    <Badge
+                      key={shop.id}
+                      variant="secondary"
+                      className="text-xs"
+                    >
                       {shop.id}
                     </Badge>
                   ))}
@@ -152,12 +154,18 @@ export function UploadSvgDialog({
         </div>
 
         <DialogFooter>
-          <Button type="button" variant="outline" onClick={() => onOpenChange(false)}>
+          <Button
+            type="button"
+            variant="outline"
+            onClick={() => onOpenChange(false)}
+          >
             {commonT("cancel")}
           </Button>
           <Button
             onClick={onUpload}
-            disabled={!svgFile || uploading || (isBuilding && selectedFloor === null)}
+            disabled={
+              !svgFile || uploading || (isBuilding && selectedFloor === null)
+            }
           >
             {uploading ? t("uploading") : t("uploadBtn")}
           </Button>

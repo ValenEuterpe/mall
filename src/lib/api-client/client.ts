@@ -91,51 +91,51 @@ const tokenRefreshManager = new TokenRefreshManager();
  * x-csrf-token header on unsafe methods.
  */
 class CsrfTokenManager {
-    private token: string | null = null;
-    private fetching: Promise<string | null> | null = null;
+  private token: string | null = null;
+  private fetching: Promise<string | null> | null = null;
 
-    setToken(token: string | null): void {
-        this.token = token;
-    }
+  setToken(token: string | null): void {
+    this.token = token;
+  }
 
-    getToken(): string | null {
+  getToken(): string | null {
+    return this.token;
+  }
+
+  /**
+   * Fetch a CSRF token from the server. Coalesces concurrent requests.
+   */
+  async fetchToken(): Promise<string | null> {
+    if (this.token) return this.token;
+    if (this.fetching) return this.fetching;
+
+    this.fetching = (async () => {
+      try {
+        const response = await fetch("/api/v1/csrf", {
+          method: "GET",
+          credentials: "include",
+        });
+        if (!response.ok) return null;
+        const body = (await response.json()) as
+          | { success: true; data: { csrfToken: string } }
+          | { success: false };
+        if (!("success" in body) || !body.success) return null;
+        this.token = body.data.csrfToken;
         return this.token;
-    }
-
-    /**
-     * Fetch a CSRF token from the server. Coalesces concurrent requests.
-     */
-    async fetchToken(): Promise<string | null> {
-        if (this.token) return this.token;
-        if (this.fetching) return this.fetching;
-
-        this.fetching = (async () => {
-            try {
-                const response = await fetch("/api/v1/csrf", {
-                    method: "GET",
-                    credentials: "include",
-                });
-                if (!response.ok) return null;
-                const body = (await response.json()) as
-                    | { success: true; data: { csrfToken: string } }
-                    | { success: false };
-                if (!("success" in body) || !body.success) return null;
-                this.token = body.data.csrfToken;
-                return this.token;
-            } catch {
-                return null;
-            } finally {
-                this.fetching = null;
-            }
-        })();
-
-        return this.fetching;
-    }
-
-    clear(): void {
-        this.token = null;
+      } catch {
+        return null;
+      } finally {
         this.fetching = null;
-    }
+      }
+    })();
+
+    return this.fetching;
+  }
+
+  clear(): void {
+    this.token = null;
+    this.fetching = null;
+  }
 }
 
 const csrfTokenManager = new CsrfTokenManager();
@@ -646,7 +646,7 @@ export class ApiClient {
 
     // POST is unsafe — attach CSRF unless explicitly skipped.
     const csrfToken = !skipCsrf
-      ? csrfTokenManager.getToken() ?? (await csrfTokenManager.fetchToken())
+      ? (csrfTokenManager.getToken() ?? (await csrfTokenManager.fetchToken()))
       : null;
 
     const retryAfterCsrfRefresh = async (): Promise<ApiResponse<T>> => {

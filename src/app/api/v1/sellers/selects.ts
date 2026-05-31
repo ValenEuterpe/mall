@@ -6,80 +6,80 @@ import { Prisma } from "@/prisma/generated/client";
  * "Registration" in this codebase is inferred by whether `password` is set.
  */
 export const SELLER_LIST_SELECT = {
-    id: true,
-    email: true,
-    password: true,
+  id: true,
+  email: true,
+  password: true,
 
-    businessName: true,
-    contactPerson: true,
-    phone: true,
-    description: true,
-    logoUrl: true,
-    socialLinks: true,
+  businessName: true,
+  contactPerson: true,
+  phone: true,
+  description: true,
+  logoUrl: true,
+  socialLinks: true,
 
-    isVerified: true,
-    isActive: true,
-    invitedAt: true,
-    lastLoginAt: true,
+  isVerified: true,
+  isActive: true,
+  invitedAt: true,
+  lastLoginAt: true,
 
-    shops: {
-        where: { isActive: true },
+  shops: {
+    where: { isActive: true },
+    select: {
+      id: true,
+      fullCode: true,
+      shopName: true,
+      floor: true,
+      building: true,
+      venue: true,
+      _count: {
         select: {
-            id: true,
-            fullCode: true,
-            shopName: true,
-            floor: true,
-            building: true,
-            venue: true,
-            _count: {
-                select: {
-                    products: true,
-                },
-            },
+          products: true,
         },
+      },
     },
-    _count: {
-        select: {
-            shops: true,
-        },
+  },
+  _count: {
+    select: {
+      shops: true,
     },
+  },
 } satisfies Prisma.SellerSelect;
 
 export const SELLER_DETAIL_SELECT = {
-    id: true,
-    email: true,
-    password: true,
+  id: true,
+  email: true,
+  password: true,
 
-    businessName: true,
-    contactPerson: true,
-    phone: true,
-    description: true,
-    logoUrl: true,
-    socialLinks: true,
+  businessName: true,
+  contactPerson: true,
+  phone: true,
+  description: true,
+  logoUrl: true,
+  socialLinks: true,
 
-    isVerified: true,
-    isActive: true,
-    invitedAt: true,
-    lastLoginAt: true,
+  isVerified: true,
+  isActive: true,
+  invitedAt: true,
+  lastLoginAt: true,
 
-    createdAt: true,
-    updatedAt: true,
+  createdAt: true,
+  updatedAt: true,
 
-    shops: {
+  shops: {
+    select: {
+      id: true,
+      fullCode: true,
+      shopName: true,
+      floor: true,
+      building: true,
+      venue: true,
+      isActive: true,
+      contacts: true,
+      _count: {
         select: {
-            id: true,
-            fullCode: true,
-            shopName: true,
-            floor: true,
-            building: true,
-            venue: true,
-            isActive: true,
-            contacts: true,
-            _count: {
-                select: {
-                    products: true,
-                },
-            },
+          products: true,
         },
+      },
     },
+  },
 } satisfies Prisma.SellerSelect;

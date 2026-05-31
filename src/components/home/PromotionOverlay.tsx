@@ -52,8 +52,7 @@ export const PromotionOverlay = memo(function PromotionOverlay({
   if (!promotion || !position) return null;
 
   const thumbnail = promotion.images[0];
-  const hasDiscount =
-    promotion.hasDiscount && promotion.effectivePrice != null;
+  const hasDiscount = promotion.hasDiscount && promotion.effectivePrice != null;
 
   return (
     <div className="pointer-events-none fixed inset-0 z-[35]">
@@ -147,8 +146,8 @@ export const PromotionOverlay = memo(function PromotionOverlay({
             </div>
 
             {/* Info */}
-            <div className="min-w-0 max-w-[120px]">
-              <p className="line-clamp-1 text-xs font-medium leading-tight">
+            <div className="max-w-[120px] min-w-0">
+              <p className="line-clamp-1 text-xs leading-tight font-medium">
                 {promotion.name}
               </p>
 

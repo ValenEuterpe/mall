@@ -32,23 +32,25 @@ export default function Error({ error, reset }: ErrorProps) {
     <div className="flex min-h-[60vh] items-center justify-center p-4">
       <Card className="w-full max-w-md">
         <CardHeader className="space-y-2 text-center">
-          <div className="mx-auto flex h-12 w-12 items-center justify-center rounded-full bg-destructive/10">
-            <AlertTriangle className="h-6 w-6 text-destructive" />
+          <div className="bg-destructive/10 mx-auto flex h-12 w-12 items-center justify-center rounded-full">
+            <AlertTriangle className="text-destructive h-6 w-6" />
           </div>
           <CardTitle>Page Error</CardTitle>
-          <CardDescription>Something went wrong loading this page.</CardDescription>
+          <CardDescription>
+            Something went wrong loading this page.
+          </CardDescription>
         </CardHeader>
 
         <CardContent>
           {error.digest && (
-            <p className="mb-4 text-center text-xs text-muted-foreground">
+            <p className="text-muted-foreground mb-4 text-center text-xs">
               Error ID: {error.digest}
             </p>
           )}
 
           {process.env.NODE_ENV === "development" && (
-            <div className="rounded-md bg-muted p-3">
-              <pre className="max-h-24 overflow-auto text-xs text-destructive">
+            <div className="bg-muted rounded-md p-3">
+              <pre className="text-destructive max-h-24 overflow-auto text-xs">
                 {error.message}
               </pre>
             </div>
@@ -61,12 +63,20 @@ export default function Error({ error, reset }: ErrorProps) {
               <RefreshCw className="mr-2 h-4 w-4" />
               Try Again
             </Button>
-            <Button variant="outline" onClick={() => router.back()} className="flex-1">
+            <Button
+              variant="outline"
+              onClick={() => router.back()}
+              className="flex-1"
+            >
               <ArrowLeft className="mr-2 h-4 w-4" />
               Go Back
             </Button>
           </div>
-          <Button variant="ghost" onClick={() => router.push("/")} className="w-full">
+          <Button
+            variant="ghost"
+            onClick={() => router.push("/")}
+            className="w-full"
+          >
             <Home className="mr-2 h-4 w-4" />
             Return Home
           </Button>
