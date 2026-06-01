@@ -4,6 +4,14 @@ import prisma from "@/lib/db/prisma";
 import { parseLocale, type SupportedLocale } from "@/lib/i18n/locale";
 import { logger } from "@/lib/utils/logger";
 
+/**
+ * Legacy suggestions endpoint.
+ *
+ * The dropdown now calls `/api/v1/products?limit=8` directly so the dropdown
+ * results stay in lockstep with the full-search results page. This endpoint is
+ * kept for any external callers that still hit it; new callers should use the
+ * main products list endpoint.
+ */
 export async function GET(request: NextRequest) {
   optionalAuth(request);
 

@@ -12,16 +12,25 @@ import {
 } from "@/components/ui/command";
 import { Skeleton } from "@/components/ui/skeleton";
 
+// Subset of the /api/v1/products response shape we actually render. The
+// endpoint returns much more (price, stock, shop, category, etc.) but the
+// dropdown only needs id, name, and the first image.
 type SuggestionProduct = {
   id: string;
   name: string;
   image: string | null;
-  categoryId: string;
 };
 
-interface SuggestionsData {
-  products: SuggestionProduct[];
-}
+// Raw shape from /api/v1/products list-handler.
+type ProductsApiItem = {
+  id: string;
+  name: string;
+  images?: string[] | null;
+};
+
+type ProductsApiResponse =
+  | { success: true; data: ProductsApiItem[] }
+  | { success: false; error: { message: string } };
 
 interface Props {
   query: string;
@@ -37,6 +46,8 @@ export interface SearchSuggestionsDropdownHandle {
   reset: () => void;
 }
 
+const DROPDOWN_LIMIT = 8;
+
 const SearchSuggestionsDropdownContent = React.forwardRef<
   SearchSuggestionsDropdownHandle,
   Props
@@ -44,60 +55,14 @@ const SearchSuggestionsDropdownContent = React.forwardRef<
   const t = useTranslations("search");
   const locale = useLocale();
   const debouncedQuery = useDebounce(query, 200);
-  const [data, setData] = React.useState<SuggestionsData>({ products: [] });
+  const [products, setProducts] = React.useState<SuggestionProduct[]>([]);
   const [loading, setLoading] = React.useState(false);
-  const [categories, setCategories] = React.useState<Record<string, string>>(
-    {}
-  );
   const [activeIndex, setActiveIndex] = React.useState<number | null>(null);
   const abortRef = React.useRef<AbortController | null>(null);
 
-  // Compute flat list of products for navigation
-  const flatProducts = React.useMemo(() => {
-    const flat: SuggestionProduct[] = [];
-    data.products.forEach((p) => {
-      flat.push(p);
-    });
-    return flat;
-  }, [data.products]);
-
-  // Fetch categories on mount for grouping
-  React.useEffect(() => {
-    const fetchCategories = async () => {
-      try {
-        const res = await fetch(`/api/v1/categories`);
-        const json = await res.json();
-        if (json?.data && Array.isArray(json.data)) {
-          const categoryMap: Record<string, string> = {};
-          json.data.forEach(
-            (cat: {
-              id: string;
-              name_en: string;
-              name_ru: string;
-              name_am?: string;
-            }) => {
-              const nameCol =
-                locale === "en"
-                  ? "name_en"
-                  : locale === "ru"
-                    ? "name_ru"
-                    : "name_am";
-              categoryMap[cat.id] =
-                cat[nameCol as keyof typeof cat] || cat.name_en;
-            }
-          );
-          setCategories(categoryMap);
-        }
-      } catch (err) {
-        console.error("Failed to fetch categories", err);
-      }
-    };
-    fetchCategories();
-  }, [locale]);
-
   React.useEffect(() => {
     if (!open || debouncedQuery.length < 2) {
-      setData({ products: [] });
+      setProducts([]);
       setActiveIndex(null);
       return;
     }
@@ -109,20 +74,37 @@ const SearchSuggestionsDropdownContent = React.forwardRef<
     setLoading(true);
     setActiveIndex(null);
 
-    fetch(
-      `/api/v1/products/suggestions?q=${encodeURIComponent(debouncedQuery)}&locale=${locale}`,
-      { signal: controller.signal }
-    )
-      .then((res) => res.json())
+    // Call the same endpoint as the full search-results page so what the
+    // dropdown shows is always a true preview of what pressing Enter brings
+    // up. Limit to 8 to keep the dropdown short.
+    const params = new URLSearchParams({
+      q: debouncedQuery,
+      locale,
+      limit: String(DROPDOWN_LIMIT),
+      page: "1",
+    });
+
+    fetch(`/api/v1/products?${params.toString()}`, {
+      signal: controller.signal,
+    })
+      .then((res) => res.json() as Promise<ProductsApiResponse>)
       .then((json) => {
-        if (json?.data) {
-          setData(json.data);
-          setActiveIndex(null);
+        if (!json || !("success" in json) || !json.success) {
+          setProducts([]);
+          return;
         }
+        const mapped: SuggestionProduct[] = json.data.map((p) => ({
+          id: p.id,
+          name: p.name,
+          image:
+            Array.isArray(p.images) && p.images.length > 0 ? p.images[0] : null,
+        }));
+        setProducts(mapped);
+        setActiveIndex(null);
       })
       .catch((err) => {
         if (err.name !== "AbortError") {
-          setData({ products: [] });
+          setProducts([]);
         }
       })
       .finally(() => setLoading(false));
@@ -138,21 +120,21 @@ const SearchSuggestionsDropdownContent = React.forwardRef<
     () => ({
       moveDown() {
         setActiveIndex((prev) => {
-          if (flatProducts.length === 0) return null;
+          if (products.length === 0) return null;
           if (prev === null) return 0;
-          return (prev + 1) % flatProducts.length;
+          return (prev + 1) % products.length;
         });
       },
       moveUp() {
         setActiveIndex((prev) => {
-          if (flatProducts.length === 0) return null;
-          if (prev === null) return flatProducts.length - 1;
-          return prev === 0 ? flatProducts.length - 1 : prev - 1;
+          if (products.length === 0) return null;
+          if (prev === null) return products.length - 1;
+          return prev === 0 ? products.length - 1 : prev - 1;
         });
       },
       selectActive() {
-        if (activeIndex !== null && activeIndex < flatProducts.length) {
-          const product = flatProducts[activeIndex];
+        if (activeIndex !== null && activeIndex < products.length) {
+          const product = products[activeIndex];
           onSelect("product", product.id, product.name);
           return true;
         }
@@ -162,26 +144,18 @@ const SearchSuggestionsDropdownContent = React.forwardRef<
         setActiveIndex(null);
       },
     }),
-    [activeIndex, flatProducts, onSelect]
+    [activeIndex, products, onSelect]
   );
 
-  // Group products by category, filtering out products without a categoryId
-  const groupedProducts = React.useMemo(() => {
-    const groups: Record<string, SuggestionProduct[]> = {};
-    data.products.forEach((p) => {
-      if (!p.categoryId) return;
-      if (!groups[p.categoryId]) {
-        groups[p.categoryId] = [];
-      }
-      groups[p.categoryId].push(p);
-    });
-    return groups;
-  }, [data.products]);
+  // With only 8 results max, grouping by category creates more noise than
+  // signal and risks rendering a misleading heading when the API doesn't
+  // return a category for a product. Show one flat "Products" group instead.
+  const productsHeading = t("products");
 
-  const hasResults = data.products.length > 0;
+  const hasResults = products.length > 0;
   const selectedValue =
-    activeIndex !== null && activeIndex < flatProducts.length
-      ? `product-${flatProducts[activeIndex].id}`
+    activeIndex !== null && activeIndex < products.length
+      ? `product-${products[activeIndex].id}`
       : "__none__";
 
   if (!open) return null;
@@ -200,34 +174,29 @@ const SearchSuggestionsDropdownContent = React.forwardRef<
           {!loading && !hasResults && (
             <CommandEmpty>{t("noSuggestions")}</CommandEmpty>
           )}
-          {!loading &&
-            hasResults &&
-            Object.entries(groupedProducts).map(([categoryId, products]) => (
-              <CommandGroup
-                key={categoryId}
-                heading={categories[categoryId] || "Products"}
-              >
-                {products.map((p) => (
-                  <CommandItem
-                    key={p.id}
-                    value={`product-${p.id}`}
-                    onMouseDown={(e) => e.preventDefault()}
-                    onSelect={() => onSelect("product", p.id, p.name)}
-                  >
-                    {p.image ? (
-                      <img
-                        src={p.image}
-                        alt={p.name}
-                        className="mr-3 h-8 w-8 shrink-0 rounded object-cover"
-                      />
-                    ) : (
-                      <div className="bg-muted mr-3 h-8 w-8 shrink-0 rounded" />
-                    )}
-                    <span className="truncate">{p.name}</span>
-                  </CommandItem>
-                ))}
-              </CommandGroup>
-            ))}
+          {!loading && hasResults && (
+            <CommandGroup heading={productsHeading}>
+              {products.map((p) => (
+                <CommandItem
+                  key={p.id}
+                  value={`product-${p.id}`}
+                  onMouseDown={(e) => e.preventDefault()}
+                  onSelect={() => onSelect("product", p.id, p.name)}
+                >
+                  {p.image ? (
+                    <img
+                      src={p.image}
+                      alt={p.name}
+                      className="mr-3 h-8 w-8 shrink-0 rounded object-cover"
+                    />
+                  ) : (
+                    <div className="bg-muted mr-3 h-8 w-8 shrink-0 rounded" />
+                  )}
+                  <span className="truncate">{p.name}</span>
+                </CommandItem>
+              ))}
+            </CommandGroup>
+          )}
         </CommandList>
       </Command>
     </div>
