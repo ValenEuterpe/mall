@@ -63,10 +63,24 @@ export function UnifiedPageClient(): React.ReactElement {
     handleResetFilters,
   } = useProductSearch({ initialQuery: urlQuery });
 
-  // Sync URL query changes to the hook
+  // Sync URL query changes to the hook. A new search via the header is the
+  // user's signal that they want a fresh search — so we also reset filter
+  // state (category, tags, price range). Without this, a previously selected
+  // category persists and silently restricts the new search, producing the
+  // surprising "dropdown shows results but results page is empty" symptom.
   useEffect(() => {
     setSearchQuery(urlQuery);
-  }, [urlQuery, setSearchQuery]);
+    setSelectedCategory("all");
+    setSelectedTagIds([]);
+    setPriceRange([0, maxPrice]);
+  }, [
+    urlQuery,
+    setSearchQuery,
+    setSelectedCategory,
+    setSelectedTagIds,
+    setPriceRange,
+    maxPrice,
+  ]);
 
   // Map data (multi-building)
   const {
@@ -159,7 +173,11 @@ export function UnifiedPageClient(): React.ReactElement {
   const handleCategoryClick = useCallback(
     (categoryId: string) => {
       setSelectedCategory(categoryId);
-      router.push("/?q= ");
+      // Clicking a category is a "browse" action — drop any active search so
+      // the user sees the full category contents, not the intersection of
+      // category × previous query. Push `/` (no `?q=`) so isSearchActive
+      // flips to false and the page renders the browse UI.
+      router.push("/");
     },
     [setSelectedCategory, router]
   );

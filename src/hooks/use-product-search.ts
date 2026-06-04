@@ -280,12 +280,14 @@ export function useProductSearch(
     }
   }, [productsLoading, hasMore]);
 
-  // Reset all
+  // Reset filters only — preserve the search query. The button is labelled
+  // "Reset filters", not "Clear search", so clearing the query out from under
+  // the user would be surprising (and also desyncs from the URL `?q=` which
+  // the page reads). To clear the search itself, navigate to `/`.
   const handleResetFilters = useCallback(() => {
     setSelectedCategory("all");
     setSelectedTagIds([]);
     setPriceRange([0, maxPrice]);
-    setSearchQuery("");
     setPage(1);
   }, [maxPrice]);
 
