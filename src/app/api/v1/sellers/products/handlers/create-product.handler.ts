@@ -9,7 +9,7 @@ import { ProductStatus } from "@/prisma/generated/client";
 import { logger } from "@/lib/utils/logger";
 import { translateBatch, isTranslationAvailable } from "@/lib/translation";
 import { generateSearchMetadata } from "@/lib/search/ai-metadata";
-import { buildSearchTokens } from "@/lib/search/tokens";
+import { buildSearchIndex } from "@/lib/search/tokens";
 
 import { getSellerShop } from "../queries/get-seller-shop";
 import { checkForDuplicateSkuOrBarcode } from "../queries/product-duplicate-check";
@@ -292,7 +292,7 @@ export async function createProductHandler(
           keywords: aiKeywords,
           productType: aiProductType,
           brand: productData.brand || aiBrand,
-          searchTokens: buildSearchTokens({
+          ...buildSearchIndex({
             name_en: multilingualFields.name_en,
             name_ru: multilingualFields.name_ru,
             name_am: multilingualFields.name_am,

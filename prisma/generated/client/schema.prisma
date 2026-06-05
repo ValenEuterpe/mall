@@ -283,6 +283,8 @@ model Product {
 
   // Precomputed lowercased + transliterated tokens for pg_trgm / array overlap search
   searchTokens String[] @default([])
+  // Denormalized join of searchTokens for GIN-trgm prefix/fuzzy match without per-row unnest
+  searchText   String?
 
   // Media (max 5 images)
   images String[]

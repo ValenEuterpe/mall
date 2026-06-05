@@ -66,9 +66,14 @@ export function transformProductForList(
       ? {
           id: product.category.id,
           key: product.category.key,
+          // All three locales are returned so consumers can pick the right
+          // one (or fall back) without a second API call. Previously `am`
+          // was omitted, which forced Armenian-locale callers to fall back
+          // to English silently.
           name: {
             en: product.category.name_en,
             ru: product.category.name_ru,
+            am: product.category.name_am ?? null,
           },
         }
       : null,
@@ -79,6 +84,7 @@ export function transformProductForList(
           name: {
             en: product.subcategory.name_en,
             ru: product.subcategory.name_ru,
+            am: product.subcategory.name_am ?? null,
           },
         }
       : null,

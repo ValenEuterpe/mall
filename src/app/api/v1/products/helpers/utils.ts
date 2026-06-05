@@ -1,12 +1,7 @@
 import { logger } from "@/lib/utils/logger";
 import prisma from "@/lib/db/prisma";
 
-export function isValidId(id: string): boolean {
-  if (!id || typeof id !== "string") {
-    return false;
-  }
-  return /^[a-zA-Z0-9_-]{20,36}$/.test(id);
-}
+export { isValidId, isValidProductId } from "./ids";
 
 export async function logProductSearch(
   query: string,
@@ -22,13 +17,6 @@ export async function logProductSearch(
       userId,
     });
   }
-}
-
-export function isValidProductId(id: string): boolean {
-  if (!id || typeof id !== "string") {
-    return false;
-  }
-  return /^[a-zA-Z0-9_-]{20,36}$/.test(id);
 }
 
 export async function incrementViewCount(productId: string): Promise<void> {

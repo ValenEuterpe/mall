@@ -49,6 +49,7 @@ export function getProductListSelect() {
         key: true,
         name_en: true,
         name_ru: true,
+        name_am: true,
       },
     },
     subcategory: {
@@ -57,6 +58,7 @@ export function getProductListSelect() {
         key: true,
         name_en: true,
         name_ru: true,
+        name_am: true,
       },
     },
     productTags: {
@@ -144,6 +146,7 @@ export function getProductDetailSelect() {
         key: true,
         name_en: true,
         name_ru: true,
+        name_am: true,
       },
     },
     subcategory: {
@@ -152,6 +155,7 @@ export function getProductDetailSelect() {
         key: true,
         name_en: true,
         name_ru: true,
+        name_am: true,
       },
     },
     productTags: {

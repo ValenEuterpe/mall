@@ -27,6 +27,10 @@ export async function GET(request: NextRequest) {
   }
 
   const tokenizedQ = q.split(/\s+/).filter((w) => w.length >= 2);
+  const useTrigram = q.length >= 4;
+  const prefix = `${q}%`;
+  const prefixPh = useTrigram ? "$3" : "$2";
+  const qPh = useTrigram ? "$2" : null;
 
   const localeNameCol: Record<SupportedLocale, string> = {
     en: "name_en",
@@ -47,27 +51,21 @@ export async function GET(request: NextRequest) {
                WHERE p.status = 'PUBLISHED' AND p."isActive" = true
                  AND (
                    p."searchTokens" && $1::text[]
-                   OR p.name_en ILIKE $3
-                   OR p.name_ru ILIKE $3
-                   OR p.name_am ILIKE $3
-                   OR EXISTS (SELECT 1 FROM unnest(p."searchTokens") AS token WHERE token ILIKE $3)
-                   OR p.name_en % $2
-                   OR p.name_ru % $2
-                   OR p.name_am % $2
+                   OR p.name_en ILIKE ${prefixPh}
+                   OR p.name_ru ILIKE ${prefixPh}
+                   OR p.name_am ILIKE ${prefixPh}
+                   OR p."searchText" ILIKE ${prefixPh}
+                   ${qPh ? `OR p.name_en % ${qPh} OR p.name_ru % ${qPh} OR p.name_am % ${qPh} OR p."searchText" % ${qPh}` : ""}
                  )
                ORDER BY GREATEST(
-                   CASE WHEN EXISTS (SELECT 1 FROM unnest(p."searchTokens") AS token WHERE token ILIKE $3) THEN 2 ELSE 0 END,
-                   CASE WHEN p.name_en ILIKE $3 THEN 2 ELSE 0 END,
-                   CASE WHEN p.name_ru ILIKE $3 THEN 2 ELSE 0 END,
-                   CASE WHEN p.name_am ILIKE $3 THEN 2 ELSE 0 END,
-                   similarity(p.name_en, $2),
-                   similarity(p.name_ru, $2),
-                   similarity(p.name_am, $2)
+                   CASE WHEN p."searchText" ILIKE ${prefixPh} THEN 2 ELSE 0 END,
+                   CASE WHEN p.name_en ILIKE ${prefixPh} THEN 2 ELSE 0 END,
+                   CASE WHEN p.name_ru ILIKE ${prefixPh} THEN 2 ELSE 0 END,
+                   CASE WHEN p.name_am ILIKE ${prefixPh} THEN 2 ELSE 0 END
+                   ${qPh ? `, similarity(p.name_en, ${qPh}), similarity(p.name_ru, ${qPh}), similarity(p.name_am, ${qPh}), similarity(COALESCE(p."searchText", ''), ${qPh})` : ""}
                ) DESC NULLS LAST
                LIMIT 8`,
-      tokenizedQ,
-      q,
-      `${q}%`
+      ...(useTrigram ? [tokenizedQ, q, prefix] : [tokenizedQ, prefix])
     );
 
     const response = NextResponse.json({

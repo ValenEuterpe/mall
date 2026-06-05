@@ -1,5 +1,6 @@
 import prisma from "@/lib/db/prisma";
 import { Prisma } from "@/prisma/generated/client";
+import { buildSearchIndex } from "@/lib/search/tokens";
 import { ImportError, ProcessedProduct } from "../types";
 
 export async function processBatch(
@@ -61,18 +62,26 @@ export async function processBatch(
         });
       }
 
+      const searchIndex = buildSearchIndex({
+        name_en: product.name,
+        brand: product.brand,
+        sku: product.sku,
+      });
+
       if (existingProduct) {
         if (updateExisting) {
           await prisma.product.update({
             where: { id: existingProduct.id },
             data: {
               name: product.name,
+              name_en: product.name,
               description: product.description,
               basePrice: product.basePrice,
               stockQuantity: product.stockQuantity,
               brand: product.brand,
               status: product.status,
               lastUpdated: new Date(),
+              ...searchIndex,
             },
           });
           result.updated++;
@@ -90,6 +99,7 @@ export async function processBatch(
         const productData: Prisma.ProductCreateInput = {
           shop: { connect: { id: shopId } },
           name: product.name,
+          name_en: product.name,
           description: product.description,
           basePrice: product.basePrice,
           stockQuantity: product.stockQuantity,
@@ -97,6 +107,7 @@ export async function processBatch(
           barcode: product.barcode,
           sku: product.sku,
           status: product.status,
+          ...searchIndex,
           ...(product.categoryKey && {
             category: { connect: { id: product.categoryKey } },
           }),

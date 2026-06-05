@@ -3,7 +3,7 @@ import { PrismaClient } from "./generated/client";
 import pg from "pg";
 import path from "path";
 import { PrismaPg } from "@prisma/adapter-pg";
-import { buildSearchTokens } from "../src/lib/search/tokens";
+import { buildSearchIndex } from "../src/lib/search/tokens";
 
 config({ path: path.join(process.cwd(), ".env.local") });
 
@@ -39,10 +39,10 @@ async function main() {
 
   let updated = 0;
   for (const product of products) {
-    const searchTokens = buildSearchTokens(product);
+    const { searchTokens, searchText } = buildSearchIndex(product);
     await prisma.product.update({
       where: { id: product.id },
-      data: { searchTokens },
+      data: { searchTokens, searchText },
     });
     updated++;
     if (updated % 10 === 0) {

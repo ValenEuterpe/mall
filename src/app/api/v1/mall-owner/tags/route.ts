@@ -4,7 +4,7 @@ import { withAdminMiddleware } from "@/lib/api/middleware";
 import { successResponse, createdResponse } from "@/lib/api/response";
 import prisma from "@/lib/db/prisma";
 import { tagCreateSchema } from "@/lib/validation/schemas/tag";
-import { buildTransliterations } from "@/lib/search/transliterate";
+import { computeTagTransliteration } from "@/lib/search/refresh-tag-transliteration";
 
 function slugFrom(text: string): string {
   return transliterate(text)
@@ -122,11 +122,10 @@ async function createTagHandler(req: NextRequest) {
     );
   }
 
-  const transliterationText =
-    buildTransliterations([
-      validated.name_ru,
-      validated.name_am ?? undefined,
-    ]).join(" ") || null;
+  const transliterationText = computeTagTransliteration({
+    name_ru: validated.name_ru,
+    name_am: validated.name_am ?? null,
+  });
 
   const tag = await prisma.tag.create({
     data: {

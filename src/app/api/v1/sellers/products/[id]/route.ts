@@ -5,7 +5,7 @@ import prisma from "@/lib/db/prisma";
 import { Prisma } from "@/prisma/generated/client";
 import { isTranslationAvailable } from "@/lib/translation";
 import { generateSearchMetadata } from "@/lib/search/ai-metadata";
-import { buildSearchTokens } from "@/lib/search/tokens";
+import { buildSearchIndex } from "@/lib/search/tokens";
 import { logger } from "@/lib/utils/logger";
 
 import { withMiddleware } from "@/lib/api/middleware";
@@ -257,7 +257,7 @@ async function putHandler(
   await prisma.product.update({
     where: { id },
     data: {
-      searchTokens: buildSearchTokens({
+      ...buildSearchIndex({
         name_en: fullUpdated.name_en,
         name_ru: fullUpdated.name_ru,
         name_am: fullUpdated.name_am,

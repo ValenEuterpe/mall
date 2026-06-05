@@ -1,6 +1,6 @@
 import { Prisma } from "@/prisma/generated/client";
 import { buildPriceRangeFilter } from "@/lib/utils/search";
-import { isValidId } from "./utils";
+import { isValidId } from "./ids";
 
 interface ProductFilters {
   categoryId?: string;

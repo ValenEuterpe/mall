@@ -40,3 +40,16 @@ export function buildSearchTokens(product: {
 
   return [...out];
 }
+
+/** Space-joined tokens for indexed prefix/trigram search (avoids per-row unnest). */
+export function buildSearchText(tokens: string[]): string {
+  return tokens.join(" ");
+}
+
+export function buildSearchIndex(product: Parameters<typeof buildSearchTokens>[0]): {
+  searchTokens: string[];
+  searchText: string;
+} {
+  const searchTokens = buildSearchTokens(product);
+  return { searchTokens, searchText: buildSearchText(searchTokens) };
+}

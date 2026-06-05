@@ -3,7 +3,7 @@ import { withAdminMiddleware } from "@/lib/api/middleware";
 import { successResponse } from "@/lib/api/response";
 import prisma from "@/lib/db/prisma";
 import { tagUpdateSchema } from "@/lib/validation/schemas/tag";
-import { buildTransliterations } from "@/lib/search/transliterate";
+import { computeTagTransliteration } from "@/lib/search/refresh-tag-transliteration";
 
 async function updateTagHandler(
   req: NextRequest,
@@ -60,8 +60,10 @@ async function updateTagHandler(
       const next_am =
         validated.name_am === undefined ? current.name_am : validated.name_am;
       transliterationUpdate = {
-        transliteration:
-          buildTransliterations([next_ru, next_am]).join(" ") || null,
+        transliteration: computeTagTransliteration({
+          name_ru: next_ru,
+          name_am: next_am,
+        }),
       };
     }
   }
